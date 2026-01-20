@@ -1,0 +1,2498 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    " " : {
+
+    },
+    "-" : {
+
+    },
+    "\"%@\"" : {
+
+    },
+    "(%@)" : {
+
+    },
+    "@%@" : {
+
+    },
+    "/" : {
+
+    },
+    "%@" : {
+
+    },
+    "%@ / %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ / %2$@"
+          }
+        }
+      }
+    },
+    "%@ • %%%@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ • %%%2$@"
+          }
+        }
+      }
+    },
+    "%@ adet" : {
+
+    },
+    "%@ adlı kişiyi paylaş" : {
+
+    },
+    "%@ arkadaş listenizden çıkarılacak." : {
+
+    },
+    "%@ Beğeni" : {
+
+    },
+    "%@ Boost hesabına eklendi!" : {
+
+    },
+    "%@ Burcu İçin" : {
+
+    },
+    "%@ değerlendirme" : {
+
+    },
+    "%@ En Seçkin Profil" : {
+
+    },
+    "%@ fotoğraf kaydedildi." : {
+
+    },
+    "%@ Günlük Seri!" : {
+
+    },
+    "%@ ile" : {
+
+    },
+    "%@ ile eşleştin!" : {
+
+    },
+    "%@ ilgi alanı kaydedildi." : {
+
+    },
+    "%@ kilometre uzaklıkta" : {
+
+    },
+    "%@ kişi" : {
+
+    },
+    "%@ kişi seni beğendi" : {
+
+    },
+    "%@ km" : {
+
+    },
+    "%@ km away" : {
+
+    },
+    "%@ oyun" : {
+
+    },
+    "%@ Oyuncu Bulundu" : {
+
+    },
+    "%@ profil" : {
+
+    },
+    "%@ sayfa" : {
+
+    },
+    "%@ Super Like hesabına eklendi!" : {
+
+    },
+    "%@ üye" : {
+
+    },
+    "%@, %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@, %2$@"
+          }
+        }
+      }
+    },
+    "%@/%@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@/%2$@"
+          }
+        }
+      }
+    },
+    "%@/%@ fotoğraf" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@/%2$@ fotoğraf"
+          }
+        }
+      }
+    },
+    "%@/%@ sayfa" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@/%2$@ sayfa"
+          }
+        }
+      }
+    },
+    "%@/5" : {
+
+    },
+    "%@/10" : {
+
+    },
+    "%@/500" : {
+
+    },
+    "%@%%" : {
+
+    },
+    "%@%% Win" : {
+
+    },
+    "%%%@" : {
+
+    },
+    "%%%@ tamamlandı" : {
+
+    },
+    "%%%@ Uyum" : {
+
+    },
+    "•" : {
+
+    },
+    "• %@ km" : {
+
+    },
+    "• %@km" : {
+
+    },
+    "+%@" : {
+
+    },
+    "+15%" : {
+
+    },
+    "⏰" : {
+
+    },
+    "♫ %@" : {
+
+    },
+    "♫ %@ - %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "♫ %1$@ - %2$@"
+          }
+        }
+      }
+    },
+    "⚡" : {
+
+    },
+    "✈️ Gezginler" : {
+
+    },
+    "✨" : {
+
+    },
+    "❤️ %@" : {
+
+    },
+    "🍴 Restoranlar" : {
+
+    },
+    "🍽️" : {
+
+    },
+    "🍽️ Gurme Keşfi" : {
+
+    },
+    "🎉" : {
+
+    },
+    "🎙️" : {
+
+    },
+    "🎭" : {
+
+    },
+    "🎸" : {
+
+    },
+    "👤" : {
+
+    },
+    "👥 Okuma Arkadaşları" : {
+
+    },
+    "👥 Yemek Arkadaşı" : {
+
+    },
+    "💬" : {
+
+    },
+    "💬 Tartışma Odaları" : {
+
+    },
+    "💭" : {
+
+    },
+    "📅 Buluşma Planla" : {
+
+    },
+    "📅 Rezervasyon" : {
+
+    },
+    "📖 %@" : {
+
+    },
+    "📚 %@" : {
+
+    },
+    "📚 Kitap Kulübü" : {
+
+    },
+    "🔍" : {
+
+    },
+    "🔮" : {
+
+    },
+    "🕐 %@" : {
+
+    },
+    "🤔" : {
+
+    },
+    "0/3" : {
+
+    },
+    "2 gün" : {
+
+    },
+    "3 dakikada tanış, sorulara cevap ver" : {
+
+    },
+    "3 Uyumlu Eşleşme!" : {
+
+    },
+    "30 dakika boyunca profilini öne çıkar ve 10 kat daha fazla görüntülenme al!" : {
+
+    },
+    "30 saniyelik ses kaydı oluştur" : {
+
+    },
+    "48/60" : {
+
+    },
+    "Abonelik otomatik olarak yenilenir. İstediğin zaman iptal edebilirsin." : {
+
+    },
+    "Abonelik otomatik olarak yenilenir. İstediğiniz zaman iptal edebilirsiniz." : {
+
+    },
+    "accepted" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Accepted"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kabul Edildi"
+          }
+        }
+      }
+    },
+    "Ad" : {
+
+    },
+    "add_photo" : {
+
+    },
+    "Adım 1/4" : {
+
+    },
+    "Adım 2/4" : {
+
+    },
+    "Adım 3/4" : {
+
+    },
+    "Adım 4/4" : {
+
+    },
+    "Aktif" : {
+
+    },
+    "Aktivite Seç" : {
+
+    },
+    "Akustik performanslar eşliğinde yeni insanlarla tanışma fırsatı. Rahat bir ortamda müzik dinleyip sohbet edebilirsiniz." : {
+
+    },
+    "Ana" : {
+
+    },
+    "ANA" : {
+
+    },
+    "Aradığım" : {
+
+    },
+    "Aramıza Katıl" : {
+
+    },
+    "Arkadaş ara..." : {
+
+    },
+    "Arkadaş ol, sosyal medyasını gör" : {
+
+    },
+    "Arkadaşlar" : {
+
+    },
+    "Arkadaşlardan gelen davetler" : {
+
+    },
+    "Arkadaşlarını Davet Et" : {
+
+    },
+    "Arkadaşlarınla birlikte eşleş" : {
+
+    },
+    "Arkadaşlık isteği kabul edildiğinde hesapların paylaşılır" : {
+
+    },
+    "Arkadaşlıktan Çıkar" : {
+
+    },
+    "auth_tagline" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Discover. Connect. Vibe."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keşfet. Bağlan. Hisset."
+          }
+        }
+      }
+    },
+    "Ayarlar" : {
+
+    },
+    "Aynı şarkıları dinleyenlerle eşleş" : {
+
+    },
+    "Bağlantı Gönder" : {
+
+    },
+    "Bağlantının yeni çağı" : {
+
+    },
+    "Başka Birini Bul" : {
+
+    },
+    "Başla" : {
+
+    },
+    "Beğenenler" : {
+
+    },
+    "Beni Hatırla" : {
+
+    },
+    "Bildirim Yok" : {
+
+    },
+    "Bildirimler" : {
+
+    },
+    "Bio" : {
+
+    },
+    "Bitir" : {
+
+    },
+    "block" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Block"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Engelle"
+          }
+        }
+      }
+    },
+    "boost" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Boost"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Öne Çıkar"
+          }
+        }
+      }
+    },
+    "Boost" : {
+
+    },
+    "boost_benefit" : {
+
+    },
+    "boost_description" : {
+
+    },
+    "boost_your_profile" : {
+
+    },
+    "Bu adımı atla" : {
+
+    },
+    "Bu isim profilinde görünecek" : {
+
+    },
+    "Bu işlem geri alınamaz. Tüm verileriniz silinecektir." : {
+
+    },
+    "Bu kişiyle devam etmek ister misin?" : {
+
+    },
+    "Bu restorana gitmek isteyen kişiler" : {
+
+    },
+    "Bu uygulama 15 yaş altı kullanıcılar için uygun değildir" : {
+
+    },
+    "Bugün Nasıl Hissediyorsun?" : {
+
+    },
+    "Bugünün Önerisi" : {
+
+    },
+    "Buluşmayı Onayla" : {
+
+    },
+    "Burç Eşleşmesi" : {
+
+    },
+    "Burcunu seç, uyumlu eşleşmeleri bul" : {
+
+    },
+    "by" : {
+
+    },
+    "cancel" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancel"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "İptal"
+          }
+        }
+      }
+    },
+    "CANLI" : {
+
+    },
+    "Canlı Müzik Gecesi" : {
+
+    },
+    "Çifte Randevu" : {
+
+    },
+    "Çifte Randevu arkadaşları" : {
+
+    },
+    "Çifte Randevu davetlerini burada göreceksin." : {
+
+    },
+    "Çifte Randevu, arkadaşlarınla birlikte diğer gruplarla tanışmanı sağlar. En fazla 3 arkadaşınla takım oluşturabilir ve diğer takımlarla eşleşebilirsin." : {
+
+    },
+    "Çifte Randevu'da en fazla 3 arkadaşınla çift olabilirsin." : {
+
+    },
+    "Cinsiyet" : {
+
+    },
+    "common_interests" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "common interests"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ortak ilgi alanı"
+          }
+        }
+      }
+    },
+    "connections" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Connections"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bağlantılar"
+          }
+        }
+      }
+    },
+    "continue_as_guest" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continue as Guest"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continuar como Invitado"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continuer en tant qu'invité"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continuar como Convidado"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Misafir Olarak Devam Et"
+          }
+        }
+      }
+    },
+    "continue_discover" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continue Discovering"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keşfetmeye Devam Et"
+          }
+        }
+      }
+    },
+    "continue_with_google" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continue with Google"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Google ile Devam Et"
+          }
+        }
+      }
+    },
+    "continue_with_phone" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continue with Phone"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Telefon ile Devam Et"
+          }
+        }
+      }
+    },
+    "Daha fazla En Seçkin Profil için\nVibeU Gold'a yükselt!" : {
+
+    },
+    "Daha sonra tekrar dene" : {
+
+    },
+    "Daha sonra tekrar gel,\nyeni kişiler eklenecek" : {
+
+    },
+    "delete_account" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete Account"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hesabı Sil"
+          }
+        }
+      }
+    },
+    "Diğer" : {
+
+    },
+    "Dil Seçin" : {
+
+    },
+    "Doğum Tarihi" : {
+
+    },
+    "Doğum tarihin gizli tutulur, sadece yaşın gösterilir" : {
+
+    },
+    "done" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Done"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tamam"
+          }
+        }
+      }
+    },
+    "E-posta" : {
+
+    },
+    "E-posta adresini gir, sana şifre sıfırlama bağlantısı gönderelim" : {
+
+    },
+    "edit_interests" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit Interests"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "İlgi Alanlarını Düzenle"
+          }
+        }
+      }
+    },
+    "edit_photos" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit Photos"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fotoğrafları Düzenle"
+          }
+        }
+      }
+    },
+    "edit_profile" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit Profile"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Profili Düzenle"
+          }
+        }
+      }
+    },
+    "Ekle" : {
+
+    },
+    "En az 1 fotoğrafın olmalı. Son fotoğrafı silemezsin." : {
+
+    },
+    "En az 1 mutfak seç" : {
+
+    },
+    "En az 1, en fazla %@ fotoğraf ekleyebilirsin" : {
+
+    },
+    "En az bir hesap eklendi" : {
+
+    },
+    "En fazla 8 hobi seç" : {
+
+    },
+    "En fazla 10 tane seçebilirsin" : {
+
+    },
+    "EN İYİ" : {
+
+    },
+    "EN İYİ FİYAT" : {
+
+    },
+    "EN POPÜLER" : {
+
+    },
+    "EN SEÇKİN PROFİLLERİ AÇ" : {
+
+    },
+    "En uyumlu 5 profil" : {
+
+    },
+    "Engellenen kullanıcı yok" : {
+
+    },
+    "enter_phone" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enter your phone"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Telefonunuzu girin"
+          }
+        }
+      }
+    },
+    "error" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Error"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hata"
+          }
+        }
+      }
+    },
+    "Eşleşme Ara" : {
+
+    },
+    "Eşleşme aranıyor..." : {
+
+    },
+    "Eşleşme bulunuyor..." : {
+
+    },
+    "Eşleşmeden önce ona mesaj göndererek dikkatini çek. Ona profilinde hoşuna giden şeyin ne olduğunu söyleyebilir, iltifat edebilir veya onu güldürebilirsin." : {
+
+    },
+    "Eşleşmeler" : {
+
+    },
+    "Eşleşmeleri Bul" : {
+
+    },
+    "Eşleşmeleri Gör" : {
+
+    },
+    "Eşleşmeyi Başlat" : {
+
+    },
+    "Evet" : {
+
+    },
+    "favorites" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Favorites"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Favoriler"
+          }
+        }
+      }
+    },
+    "Fotoğraf Ekle" : {
+
+    },
+    "Fotoğraf yok, sadece sohbet" : {
+
+    },
+    "Fotoğrafı Değiştir" : {
+
+    },
+    "Fotoğraflar" : {
+
+    },
+    "Fotoğrafları sürükleyerek sıralayabilirsin" : {
+
+    },
+    "Fotoğrafların" : {
+
+    },
+    "friends" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Friends"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arkadaşlar"
+          }
+        }
+      }
+    },
+    "Geç" : {
+
+    },
+    "Geri" : {
+
+    },
+    "get_started" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Get Started"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Başla"
+          }
+        }
+      }
+    },
+    "Giriş Yap" : {
+
+    },
+    "Gitmek istediğin yerleri seç" : {
+
+    },
+    "Gizemli Eşleşme" : {
+
+    },
+    "Gizlilik" : {
+
+    },
+    "Gizlilik Ayarları" : {
+
+    },
+    "Gizlilik Koruması" : {
+
+    },
+    "global" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Global"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Global"
+          }
+        }
+      }
+    },
+    "GOLD" : {
+
+    },
+    "Google ile Giriş Yap" : {
+
+    },
+    "Google ile Kayıt Ol" : {
+
+    },
+    "Göz At" : {
+
+    },
+    "Güler yüzlü fotoğraflar daha çok ilgi çeker" : {
+
+    },
+    "Hakkında" : {
+
+    },
+    "Hangi mutfakları seviyorsun?" : {
+
+    },
+    "Harika bir akşam yemeği sizi bekliyor" : {
+
+    },
+    "Harita" : {
+
+    },
+    "Hayır" : {
+
+    },
+    "help_center" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Help Center"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Yardım Merkezi"
+          }
+        }
+      }
+    },
+    "Henüz karar vermedim" : {
+
+    },
+    "Her gün giriş yap, ödül kazan" : {
+
+    },
+    "Hesabı Sil" : {
+
+    },
+    "Hesabın yok mu?" : {
+
+    },
+    "Hesabına giriş yap" : {
+
+    },
+    "Hesap Oluştur" : {
+
+    },
+    "Hesapların profilinde görünecek" : {
+
+    },
+    "Hesaplarını ekle, profilinde görünsün" : {
+
+    },
+    "Hikayende Paylaş" : {
+
+    },
+    "Hızlı Filtreler" : {
+
+    },
+    "Hızlı Tanışma" : {
+
+    },
+    "Hobiler" : {
+
+    },
+    "Hoş Geldin" : {
+
+    },
+    "ile %@" : {
+
+    },
+    "ile kitap buluşması" : {
+
+    },
+    "İlgi Alanları" : {
+
+    },
+    "İlgi Alanlarını Seç" : {
+
+    },
+    "İlgi çekici bir bio, profilinin daha fazla görülmesini sağlar" : {
+
+    },
+    "İlk fotoğraf profil fotoğrafın olacak" : {
+
+    },
+    "İlk İzlenim ile öne çık" : {
+
+    },
+    "İptal" : {
+
+    },
+    "İstek kabul edildiğinde sosyal medya hesapları görünür olacak" : {
+
+    },
+    "Kadıköy, İstanbul" : {
+
+    },
+    "Kapat" : {
+
+    },
+    "Kategori Puanların" : {
+
+    },
+    "Katılımcılar" : {
+
+    },
+    "Kaydet" : {
+
+    },
+    "Kayıt Ol" : {
+
+    },
+    "Keşfet" : {
+
+    },
+    "Keşfetmeye Devam Et" : {
+
+    },
+    "Keşif Modu" : {
+
+    },
+    "kişi" : {
+
+    },
+    "Kişi Sayısı" : {
+
+    },
+    "Kişilik profilin oluşturuldu\nEşleşmelerin hazırlanıyor..." : {
+
+    },
+    "Kişilik Testi" : {
+
+    },
+    "Kişilik testi sonuçların artık profilinde görünecek ve seninle uyumlu kişileri bulmamıza yardımcı olacak!" : {
+
+    },
+    "Kişilik testine göre eşleş" : {
+
+    },
+    "Konu: %@" : {
+
+    },
+    "Kör Randevu" : {
+
+    },
+    "Kullanıcı Bildir" : {
+
+    },
+    "language" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Language"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dil"
+          }
+        }
+      }
+    },
+    "liked_you" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Liked You"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seni Beğendi"
+          }
+        }
+      }
+    },
+    "likes" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Likes"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Beğeni"
+          }
+        }
+      }
+    },
+    "local" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Local"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Yerel"
+          }
+        }
+      }
+    },
+    "Loegs Studio" : {
+
+    },
+    "Maksimum Mesafe" : {
+
+    },
+    "Merhaba! Ben %@. Müzik dinlemeyi, seyahat etmeyi ve yeni insanlarla tanışmayı seviyorum. 🎵✈️" : {
+
+    },
+    "Merhaba! Ben..." : {
+
+    },
+    "Mesaj Gönder" : {
+
+    },
+    "Mesajın gönderildi!" : {
+
+    },
+    "Mevcut: %@" : {
+
+    },
+    "Moda Sahili yakını" : {
+
+    },
+    "Müzik Eşleşmesi!" : {
+
+    },
+    "Müzik Uyumu" : {
+
+    },
+    "Müzik Zevkin Ne?" : {
+
+    },
+    "Müzik Zevkini Analiz Ediyoruz..." : {
+
+    },
+    "my_qr_code" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "My QR Code"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "QR Kodum"
+          }
+        }
+      }
+    },
+    "Ne oynuyorsun?" : {
+
+    },
+    "neon_frame" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Neon Profile Frame"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Neon Profil Çerçevesi"
+          }
+        }
+      }
+    },
+    "next" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Next"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "İleri"
+          }
+        }
+      }
+    },
+    "no_ads" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No Ads"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reklamsız"
+          }
+        }
+      }
+    },
+    "notifications" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Notifications"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bildirimler"
+          }
+        }
+      }
+    },
+    "ok" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OK"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tamam"
+          }
+        }
+      }
+    },
+    "Okuma Arkadaşı Bul" : {
+
+    },
+    "Okuma İlerlemen" : {
+
+    },
+    "onboarding_subtitle_1" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Discover amazing people around you and across the globe"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Çevrenizdeki ve dünyadaki harika insanları keşfedin"
+          }
+        }
+      }
+    },
+    "onboarding_subtitle_2" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Switch between local and global discovery modes"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Yerel ve global keşif modları arasında geçiş yapın"
+          }
+        }
+      }
+    },
+    "onboarding_subtitle_3" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Connect your social media and share with new friends"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sosyal medyanızı bağlayın ve yeni arkadaşlarla paylaşın"
+          }
+        }
+      }
+    },
+    "onboarding_title_1" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Connect with People"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Conecta con Personas"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Connectez-vous"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Conecte-se com Pessoas"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "İnsanlarla Bağlan"
+          }
+        }
+      }
+    },
+    "onboarding_title_2" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Local & Global"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Yerel & Global"
+          }
+        }
+      }
+    },
+    "onboarding_title_3" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Share Socials"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sosyal Medya Paylaş"
+          }
+        }
+      }
+    },
+    "Öneriler" : {
+
+    },
+    "online" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Online"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Çevrimiçi"
+          }
+        }
+      }
+    },
+    "or" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "or"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "o"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ou"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ou"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "veya"
+          }
+        }
+      }
+    },
+    "Ortak Zevkler" : {
+
+    },
+    "otp_sent_to" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Code sent to"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kod gönderildi"
+          }
+        }
+      }
+    },
+    "Oyun arkadaşı bulmak için oyunlarını seç" : {
+
+    },
+    "Oyuna Davet Et" : {
+
+    },
+    "Oyuncu Ara" : {
+
+    },
+    "Oyuncu Aranıyor..." : {
+
+    },
+    "Özel Deneyimler" : {
+
+    },
+    "Paylaş" : {
+
+    },
+    "pending" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pending"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bekliyor"
+          }
+        }
+      }
+    },
+    "phone_description" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "We'll send you a verification code"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Size bir doğrulama kodu göndereceğiz"
+          }
+        }
+      }
+    },
+    "Planını Seç" : {
+
+    },
+    "POPÜLER" : {
+
+    },
+    "Premium" : {
+
+    },
+    "Premium ile kimlerin beğendiğini gör" : {
+
+    },
+    "Premium üyeliğiniz aktif edildi!" : {
+
+    },
+    "premium_required_likes" : {
+
+    },
+    "Premium'a Geç" : {
+
+    },
+    "privacy" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Privacy"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gizlilik"
+          }
+        }
+      }
+    },
+    "PRO" : {
+
+    },
+    "Profil" : {
+
+    },
+    "Profil oluşturuluyor..." : {
+
+    },
+    "Profil yükleniyor..." : {
+
+    },
+    "profile" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Profile"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Profil"
+          }
+        }
+      }
+    },
+    "QR kod fotoğraflarına kaydedildi." : {
+
+    },
+    "QR kodu taratarak bağlan" : {
+
+    },
+    "received" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Received"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gelen"
+          }
+        }
+      }
+    },
+    "rejected" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rejected"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reddedildi"
+          }
+        }
+      }
+    },
+    "remove_friend" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove Friend"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arkadaşı Kaldır"
+          }
+        }
+      }
+    },
+    "report" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Report"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Şikayet Et"
+          }
+        }
+      }
+    },
+    "requests" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Requests"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "İstekler"
+          }
+        }
+      }
+    },
+    "resend_code" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Resend Code"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kodu Tekrar Gönder"
+          }
+        }
+      }
+    },
+    "resend_in_seconds %@" : {
+
+    },
+    "Restoranlar aranıyor..." : {
+
+    },
+    "Restoranları Gör" : {
+
+    },
+    "retry" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Retry"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tekrar Dene"
+          }
+        }
+      }
+    },
+    "Rezervasyon Onaylandı! 🎉" : {
+
+    },
+    "Rezervasyonu Onayla" : {
+
+    },
+    "Rozetler" : {
+
+    },
+    "Rozetler profilinde görünür ve ortak ilgi alanlarını bulmana yardımcı olur" : {
+
+    },
+    "Ruh Eşini Bul" : {
+
+    },
+    "Saat Seç" : {
+
+    },
+    "Sadece Çevrimiçi" : {
+
+    },
+    "Sadece Doğrulanmış" : {
+
+    },
+    "Sana Özel" : {
+
+    },
+    "Satın Al" : {
+
+    },
+    "Satın Al - %@" : {
+
+    },
+    "save" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kaydet"
+          }
+        }
+      }
+    },
+    "scan_to_connect" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scan to connect with me"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Benimle bağlanmak için tara"
+          }
+        }
+      }
+    },
+    "search_hint" : {
+
+    },
+    "Seçilen Rozetler" : {
+
+    },
+    "see_who_liked" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "See Who Liked You"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seni Beğenenleri Gör"
+          }
+        }
+      }
+    },
+    "see_who_liked_you" : {
+
+    },
+    "Şehir" : {
+
+    },
+    "send_code" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Send Code"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kod Gönder"
+          }
+        }
+      }
+    },
+    "send_feedback" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Send Feedback"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Geri Bildirim Gönder"
+          }
+        }
+      }
+    },
+    "Seni beğenen kişileri\ngörmek için Gold'a yükselt" : {
+
+    },
+    "Seni Beğenenler" : {
+
+    },
+    "Seni beğenenleri gör ve daha fazlasını keşfet" : {
+
+    },
+    "Seni kimlerin beğendiğini gör" : {
+
+    },
+    "Senin İçin Seçtik" : {
+
+    },
+    "sent" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sent"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gönderilen"
+          }
+        }
+      }
+    },
+    "Ses Tanışması" : {
+
+    },
+    "Seyahat Arkadaşı" : {
+
+    },
+    "share" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Share"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paylaş"
+          }
+        }
+      }
+    },
+    "share_profile" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Share Profile"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Profili Paylaş"
+          }
+        }
+      }
+    },
+    "Şifre" : {
+
+    },
+    "Şifre sıfırlama bağlantısı e-posta adresine gönderildi." : {
+
+    },
+    "Şifremi Unuttum?" : {
+
+    },
+    "Şifreni Sıfırla" : {
+
+    },
+    "sign_out" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sign Out"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Çıkış Yap"
+          }
+        }
+      }
+    },
+    "Şimdilik bu kadar!" : {
+
+    },
+    "Şimdilik Geç" : {
+
+    },
+    "Sıfırla" : {
+
+    },
+    "Sınırsız eşleşme, sınırsız bağlantı" : {
+
+    },
+    "Sıralamak için basılı tut ve sürükle" : {
+
+    },
+    "skip" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skip"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Atla"
+          }
+        }
+      }
+    },
+    "social_links" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Social Links"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sosyal Medya"
+          }
+        }
+      }
+    },
+    "Sohbet" : {
+
+    },
+    "Sohbete Başla" : {
+
+    },
+    "Son Zamanlarda Aktif" : {
+
+    },
+    "Sonraki" : {
+
+    },
+    "Soru %@/%@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Soru %1$@/%2$@"
+          }
+        }
+      }
+    },
+    "Sosyal Medya" : {
+
+    },
+    "Sosyal medya bağlantısı isteği" : {
+
+    },
+    "Sosyal medya hesapların güncellendi." : {
+
+    },
+    "Sosyal medya hesapların sadece arkadaşlarına görünür" : {
+
+    },
+    "Soyad" : {
+
+    },
+    "spotlight_global" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Discover the World"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dünyayı Keşfet"
+          }
+        }
+      }
+    },
+    "spotlight_local" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Popular in Your City"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Şehrinde Popüler"
+          }
+        }
+      }
+    },
+    "Şu an kimse yok" : {
+
+    },
+    "Şu an: %@" : {
+
+    },
+    "Super Like" : {
+
+    },
+    "Super Like ile öne çık ve eşleşme şansını 3 kat artır!" : {
+
+    },
+    "Süre Doldu!" : {
+
+    },
+    "Sürüm" : {
+
+    },
+    "tab_discover" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Discover"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keşfet"
+          }
+        }
+      }
+    },
+    "tab_profile" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Profile"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Profil"
+          }
+        }
+      }
+    },
+    "tab_requests" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Requests"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "İstekler"
+          }
+        }
+      }
+    },
+    "Takımdan Ayrıl" : {
+
+    },
+    "Takımı Sil" : {
+
+    },
+    "Takma ad, rumuz veya gerçek adını kullanabilirsin" : {
+
+    },
+    "Tamamlandı!" : {
+
+    },
+    "Tarih Seç" : {
+
+    },
+    "Tartışmalara Katıl" : {
+
+    },
+    "Tehlikeli Bölge" : {
+
+    },
+    "Telefon ile Giriş Yap" : {
+
+    },
+    "Telefon ile Kayıt Ol" : {
+
+    },
+    "Temel Bilgiler" : {
+
+    },
+    "trending_global" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trending Worldwide"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dünyada Popüler"
+          }
+        }
+      }
+    },
+    "trending_local" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trending Near You"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Yakınında Popüler"
+          }
+        }
+      }
+    },
+    "Tüm Dünya" : {
+
+    },
+    "Tüm gezginleri gördün!" : {
+
+    },
+    "Tüm premium özelliklere eriş!" : {
+
+    },
+    "Tümünü Oku" : {
+
+    },
+    "U" : {
+
+    },
+    "Ülke" : {
+
+    },
+    "unlimited_global" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unlimited Global"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sınırsız Global"
+          }
+        }
+      }
+    },
+    "unlimited_likes" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unlimited Likes"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sınırsız Beğeni"
+          }
+        }
+      }
+    },
+    "upgrade_to_premium" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Upgrade to Premium"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Premium'a Yükselt"
+          }
+        }
+      }
+    },
+    "Uygula" : {
+
+    },
+    "Uygulama dilini değiştirin" : {
+
+    },
+    "Uyumlu Eşleşmeleri Gör" : {
+
+    },
+    "Uyumluluk & Yakınlık" : {
+
+    },
+    "Uyumluluk Artışı" : {
+
+    },
+    "verify_phone" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verify your phone"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Telefonunuzu doğrulayın"
+          }
+        }
+      }
+    },
+    "veya" : {
+
+    },
+    "Vibe" : {
+
+    },
+    "VibeU" : {
+
+    },
+    "VibeU Gold %@ aboneliğin aktif edildi!" : {
+
+    },
+    "vibeu_premium" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "VibeU Premium"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "VibeU Premium"
+          }
+        }
+      }
+    },
+    "views" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Views"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Görüntülenme"
+          }
+        }
+      }
+    },
+    "Win Rate" : {
+
+    },
+    "𝕏" : {
+
+    },
+    "Yaklaşan Etkinlikler" : {
+
+    },
+    "Yaş Aralığı" : {
+
+    },
+    "Yaşın:" : {
+
+    },
+    "Yeni bildirimler geldiğinde burada görünecek" : {
+
+    },
+    "Yeni bir maceraya başla" : {
+
+    },
+    "Yükleniyor..." : {
+
+    },
+    "Zaten hesabın var mı?" : {
+
+    }
+  },
+  "version" : "1.0"
+}

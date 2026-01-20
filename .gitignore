@@ -1,0 +1,24 @@
+# System
+.DS_Store
+
+# Node
+node_modules/
+npm-debug.log
+yarn-error.log
+.env
+dist/
+
+# Xcode / Swift
+build/
+DerivedData/
+*.xcodeproj/project.xcworkspace/xcuserdata
+*.xcuserdatad
+*.xccheckout
+*.moved-aside
+*.xcuserstate
+*.xcactivitylog
+.idea/
+.vscode/
+
+# Project specific
+*.loca.lt
