@@ -6,6 +6,7 @@ struct ProfileDetailView: View {
     @State private var isFavorite = false
     @State private var showingRequestSentAlert = false
     @State private var showingErrorAlert = false
+    @State private var showDiamondSheet = false // For insufficient diamonds
     @State private var errorMessage = ""
     @Environment(\.dismiss) private var dismiss
     @Environment(\.themeColors) private var colors
@@ -250,10 +251,16 @@ struct ProfileDetailView: View {
         } message: {
             Text("\(user.displayName) kişisine arkadaşlık isteği gönderildi.")
         }
-        .alert("İstek Gönderilemedi", isPresented: $showingErrorAlert) {
-            Button("Tamam", role: .cancel) { }
+        .alert("Yetersiz Elmas 💎", isPresented: $showingErrorAlert) {
+            Button("Elmas Al") { 
+                showDiamondSheet = true
+            }
+            Button("İptal", role: .cancel) { }
         } message: {
-            Text(errorMessage)
+            Text("Arkadaşlık isteği göndermek için 10 elmas gerekiyor. Günlük ücretsiz elmasını alabilirsin!")
+        }
+        .sheet(isPresented: $showDiamondSheet) {
+            DiamondScreen()
         }
         .onAppear {
             withAnimation {

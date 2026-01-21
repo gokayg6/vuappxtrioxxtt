@@ -147,7 +147,7 @@ final class DiscoverViewModel {
     func addToFavorites(user: DiscoverUser) {
         Task {
             do {
-                _ = try await DiscoverService.shared.addFavorite(userId: user.id)
+                try await DiscoverService.shared.favorite(userId: user.id)
             } catch {
                 // Handle error
             }

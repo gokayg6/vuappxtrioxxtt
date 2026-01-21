@@ -1,173 +1,326 @@
 import Foundation
+import FirebaseFirestore
+import FirebaseAuth
+
+// MARK: - Friend Request Errors
+enum FriendRequestError: Error, LocalizedError {
+    case userNotFound
+    case insufficientDiamonds
+    case requestFailed
+    
+    var errorDescription: String? {
+        switch self {
+        case .userNotFound: return "Kullanıcı bulunamadı"
+        case .insufficientDiamonds: return "Yetersiz elmas bakiyesi"
+        case .requestFailed: return "İstek gönderilemedi"
+        }
+    }
+}
 
 // MARK: - FriendsService
-// This service handles friend-related API calls
-// Requirements: 8.4, 8.7
+// This service handles friend-related operations via Firestore (Permanent Solution)
+// It maps Firestore data to SocialModels (SocialRequest, Friend, Friendship) required by Views.
 actor FriendsService {
     static let shared = FriendsService()
+    private let db = Firestore.firestore()
+    
+    // Collection References
+    private var requestsRef: CollectionReference {
+        return db.collection("friend_requests")
+    }
+    
+    // Subcollection: users/{userId}/friends/{friendId}
+    private func userFriendsRef(userId: String) -> CollectionReference {
+        return db.collection("users").document(userId).collection("friends")
+    }
     
     private init() {}
     
-    // MARK: - Response Types
-    struct FriendsResponse: Codable {
-        let friends: [Friend]
-    }
+    // MARK: - Operations
     
-    struct RemoveFriendResponse: Codable {
-        let success: Bool
-    }
-    
-    // MARK: - GET /friends
-    // Returns all friends for the authenticated user
-    // Requirement: 8.4
+    // Returns [Friend] for FriendsView
     func getFriends() async throws -> [Friend] {
-        let response: FriendsResponse = try await APIClient.shared.request(
-            endpoint: "/friends",
-            method: .get
-        )
-        return response.friends
+        guard let currentUid = Auth.auth().currentUser?.uid else { return [] }
+        
+        let snapshot = try await userFriendsRef(userId: currentUid).getDocuments()
+        var friends: [Friend] = []
+        
+        for doc in snapshot.documents {
+            let friendId = doc.documentID
+            let data = doc.data()
+            let createdAt = (data["createdAt"] as? Timestamp)?.dateValue() ?? Date()
+            
+            if let user = try? await UserService.shared.fetchUser(uid: friendId) {
+                // Map User to Friend
+                let friend = Friend(
+                    id: user.id,
+                    displayName: user.displayName,
+                    age: user.age,
+                    city: user.city,
+                    profilePhotoURL: user.profilePhotoURL,
+                    isOnline: false, // Online status could be fetched from separate "presence" system
+                    lastActiveAt: user.lastActiveAt, // Assuming User has lastActiveAt
+                    tiktokUsername: user.socialLinks?.tiktok?.username,
+                    instagramUsername: user.socialLinks?.instagram?.username,
+                    snapchatUsername: user.socialLinks?.snapchat?.username,
+                    socialLinks: user.socialLinks,
+                    friendshipId: doc.documentID, // Using friendId as friendshipId roughly
+                    friendshipCreatedAt: createdAt
+                )
+                friends.append(friend)
+            }
+        }
+        return friends
     }
     
-    // MARK: - DELETE /friends/:friendId
-    // Removes a friendship bidirectionally
-    // Requirement: 8.7
+    // Returns [Friendship] for RequestsView (Friends Tab)
+    func getFriendships() async throws -> [Friendship] {
+        guard let currentUid = Auth.auth().currentUser?.uid else { return [] }
+        
+        let snapshot = try await userFriendsRef(userId: currentUid).getDocuments()
+        var friendships: [Friendship] = []
+        
+        for doc in snapshot.documents {
+            let friendId = doc.documentID
+            let data = doc.data()
+            let createdAt = (data["createdAt"] as? Timestamp)?.dateValue() ?? Date()
+            
+            if let user = try? await UserService.shared.fetchUser(uid: friendId) {
+                let friendUser = FriendUser(
+                    id: user.id,
+                    displayName: user.displayName,
+                    profilePhotoURL: user.profilePhotoURL,
+                    socialLinks: user.socialLinks,
+                    lastActiveAt: user.lastActiveAt
+                )
+                
+                let friendship = Friendship(
+                    id: doc.documentID,
+                    friend: friendUser,
+                    createdAt: createdAt
+                )
+                friendships.append(friendship)
+            }
+        }
+        return friendships
+    }
+    
     func removeFriend(friendId: String) async throws {
-        try await APIClient.shared.requestVoid(
-            endpoint: "/friends/\(friendId)",
-            method: .delete
-        )
+        guard let currentUid = Auth.auth().currentUser?.uid else { return }
+        
+        // Remove from my friends
+        try await userFriendsRef(userId: currentUid).document(friendId).delete()
+        
+        // Remove me from their friends
+        try await userFriendsRef(userId: friendId).document(currentUid).delete()
     }
     
-    // MARK: - POST /requests
-    // Sends a friend request to another user
-    // Requirement: 5.2
     func sendFriendRequest(userId: String) async throws {
-        print("📨 [FriendsService] Sending request to userId: \(userId)")
+        guard let currentUid = Auth.auth().currentUser?.uid else {
+            print("❌ [FriendsService] No current user for sending request!")
+            throw FriendRequestError.userNotFound
+        }
         
-        // First, sync the target user to backend (in case they don't exist)
-        try await syncUserToBackend(userId: userId)
+        print("📤 [FriendsService] Sending request from \(currentUid) to \(userId)")
         
-        let body = ["target_user_id": userId]
-        // Note: requiresAuth false for dev since backend accepts mock tokens
-        try await APIClient.shared.requestVoid(
-            endpoint: "/requests",
-            method: .post,
-            body: body,
-            requiresAuth: true
-        )
-        print("📨 [FriendsService] Request sent successfully!")
-    }
-    
-    // Sync user to backend database
-    private func syncUserToBackend(userId: String) async throws {
-        // Fetch user info from Firebase/UserService
-        if let user = try? await UserService.shared.getProfileById(userId) {
-            let dateFormatter = ISO8601DateFormatter()
-            
-            struct SyncUserBody: Codable {
-                let userId: String
-                let displayName: String
-                let email: String
-                let profilePhotoUrl: String?
-                let dateOfBirth: String
-                let gender: String
-                let country: String
-                let city: String
+        // 1. Check if request already exists
+        let query = requestsRef
+            .whereField("fromId", isEqualTo: currentUid)
+            .whereField("toId", isEqualTo: userId)
+            .whereField("status", isEqualTo: "pending")
+        
+        let existing = try await query.getDocuments()
+        if !existing.isEmpty {
+            print("⚠️ [FriendsService] Request already pending")
+            return
+        }
+        
+        // 2. Charge 10 diamonds for the request (inline transaction)
+        let userRef = db.collection("users").document(currentUid)
+        
+        do {
+            try await db.runTransaction { (transaction, errorPointer) -> Any? in
+                let snapshot: DocumentSnapshot
+                do {
+                    snapshot = try transaction.getDocument(userRef)
+                } catch let fetchError as NSError {
+                    errorPointer?.pointee = fetchError
+                    return nil
+                }
+                
+                let currentBalance = snapshot.data()?["diamond_balance"] as? Int ?? 0
+                
+                // Check sufficient balance
+                guard currentBalance >= 10 else {
+                    let error = NSError(
+                        domain: "DiamondService",
+                        code: -1,
+                        userInfo: [NSLocalizedDescriptionKey: "Yetersiz elmas"]
+                    )
+                    errorPointer?.pointee = error
+                    return nil
+                }
+                
+                // Deduct diamonds
+                transaction.updateData([
+                    "diamond_balance": currentBalance - 10
+                ], forDocument: userRef)
+                
+                return nil
             }
             
-            let body = SyncUserBody(
-                userId: user.id,
-                displayName: user.displayName,
-                email: user.username,
-                profilePhotoUrl: user.profilePhotoURL,
-                dateOfBirth: dateFormatter.string(from: user.dateOfBirth),
-                gender: user.gender.rawValue,
-                country: user.country,
-                city: user.city
-            )
+            // Log transaction
+            try await db.collection("diamond_transactions").addDocument(data: [
+                "userId": currentUid,
+                "type": "match_request",
+                "amount": -10,
+                "created_at": FieldValue.serverTimestamp(),
+                "metadata": ["targetUserId": userId]
+            ])
             
-            try? await APIClient.shared.requestVoid(
-                endpoint: "/auth/sync",
-                method: .post,
-                body: body,
-                requiresAuth: false
-            )
-            print("✅ [FriendsService] Target user synced to backend: \(userId)")
-        } else {
-            // If can't fetch from Firebase, create minimal sync
-            struct MinimalSyncBody: Codable {
-                let userId: String
-                let displayName: String
+            print("💎 [FriendsService] Charged 10 diamonds for request")
+        } catch {
+            print("❌ [FriendsService] Insufficient diamonds or transaction failed!")
+            throw FriendRequestError.insufficientDiamonds
+        }
+        
+        // 3. Create Request
+        let data: [String: Any] = [
+            "fromId": currentUid,
+            "toId": userId,
+            "status": "pending",
+            "createdAt": FieldValue.serverTimestamp()
+        ]
+        
+        let docRef = try await requestsRef.addDocument(data: data)
+        print("✅ [FriendsService] Firestore Request Sent! DocID: \(docRef.documentID)")
+    }
+    
+    // Fetch pending requests received by current user
+    func getReceivedRequests() async throws -> [SocialRequest] {
+        guard let currentUid = Auth.auth().currentUser?.uid else { 
+            print("❌ [FriendsService] No current user!")
+            return [] 
+        }
+        
+        print("🔍 [FriendsService] Fetching requests for uid: \(currentUid)")
+        
+        // Simplified query without order (to avoid composite index requirement)
+        let snapshot = try await requestsRef
+            .whereField("toId", isEqualTo: currentUid)
+            .whereField("status", isEqualTo: "pending")
+            .getDocuments()
+        
+        print("📦 [FriendsService] Found \(snapshot.documents.count) pending requests")
+            
+        var requests: [SocialRequest] = []
+        
+        for doc in snapshot.documents {
+            let data = doc.data()
+            print("📄 [FriendsService] Request doc: \(doc.documentID), data: \(data)")
+            
+            guard let fromId = data["fromId"] as? String else { continue }
+            
+            // Fetch sender profile
+            if let user = try? await UserService.shared.fetchUser(uid: fromId) {
+                let fromRequestUser = RequestUser(
+                    id: user.id,
+                    displayName: user.displayName,
+                    profilePhotoURL: user.profilePhotoURL,
+                    age: user.age,
+                    city: user.city
+                )
+                
+                let timestamp = (data["createdAt"] as? Timestamp)?.dateValue() ?? Date()
+                
+                let request = SocialRequest(
+                    id: doc.documentID,
+                    fromUser: fromRequestUser,
+                    toUser: nil,
+                    status: .pending,
+                    createdAt: timestamp,
+                    respondedAt: nil
+                )
+                requests.append(request)
+            } else {
+                print("⚠️ [FriendsService] Could not fetch user for fromId: \(fromId)")
             }
-            
-            let body = MinimalSyncBody(userId: userId, displayName: "VibeU User")
-            
-            try? await APIClient.shared.requestVoid(
-                endpoint: "/auth/sync",
-                method: .post,
-                body: body,
-                requiresAuth: false
-            )
         }
-    }
-    
-    // MARK: - Friend Request Models
-    struct PendingRequest: Codable, Identifiable {
-        let id: String
-        let fromUser: RequestUser
-        let status: String
-        let createdAt: String
         
-        enum CodingKeys: String, CodingKey {
-            case id, status
-            case fromUser = "from_user"
-            case createdAt = "created_at"
-        }
+        print("✅ [FriendsService] Returning \(requests.count) SocialRequests")
+        return requests
     }
     
-    struct RequestUser: Codable {
-        let id: String
-        let displayName: String
-        let profilePhotoUrl: String
-        let city: String
-        let dateOfBirth: String? // Optional since backend might not send it always
+    // Fetch pending requests sent by current user
+    func getSentRequests() async throws -> [SocialRequest] {
+        guard let currentUid = Auth.auth().currentUser?.uid else { return [] }
         
-        enum CodingKeys: String, CodingKey {
-            case id, city, dateOfBirth
-            case displayName = "display_name"
-            case profilePhotoUrl = "profile_photo_url"
+        let snapshot = try await requestsRef
+            .whereField("fromId", isEqualTo: currentUid)
+            .whereField("status", isEqualTo: "pending")
+            .order(by: "createdAt", descending: true)
+            .getDocuments()
+            
+        var requests: [SocialRequest] = []
+        
+        for doc in snapshot.documents {
+            let data = doc.data()
+            guard let toId = data["toId"] as? String else { continue }
+            
+            // Fetch target user profile
+            if let user = try? await UserService.shared.fetchUser(uid: toId) {
+                let toRequestUser = RequestUser(
+                    id: user.id,
+                    displayName: user.displayName,
+                    profilePhotoURL: user.profilePhotoURL,
+                    age: user.age,
+                    city: user.city
+                )
+                
+                let timestamp = (data["createdAt"] as? Timestamp)?.dateValue() ?? Date()
+                
+                let request = SocialRequest(
+                    id: doc.documentID,
+                    fromUser: nil, // We are 'fromUser'
+                    toUser: toRequestUser,
+                    status: .pending,
+                    createdAt: timestamp,
+                    respondedAt: nil
+                )
+                requests.append(request)
+            }
         }
+        return requests
+    }
+
+    // Alias for getReceivedRequests to match previous API if needed, 
+    // but code should switch to getReceivedRequests
+    func getPendingRequests() async throws -> [SocialRequest] {
+        return try await getReceivedRequests()
     }
     
-    struct RequestsResponse: Codable {
-        let requests: [PendingRequest]
-    }
-    
-    // MARK: - GET /requests/received
-    // Fetch pending friend requests
-    func getPendingRequests() async throws -> [PendingRequest] {
-        let response: RequestsResponse = try await APIClient.shared.request(
-            endpoint: "/requests/received",
-            method: .get
-        )
-        return response.requests
-    }
-    
-    // MARK: - PUT /requests/:id/accept
-    // Accept a friend request
     func acceptRequest(requestId: String) async throws {
-        try await APIClient.shared.requestVoid(
-            endpoint: "/requests/\(requestId)/accept",
-            method: .put
-        )
+        guard let currentUid = Auth.auth().currentUser?.uid else { return }
+        
+        let docRef = requestsRef.document(requestId)
+        let doc = try await docRef.getDocument()
+        
+        guard let data = doc.data(),
+              let fromId = data["fromId"] as? String, // Sender
+              let toId = data["toId"] as? String, // Should be me
+              toId == currentUid else { return }
+              
+        // 1. Update request status
+        try await docRef.updateData(["status": "accepted"])
+        
+        // 2. Add to Friends Collections (Bidirectional)
+        let timestamp = FieldValue.serverTimestamp()
+        try await userFriendsRef(userId: currentUid).document(fromId).setData(["createdAt": timestamp])
+        try await userFriendsRef(userId: fromId).document(currentUid).setData(["createdAt": timestamp])
     }
     
-    // MARK: - POST /requests/:id/reject
-    // Reject a friend request
     func rejectRequest(requestId: String) async throws {
-        try await APIClient.shared.requestVoid(
-            endpoint: "/requests/\(requestId)/reject",
-            method: .post
-        )
+        // Just update status to rejected (or delete)
+        try await requestsRef.document(requestId).updateData(["status": "rejected"])
     }
 }

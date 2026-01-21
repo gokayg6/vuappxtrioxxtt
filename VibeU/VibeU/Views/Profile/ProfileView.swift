@@ -1,4 +1,6 @@
 import SwiftUI
+import FirebaseAuth
+import FirebaseFirestore
 
 struct ProfileView: View {
     @State private var viewModel = ProfileViewModel()
@@ -425,7 +427,7 @@ struct QuickStatsRowView: View {
                 showSuperLikeSheet = true
             }
             
-            // Boost Card
+            // Boost Card (opens combined sheet)
             QuickStatCardNew(
                 icon: "bolt.fill",
                 iconColor: Color(red: 0.62, green: 0.31, blue: 0.87),
@@ -456,7 +458,7 @@ struct QuickStatsRowView: View {
             SuperLikePurchaseSheet(currentCount: $superLikeCount)
         }
         .sheet(isPresented: $showBoostSheet) {
-            BoostPurchaseSheet(currentCount: $boostCount)
+            BoostDiamondCombinedSheet()
         }
         .sheet(isPresented: $showSubscriptionSheet) {
             SubscriptionSheet()
@@ -466,6 +468,22 @@ struct QuickStatsRowView: View {
     private func loadCounts() {
         superLikeCount = UserDefaults.standard.integer(forKey: ProfileKeys.superLikes)
         boostCount = UserDefaults.standard.integer(forKey: ProfileKeys.boosts)
+        
+        Task {
+            guard let uid = Auth.auth().currentUser?.uid else { return }
+            
+            do {
+                let doc = try await Firestore.firestore().collection("users").document(uid).getDocument()
+                let data = doc.data() ?? [:]
+                
+                await MainActor.run {
+                    superLikeCount = data["superlike_count"] as? Int ?? superLikeCount
+                    boostCount = data["boost_count"] as? Int ?? boostCount
+                }
+            } catch {
+                print("❌ [QuickStatsRowView] Error loading counts: \(error)")
+            }
+        }
     }
 }
 
@@ -1649,5 +1667,256 @@ struct SafetyTipCard: View {
 extension Bundle {
     var appVersion: String {
         (infoDictionary?["CFBundleShortVersionString"] as? String) ?? "1.0"
+    }
+}
+
+// MARK: - Boost + Diamond Combined Sheet
+struct BoostDiamondCombinedSheet: View {
+    @Environment(\.dismiss) private var dismiss
+    @Environment(AppState.self) private var appState
+    @Environment(\.colorScheme) private var systemColorScheme
+    
+    @State private var selectedTab = 0 // 0 = Diamond, 1 = Boost
+    @State private var boostCount = 0
+    @State private var diamondBalance = 0
+    @State private var canClaimReward = true
+    @State private var isClaiming = false
+    @State private var isLoading = true
+    
+    private var isDark: Bool {
+        switch appState.currentTheme {
+        case .dark: return true
+        case .light: return false
+        case .system: return systemColorScheme == .dark
+        }
+    }
+    
+    private var colors: ThemeColors { isDark ? .dark : .light }
+    
+    var body: some View {
+        NavigationStack {
+            ZStack {
+                colors.background.ignoresSafeArea()
+                
+                VStack(spacing: 0) {
+                    // Tab Picker
+                    Picker("", selection: $selectedTab) {
+                        Text("💎 Elmas").tag(0)
+                        Text("⚡ Boost").tag(1)
+                    }
+                    .pickerStyle(.segmented)
+                    .padding()
+                    
+                    if isLoading {
+                        Spacer()
+                        ProgressView()
+                        Spacer()
+                    } else {
+                        TabView(selection: $selectedTab) {
+                            // Diamond Tab
+                            diamondTabContent
+                                .tag(0)
+                            
+                            // Boost Tab
+                            boostTabContent
+                                .tag(1)
+                        }
+                        .tabViewStyle(.page(indexDisplayMode: .never))
+                    }
+                }
+            }
+            .navigationTitle("Boost & Elmas")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbarColorScheme(isDark ? .dark : .light, for: .navigationBar)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button { dismiss() } label: {
+                        Image(systemName: "xmark.circle.fill")
+                            .font(.title2)
+                            .foregroundStyle(colors.tertiaryText)
+                    }
+                }
+            }
+        }
+        .task { await loadData() }
+    }
+    
+    // MARK: - Diamond Tab
+    private var diamondTabContent: some View {
+        ScrollView {
+            VStack(spacing: 24) {
+                // Balance
+                VStack(spacing: 8) {
+                    Image(systemName: "sparkles")
+                        .font(.system(size: 50))
+                        .foregroundStyle(LinearGradient(colors: [.cyan, .purple], startPoint: .topLeading, endPoint: .bottomTrailing))
+                    
+                    Text("\(diamondBalance)")
+                        .font(.system(size: 42, weight: .bold, design: .rounded))
+                        .foregroundStyle(colors.primaryText)
+                    
+                    Text("Elmas")
+                        .font(.subheadline)
+                        .foregroundStyle(colors.secondaryText)
+                }
+                .padding(.top, 20)
+                
+                // Daily Reward
+                if canClaimReward {
+                    Button {
+                        Task { await claimDailyReward() }
+                    } label: {
+                        HStack {
+                            if isClaiming {
+                                ProgressView().tint(.white)
+                            } else {
+                                Image(systemName: "gift.fill")
+                                Text("Günlük 100 Elmas Al")
+                            }
+                        }
+                        .font(.headline)
+                        .foregroundStyle(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 16)
+                        .background(LinearGradient(colors: [.orange, .pink], startPoint: .leading, endPoint: .trailing), in: RoundedRectangle(cornerRadius: 16))
+                    }
+                    .disabled(isClaiming)
+                    .padding(.horizontal)
+                } else {
+                    HStack {
+                        Image(systemName: "checkmark.circle.fill").foregroundStyle(.green)
+                        Text("Bugünkü ödülünüzü aldınız!").foregroundStyle(colors.secondaryText)
+                    }
+                    .padding()
+                    .frame(maxWidth: .infinity)
+                    .background(colors.secondaryBackground, in: RoundedRectangle(cornerRadius: 16))
+                    .padding(.horizontal)
+                }
+                
+                // Info
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("Elmas Kullanımı").font(.headline).foregroundStyle(colors.primaryText)
+                    
+                    HStack {
+                        Image(systemName: "heart.fill").foregroundStyle(.pink).frame(width: 24)
+                        Text("Eşleşme isteği: 10 elmas").foregroundStyle(colors.secondaryText)
+                    }
+                }
+                .padding()
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(colors.cardBackground, in: RoundedRectangle(cornerRadius: 16))
+                .padding(.horizontal)
+            }
+        }
+    }
+    
+    // MARK: - Boost Tab
+    private var boostTabContent: some View {
+        ScrollView {
+            VStack(spacing: 24) {
+                // Count
+                VStack(spacing: 8) {
+                    Image(systemName: "bolt.fill")
+                        .font(.system(size: 50))
+                        .foregroundStyle(LinearGradient(colors: [.purple, .pink], startPoint: .top, endPoint: .bottom))
+                    
+                    Text("\(boostCount)")
+                        .font(.system(size: 42, weight: .bold, design: .rounded))
+                        .foregroundStyle(colors.primaryText)
+                    
+                    Text("Boost")
+                        .font(.subheadline)
+                        .foregroundStyle(colors.secondaryText)
+                }
+                .padding(.top, 20)
+                
+                // Info
+                Text("30 dakika boyunca profilini öne çıkar!")
+                    .font(.subheadline)
+                    .foregroundStyle(colors.secondaryText)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal)
+                
+                // Purchase Options
+                VStack(spacing: 12) {
+                    purchaseRow(count: 1, price: "₺39.99")
+                    purchaseRow(count: 5, price: "₺149.99", isPopular: true)
+                    purchaseRow(count: 10, price: "₺249.99")
+                }
+                .padding(.horizontal)
+            }
+        }
+    }
+    
+    private func purchaseRow(count: Int, price: String, isPopular: Bool = false) -> some View {
+        Button {} label: {
+            HStack {
+                Text("\(count) Boost").font(.headline).foregroundStyle(colors.primaryText)
+                if isPopular {
+                    Text("EN İYİ").font(.caption.bold()).foregroundStyle(.black).padding(.horizontal, 6).padding(.vertical, 2).background(Color.green, in: Capsule())
+                }
+                Spacer()
+                Text(price).font(.headline).foregroundStyle(isPopular ? .green : colors.primaryText)
+            }
+            .padding()
+            .background(colors.cardBackground, in: RoundedRectangle(cornerRadius: 14))
+            .overlay(RoundedRectangle(cornerRadius: 14).stroke(isPopular ? Color.green.opacity(0.5) : colors.border, lineWidth: isPopular ? 2 : 1))
+        }
+    }
+    
+    private func loadData() async {
+        guard let uid = Auth.auth().currentUser?.uid else { isLoading = false; return }
+        
+        do {
+            let doc = try await Firestore.firestore().collection("users").document(uid).getDocument()
+            let data = doc.data() ?? [:]
+            
+            diamondBalance = data["diamond_balance"] as? Int ?? 100
+            boostCount = data["boost_count"] as? Int ?? 0
+            
+            if let lastClaim = data["daily_reward_last_claim_at"] as? Timestamp {
+                let istanbul = TimeZone(identifier: "Europe/Istanbul")!
+                var calendar = Calendar.current
+                calendar.timeZone = istanbul
+                let lastDay = calendar.startOfDay(for: lastClaim.dateValue())
+                let today = calendar.startOfDay(for: Date())
+                canClaimReward = today > lastDay
+            } else {
+                canClaimReward = true
+            }
+        } catch {
+            print("Error: \(error)")
+        }
+        isLoading = false
+    }
+    
+    private func claimDailyReward() async {
+        guard let uid = Auth.auth().currentUser?.uid else { return }
+        canClaimReward = false
+        isClaiming = true
+        
+        do {
+            let db = Firestore.firestore()
+            let docRef = db.collection("users").document(uid)
+            
+            try await db.runTransaction { (transaction, errorPointer) -> Any? in
+                let snapshot: DocumentSnapshot
+                do { snapshot = try transaction.getDocument(docRef) }
+                catch let e as NSError { errorPointer?.pointee = e; return nil }
+                
+                let current = snapshot.data()?["diamond_balance"] as? Int ?? 100
+                transaction.updateData([
+                    "diamond_balance": current + 100,
+                    "daily_reward_last_claim_at": FieldValue.serverTimestamp()
+                ], forDocument: docRef)
+                return nil
+            }
+            
+            diamondBalance += 100
+            UINotificationFeedbackGenerator().notificationOccurred(.success)
+        } catch {
+            canClaimReward = true
+        }
+        isClaiming = false
     }
 }

@@ -1,5 +1,6 @@
 import SwiftUI
 import CoreImage.CIFilterBuiltins
+import FirebaseAuth
 
 struct QRProfileView: View {
     @State private var qrImage: UIImage?
@@ -221,7 +222,7 @@ struct QRProfileView: View {
     
     private func generateQR() {
         // Safe access to ID with fallback
-        let userId = appState.currentUser?.id ?? UserDefaults.standard.string(forKey: "current_user_id") ?? UUID().uuidString
+        let userId = Auth.auth().currentUser?.uid ?? appState.currentUser?.id ?? UserDefaults.standard.string(forKey: "current_user_id") ?? UUID().uuidString
         let qrString = QRCodeURLGenerator.generateProfileURL(userId: userId)
         
         filter.message = Data(qrString.utf8)

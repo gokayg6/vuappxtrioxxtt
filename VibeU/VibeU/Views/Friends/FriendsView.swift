@@ -15,6 +15,7 @@ struct FriendsView: View {
     @State private var isSearchExpanded = false
 
     @State private var showNotifications = false
+    @State private var pendingRequestCount = 0
     @FocusState private var isSearchFocused: Bool
     
     init() {
@@ -69,6 +70,15 @@ struct FriendsView: View {
     }
     
     private var onlineCount: Int { friends.filter { $0.isOnline }.count }
+    
+    private func loadRequestsCount() {
+        Task {
+            do {
+                let requests = try await FriendsService.shared.getReceivedRequests()
+                await MainActor.run { self.pendingRequestCount = requests.count }
+            } catch { print("Failed to load requests count: \(error)") }
+        }
+    }
 
     var body: some View {
         NavigationStack {
@@ -115,12 +125,14 @@ struct FriendsView: View {
                                         .foregroundStyle(colors.primaryText)
                                 )
                             
-                            // Bildirim noktası - better positioned
-                            Circle()
-                                .fill(Color.red)
-                                .frame(width: 10, height: 10)
-                                .overlay(Circle().stroke(colors.background, lineWidth: 2))
-                                .padding(2) // Push it slightly inside
+                            // Bildirim noktası (Conditional)
+                            if pendingRequestCount > 0 {
+                                Circle()
+                                    .fill(Color.red)
+                                    .frame(width: 10, height: 10)
+                                    .overlay(Circle().stroke(colors.background, lineWidth: 2))
+                                    .padding(2)
+                            }
                         }
                     }
                     .buttonStyle(.plain) // Ensure button doesn't distort shape
@@ -132,9 +144,12 @@ struct FriendsView: View {
             }
             .onAppear {
                 loadFriends()
+                loadRequestsCount()
             }
 
-            .sheet(isPresented: $showNotifications) {
+            .sheet(isPresented: $showNotifications, onDismiss: {
+                loadFriends() // Refresh count on dismiss
+            }) {
                 IncomingFriendRequestsSheet(isDark: isDark)
             }
             .sheet(item: $selectedFriend) { friend in
@@ -1078,7 +1093,7 @@ struct IncomingFriendRequestsSheet: View {
     let isDark: Bool
     @Environment(\.dismiss) private var dismiss
     
-    @State private var requests: [FriendsService.PendingRequest] = []
+    @State private var requests: [SocialRequest] = []
     @State private var isLoading = true
     
     private var backgroundColor: Color {
@@ -1151,7 +1166,7 @@ struct IncomingFriendRequestsSheet: View {
         isLoading = true
         Task {
             do {
-                requests = try await FriendsService.shared.getPendingRequests()
+                requests = try await FriendsService.shared.getReceivedRequests()
             } catch {
                 print("Failed to load requests: \(error)")
             }
@@ -1159,7 +1174,7 @@ struct IncomingFriendRequestsSheet: View {
         }
     }
     
-    private func handleRequest(_ request: FriendsService.PendingRequest, accepted: Bool) {
+    private func handleRequest(_ request: SocialRequest, accepted: Bool) {
         Task {
             // Optimistic UI update
             withAnimation {
@@ -1181,7 +1196,7 @@ struct IncomingFriendRequestsSheet: View {
 }
 
 private struct RequestRow: View {
-    let request: FriendsService.PendingRequest
+    let request: SocialRequest
     let isDark: Bool
     let onAccept: () -> Void
     let onReject: () -> Void
@@ -1197,7 +1212,7 @@ private struct RequestRow: View {
     var body: some View {
         HStack(spacing: 12) {
             // Avatar
-            AsyncImage(url: URL(string: request.fromUser.profilePhotoUrl)) { image in
+            AsyncImage(url: URL(string: request.fromUser?.profilePhotoURL ?? "")) { image in
                 image.resizable().scaledToFill()
             } placeholder: {
                 Circle().fill(Color.gray.opacity(0.3))
@@ -1208,13 +1223,15 @@ private struct RequestRow: View {
             
             // Info
             VStack(alignment: .leading, spacing: 4) {
-                Text(request.fromUser.displayName)
+                Text(request.fromUser?.displayName ?? "Kullanıcı")
                     .font(.system(size: 16, weight: .bold))
                     .foregroundStyle(primaryText)
                 
-                Text(request.fromUser.city)
-                    .font(.system(size: 13))
-                    .foregroundStyle(isDark ? .white.opacity(0.6) : .black.opacity(0.6))
+                if let city = request.fromUser?.city {
+                    Text(city)
+                        .font(.system(size: 13))
+                        .foregroundStyle(isDark ? .white.opacity(0.6) : .black.opacity(0.6))
+                }
             }
             
             Spacer()

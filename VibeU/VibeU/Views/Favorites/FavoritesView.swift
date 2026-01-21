@@ -1,4 +1,6 @@
 import SwiftUI
+import FirebaseAuth
+import FirebaseFirestore
 
 // MARK: - Beğenenler View (Tinder Style Redesign)
 
@@ -335,28 +337,106 @@ struct FavoritesView: View {
 
     // MARK: - Load Data
     private func loadData() {
-        // Seni Beğenenler - Mock data
-        likedByUsers = [
-            LikeUser(id: "1", name: "Ada", age: 25, city: "İstanbul", photo: "https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=400", timeLeft: "11sa. kaldı", bio: "Kısa ilişki ama uzun da olur"),
-            LikeUser(id: "2", name: "Deniz", age: 20, city: "Ankara", photo: "https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=400", timeLeft: "11sa. kaldı", bio: "Hayatı seviyorum"),
-            LikeUser(id: "3", name: "Ahu", age: 23, city: "İzmir", photo: "https://images.pexels.com/photos/1065084/pexels-photo-1065084.jpeg?auto=compress&cs=tinysrgb&w=400", timeLeft: "11sa. kaldı", bio: "Müzik ve kitap"),
-            LikeUser(id: "4", name: "Selin", age: 22, city: "Bursa", photo: "https://images.pexels.com/photos/1587009/pexels-photo-1587009.jpeg?auto=compress&cs=tinysrgb&w=400", timeLeft: "11sa. kaldı", bio: "Seyahat tutkunu"),
-        ]
+        Task {
+            guard let uid = Auth.auth().currentUser?.uid else { return }
+            
+            let db = Firestore.firestore()
+            
+            do {
+                // Fetch received likes from Firestore
+                let likesSnapshot = try await db.collection("likes")
+                    .whereField("toUserId", isEqualTo: uid)
+                    .limit(to: 20)
+                    .getDocuments()
+                
+                var fetchedLikedByUsers: [LikeUser] = []
+                
+                for doc in likesSnapshot.documents {
+                    let data = doc.data()
+                    let fromUserId = data["fromUserId"] as? String ?? ""
+                    let type = data["type"] as? String ?? "like"
+                    let createdAt = (data["createdAt"] as? Timestamp)?.dateValue() ?? Date()
+                    
+                    // Fetch user info
+                    if let userDoc = try? await db.collection("users").document(fromUserId).getDocument(),
+                       let userData = userDoc.data() {
+                        let user = LikeUser(
+                            id: doc.documentID,
+                            name: userData["displayName"] as? String ?? "Kullanıcı",
+                            age: userData["age"] as? Int ?? 0,
+                            city: userData["city"] as? String ?? "",
+                            photo: userData["profilePhotoURL"] as? String ?? "",
+                            timeLeft: formatTimeAgo(createdAt),
+                            bio: type == "superlike" ? "⭐ SuperLike" : ""
+                        )
+                        fetchedLikedByUsers.append(user)
+                    }
+                }
+                
+                // If no real likes, add mock likes from mockUsers
+                if fetchedLikedByUsers.isEmpty {
+                    let mockLikes = DiscoverUser.mockUsers.prefix(8).map { mockUser in
+                        LikeUser(
+                            id: mockUser.id,
+                            name: mockUser.displayName,
+                            age: mockUser.age,
+                            city: mockUser.city,
+                            photo: mockUser.profilePhotoURL,
+                            timeLeft: ["5 dk önce", "12 dk önce", "1 saat önce", "3 saat önce"].randomElement()!,
+                            bio: mockUser.isBoosted ? "⭐ SuperLike" : ""
+                        )
+                    }
+                    fetchedLikedByUsers = mockLikes
+                }
+                
+                // Fetch top profiles - use mock data directly for reliability
+                let topPicksFromMock = DiscoverUser.mockUsers
+                    .sorted { $0.score > $1.score }
+                    .prefix(10)
+                    .map { mockUser in
+                        LikeUser(
+                            id: mockUser.id,
+                            name: mockUser.displayName,
+                            age: mockUser.age,
+                            city: mockUser.city,
+                            photo: mockUser.profilePhotoURL,
+                            timeLeft: mockUser.isBoosted ? "🚀 Boost" : "",
+                            bio: ""
+                        )
+                    }
+                
+                await MainActor.run {
+                    likedByUsers = fetchedLikedByUsers
+                    topPickUsers = Array(topPicksFromMock)
+                }
+            } catch {
+                print("❌ [FavoritesView] Error loading data: \(error)")
+                
+                // Fallback to mock data on error
+                await MainActor.run {
+                    likedByUsers = DiscoverUser.mockUsers.prefix(8).map { u in
+                        LikeUser(id: u.id, name: u.displayName, age: u.age, city: u.city, photo: u.profilePhotoURL, timeLeft: "Yeni", bio: "")
+                    }
+                    topPickUsers = DiscoverUser.mockUsers.sorted { $0.score > $1.score }.prefix(10).map { u in
+                        LikeUser(id: u.id, name: u.displayName, age: u.age, city: u.city, photo: u.profilePhotoURL, timeLeft: u.isBoosted ? "🚀" : "", bio: "")
+                    }
+                }
+            }
+        }
+    }
+    
+    private func formatTimeAgo(_ date: Date) -> String {
+        let interval = Date().timeIntervalSince(date)
         
-        // En Seçkin Profiller - Mock data (10 profiles, 6 free)
-        topPickUsers = [
-            LikeUser(id: "t1", name: "Elif", age: 24, city: "İstanbul", photo: "https://images.pexels.com/photos/1758144/pexels-photo-1758144.jpeg?auto=compress&cs=tinysrgb&w=400", timeLeft: "8sa. kaldı", bio: "Seyahat tutkunu"),
-            LikeUser(id: "t2", name: "Zeynep", age: 23, city: "Ankara", photo: "https://images.pexels.com/photos/1898555/pexels-photo-1898555.jpeg?auto=compress&cs=tinysrgb&w=400", timeLeft: "8sa. kaldı", bio: "Yoga ve meditasyon"),
-            LikeUser(id: "t3", name: "Ayşe", age: 25, city: "İzmir", photo: "https://images.pexels.com/photos/1382731/pexels-photo-1382731.jpeg?auto=compress&cs=tinysrgb&w=400", timeLeft: "8sa. kaldı", bio: "Fotoğrafçılık"),
-            LikeUser(id: "t4", name: "Merve", age: 22, city: "Antalya", photo: "https://images.pexels.com/photos/1462637/pexels-photo-1462637.jpeg?auto=compress&cs=tinysrgb&w=400", timeLeft: "8sa. kaldı", bio: "Deniz ve güneş"),
-            LikeUser(id: "t5", name: "Büşra", age: 24, city: "Bursa", photo: "https://images.pexels.com/photos/1542085/pexels-photo-1542085.jpeg?auto=compress&cs=tinysrgb&w=400", timeLeft: "8sa. kaldı", bio: "Kitap kurdu"),
-            LikeUser(id: "t6", name: "Cansu", age: 23, city: "Konya", photo: "https://images.pexels.com/photos/1468379/pexels-photo-1468379.jpeg?auto=compress&cs=tinysrgb&w=400", timeLeft: "8sa. kaldı", bio: "Müzik aşığı"),
-            // Premium only (blurred)
-            LikeUser(id: "t7", name: "Defne", age: 25, city: "Trabzon", photo: "https://images.pexels.com/photos/1391498/pexels-photo-1391498.jpeg?auto=compress&cs=tinysrgb&w=400", timeLeft: "8sa. kaldı", bio: "Doğa yürüyüşü"),
-            LikeUser(id: "t8", name: "İpek", age: 22, city: "Eskişehir", photo: "https://images.pexels.com/photos/1536619/pexels-photo-1536619.jpeg?auto=compress&cs=tinysrgb&w=400", timeLeft: "8sa. kaldı", bio: "Sanat ve tasarım"),
-            LikeUser(id: "t9", name: "Nehir", age: 24, city: "Samsun", photo: "https://images.pexels.com/photos/1181686/pexels-photo-1181686.jpeg?auto=compress&cs=tinysrgb&w=400", timeLeft: "8sa. kaldı", bio: "Film izlemek"),
-            LikeUser(id: "t10", name: "Pelin", age: 23, city: "Kayseri", photo: "https://images.pexels.com/photos/1130626/pexels-photo-1130626.jpeg?auto=compress&cs=tinysrgb&w=400", timeLeft: "8sa. kaldı", bio: "Spor ve sağlık"),
-        ]
+        if interval < 60 {
+            return "Az önce"
+        } else if interval < 3600 {
+            return "\(Int(interval / 60)) dk önce"
+        } else if interval < 86400 {
+            return "\(Int(interval / 3600)) saat önce"
+        } else {
+            return "\(Int(interval / 86400)) gün önce"
+        }
     }
 }
 

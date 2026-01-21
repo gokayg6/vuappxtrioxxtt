@@ -2,8 +2,8 @@ import SwiftUI
 
 struct MainTabView: View {
     @State private var selectedTab: MainTab = .home
-    @State private var notificationCount = 3
-    @State private var likesCount = 5
+    @State private var notificationCount = 0
+    @State private var likesCount = 0
     @Environment(AppState.self) private var appState
     @Environment(\.colorScheme) private var systemColorScheme
     
@@ -167,28 +167,23 @@ struct MainLikesView: View {
                 
                 ScrollView(showsIndicators: false) {
                     VStack(spacing: 20) {
-                        if !appState.isPremium {
-                            VStack(spacing: 8) {
-                                ZStack {
-                                    Circle()
-                                        .fill(LinearGradient(colors: [.pink, .red], startPoint: .topLeading, endPoint: .bottomTrailing))
-                                        .frame(width: 70, height: 70)
-                                    
-                                    Image(systemName: "heart.fill")
-                                        .font(.system(size: 32))
-                                        .foregroundStyle(.white)
-                                }
-                                
-                                Text("\(likedYouUsers.count) kişi seni beğendi")
-                                    .font(.system(size: 18, weight: .bold))
-                                    .foregroundStyle(colors.primaryText)
-                                
-                                Text("Premium ile kimlerin beğendiğini gör")
-                                    .font(.system(size: 14))
-                                    .foregroundStyle(colors.secondaryText)
-                            }
-                            .padding(.top, 20)
-                        }
+                if !appState.isPremium {
+                    VStack(spacing: 8) {
+                        Image(systemName: "heart.slash")
+                            .font(.system(size: 40))
+                            .foregroundStyle(colors.secondaryText.opacity(0.5))
+                        
+                        Text("Henüz Beğeni Yok")
+                            .font(.headline)
+                            .foregroundStyle(colors.primaryText)
+                        
+                        Text("Seni beğenen kişiler burada görünecek.")
+                            .font(.subheadline)
+                            .foregroundStyle(colors.secondaryText)
+                            .multilineTextAlignment(.center)
+                    }
+                    .padding(.top, 50)
+                }
                         
                         LazyVGrid(columns: [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)], spacing: 12) {
                             ForEach(likedYouUsers) { user in

@@ -1,4 +1,6 @@
 import SwiftUI
+import FirebaseAuth
+import FirebaseFirestore
 
 // MARK: - Favorites Sheet
 
@@ -515,5 +517,251 @@ struct SearchSheet: View {
         }
         .presentationDetents([.large])
         .presentationDragIndicator(.visible)
+    }
+}
+
+// MARK: - Diamond Screen (Elmas Ekranı)
+struct DiamondScreen: View {
+    @Environment(\.dismiss) private var dismiss
+    @Environment(AppState.self) private var appState
+    @Environment(\.colorScheme) private var systemColorScheme
+    
+    @State private var balance: Int = 0
+    @State private var canClaimReward = false
+    @State private var isLoading = true
+    @State private var isClaiming = false
+    @State private var timeUntilNextReward: TimeInterval?
+    
+    private var isDark: Bool {
+        switch appState.currentTheme {
+        case .dark: return true
+        case .light: return false
+        case .system: return systemColorScheme == .dark
+        }
+    }
+    
+    private var colors: ThemeColors { isDark ? .dark : .light }
+    
+    var body: some View {
+        NavigationStack {
+            ZStack {
+                colors.background.ignoresSafeArea()
+                
+                LinearGradient(
+                    colors: [.clear, .cyan.opacity(isDark ? 0.1 : 0.05), .clear],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+                .ignoresSafeArea()
+                
+                if isLoading {
+                    ProgressView()
+                } else {
+                    VStack(spacing: 32) {
+                        balanceCard
+                        dailyRewardSection
+                        infoSection
+                        Spacer()
+                    }
+                    .padding(.horizontal, 20)
+                    .padding(.top, 24)
+                }
+            }
+            .navigationTitle("Elmaslarım")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbarColorScheme(isDark ? .dark : .light, for: .navigationBar)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button { dismiss() } label: {
+                        Image(systemName: "xmark")
+                            .font(.body.weight(.semibold))
+                            .foregroundStyle(colors.secondaryText)
+                            .frame(width: 32, height: 32)
+                            .background(colors.secondaryBackground, in: Circle())
+                    }
+                }
+            }
+        }
+        .presentationDetents([.medium, .large])
+        .presentationDragIndicator(.visible)
+        .task { await loadData() }
+    }
+    
+    private var balanceCard: some View {
+        VStack(spacing: 16) {
+            ZStack {
+                Circle()
+                    .fill(RadialGradient(colors: [.cyan.opacity(0.4), .clear], center: .center, startRadius: 20, endRadius: 80))
+                    .frame(width: 120, height: 120)
+                    .blur(radius: 20)
+                
+                Image(systemName: "diamond.fill")
+                    .font(.system(size: 60))
+                    .foregroundStyle(LinearGradient(colors: [.cyan, .blue], startPoint: .topLeading, endPoint: .bottomTrailing))
+                    .shadow(color: .cyan.opacity(0.5), radius: 10)
+            }
+            
+            VStack(spacing: 4) {
+                Text("\(balance)")
+                    .font(.system(size: 48, weight: .bold, design: .rounded))
+                    .foregroundStyle(colors.primaryText)
+                
+                Text("Elmas")
+                    .font(.subheadline)
+                    .foregroundStyle(colors.secondaryText)
+            }
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 32)
+        .background(colors.cardBackground, in: RoundedRectangle(cornerRadius: 24))
+        .overlay(RoundedRectangle(cornerRadius: 24).stroke(LinearGradient(colors: [.cyan.opacity(0.3), .blue.opacity(0.3)], startPoint: .topLeading, endPoint: .bottomTrailing), lineWidth: 1))
+    }
+    
+    private var dailyRewardSection: some View {
+        VStack(spacing: 16) {
+            HStack {
+                Image(systemName: "gift.fill").foregroundStyle(.orange)
+                Text("Günlük Ödül").font(.headline).foregroundStyle(colors.primaryText)
+                Spacer()
+                Text("+100").font(.headline.weight(.bold)).foregroundStyle(.cyan)
+                Image(systemName: "diamond.fill").foregroundStyle(.cyan)
+            }
+            
+            if canClaimReward {
+                Button { Task { await claimReward() } } label: {
+                    HStack {
+                        if isClaiming { ProgressView().tint(.white) }
+                        else { Image(systemName: "gift.fill"); Text("Ödülümü Al") }
+                    }
+                    .font(.headline)
+                    .foregroundStyle(.white)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 16)
+                    .background(LinearGradient(colors: [.orange, .pink], startPoint: .leading, endPoint: .trailing), in: RoundedRectangle(cornerRadius: 16))
+                }
+                .disabled(isClaiming)
+            } else {
+                VStack(spacing: 8) {
+                    HStack {
+                        Image(systemName: "checkmark.circle.fill").foregroundStyle(.green)
+                        Text("Bugünkü ödülünü aldın!").font(.subheadline).foregroundStyle(colors.secondaryText)
+                    }
+                    if let time = timeUntilNextReward, time > 0 {
+                        Text("Yeni ödül: \(formatTime(time))").font(.caption).foregroundStyle(colors.tertiaryText)
+                    }
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 16)
+                .background(colors.secondaryBackground, in: RoundedRectangle(cornerRadius: 16))
+            }
+        }
+        .padding(20)
+        .background(colors.cardBackground, in: RoundedRectangle(cornerRadius: 20))
+        .overlay(RoundedRectangle(cornerRadius: 20).stroke(colors.border, lineWidth: 0.5))
+    }
+    
+    private var infoSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Elmas Nasıl Kullanılır?").font(.headline).foregroundStyle(colors.primaryText)
+            
+            HStack(spacing: 12) {
+                Image(systemName: "heart.fill").foregroundStyle(.pink).frame(width: 24)
+                Text("Eşleşme isteği göndermek: 10 elmas").font(.subheadline).foregroundStyle(colors.secondaryText)
+            }
+            HStack(spacing: 12) {
+                Image(systemName: "gift.fill").foregroundStyle(.orange).frame(width: 24)
+                Text("Her gün ücretsiz 100 elmas al").font(.subheadline).foregroundStyle(colors.secondaryText)
+            }
+        }
+        .padding(20)
+        .background(colors.cardBackground, in: RoundedRectangle(cornerRadius: 20))
+        .overlay(RoundedRectangle(cornerRadius: 20).stroke(colors.border, lineWidth: 0.5))
+    }
+    
+    private func loadData() async {
+        guard let uid = Auth.auth().currentUser?.uid else { isLoading = false; return }
+        
+        let db = Firestore.firestore()
+        do {
+            let doc = try await db.collection("users").document(uid).getDocument()
+            balance = doc.data()?["diamond_balance"] as? Int ?? 100
+            
+            if let lastClaim = doc.data()?["daily_reward_last_claim_at"] as? Timestamp {
+                let istanbul = TimeZone(identifier: "Europe/Istanbul")!
+                var calendar = Calendar.current
+                calendar.timeZone = istanbul
+                let lastDay = calendar.startOfDay(for: lastClaim.dateValue())
+                let today = calendar.startOfDay(for: Date())
+                canClaimReward = today > lastDay
+                
+                let tomorrow = calendar.date(byAdding: .day, value: 1, to: lastDay)!
+                timeUntilNextReward = tomorrow.timeIntervalSince(Date())
+            } else {
+                canClaimReward = true
+            }
+        } catch {
+            print("❌ [DiamondScreen] Error: \(error)")
+        }
+        isLoading = false
+    }
+    
+    private func claimReward() async {
+        guard let uid = Auth.auth().currentUser?.uid else { return }
+        
+        // IMMEDIATELY disable button to prevent double claims
+        canClaimReward = false
+        isClaiming = true
+        
+        let db = Firestore.firestore()
+        let docRef = db.collection("users").document(uid)
+        
+        do {
+            // First check if already claimed today (double check)
+            let checkDoc = try await docRef.getDocument()
+            if let lastClaim = checkDoc.data()?["daily_reward_last_claim_at"] as? Timestamp {
+                let istanbul = TimeZone(identifier: "Europe/Istanbul")!
+                var calendar = Calendar.current
+                calendar.timeZone = istanbul
+                let lastDay = calendar.startOfDay(for: lastClaim.dateValue())
+                let today = calendar.startOfDay(for: Date())
+                
+                if today <= lastDay {
+                    print("⚠️ [DiamondScreen] Already claimed today!")
+                    isClaiming = false
+                    return
+                }
+            }
+            
+            try await db.runTransaction { (transaction, errorPointer) -> Any? in
+                let snapshot: DocumentSnapshot
+                do { snapshot = try transaction.getDocument(docRef) }
+                catch let e as NSError { errorPointer?.pointee = e; return nil }
+                
+                let current = snapshot.data()?["diamond_balance"] as? Int ?? 100
+                transaction.updateData([
+                    "diamond_balance": current + 100,
+                    "daily_reward_last_claim_at": FieldValue.serverTimestamp()
+                ], forDocument: docRef)
+                return nil
+            }
+            
+            try await db.collection("diamond_transactions").addDocument(data: [
+                "userId": uid, "type": "daily_reward", "amount": 100, "created_at": FieldValue.serverTimestamp()
+            ])
+            
+            balance += 100
+            UINotificationFeedbackGenerator().notificationOccurred(.success)
+        } catch {
+            print("❌ [DiamondScreen] Claim error: \(error)")
+            // If failed, allow retry
+            canClaimReward = true
+        }
+        isClaiming = false
+    }
+    
+    private func formatTime(_ interval: TimeInterval) -> String {
+        let hours = Int(interval) / 3600
+        let minutes = (Int(interval) % 3600) / 60
+        return hours > 0 ? "\(hours) saat \(minutes) dakika" : "\(minutes) dakika"
     }
 }

@@ -1,10 +1,33 @@
 import SwiftUI
 
-// MARK: - Async Image with Glass Loading
+// MARK: - Image Cache Manager
+final class ImageCacheManager {
+    static let shared = ImageCacheManager()
+    
+    private let cache = NSCache<NSString, UIImage>()
+    private let memoryLimit = 100 // Max 100 images in memory
+    
+    private init() {
+        cache.countLimit = memoryLimit
+    }
+    
+    func image(for url: String) -> UIImage? {
+        return cache.object(forKey: url as NSString)
+    }
+    
+    func setImage(_ image: UIImage, for url: String) {
+        cache.setObject(image, forKey: url as NSString)
+    }
+}
+
+// MARK: - Async Image with Glass Loading (CACHED)
 
 struct GlassAsyncImage: View {
     let url: String?
     let contentMode: ContentMode
+    
+    @State private var image: UIImage?
+    @State private var isLoading = false
     
     init(url: String?, contentMode: ContentMode = .fill) {
         self.url = url
@@ -12,23 +35,50 @@ struct GlassAsyncImage: View {
     }
     
     var body: some View {
-        if let urlString = url, let imageURL = URL(string: urlString) {
-            AsyncImage(url: imageURL) { phase in
-                switch phase {
-                case .empty:
-                    GlassSkeletonCard()
-                case .success(let image):
-                    image
-                        .resizable()
-                        .aspectRatio(contentMode: contentMode)
-                case .failure:
-                    placeholderView
-                @unknown default:
-                    placeholderView
+        Group {
+            if let image = image {
+                Image(uiImage: image)
+                    .resizable()
+                    .aspectRatio(contentMode: contentMode)
+            } else if isLoading {
+                GlassSkeletonCard()
+            } else {
+                placeholderView
+                    .onAppear {
+                        loadImage()
+                    }
+            }
+        }
+    }
+    
+    private func loadImage() {
+        guard let urlString = url, let imageURL = URL(string: urlString) else { return }
+        
+        // Check cache first
+        if let cached = ImageCacheManager.shared.image(for: urlString) {
+            self.image = cached
+            return
+        }
+        
+        isLoading = true
+        
+        Task {
+            do {
+                let (data, _) = try await URLSession.shared.data(from: imageURL)
+                if let uiImage = UIImage(data: data) {
+                    // Save to cache
+                    ImageCacheManager.shared.setImage(uiImage, for: urlString)
+                    
+                    await MainActor.run {
+                        self.image = uiImage
+                        self.isLoading = false
+                    }
+                }
+            } catch {
+                await MainActor.run {
+                    self.isLoading = false
                 }
             }
-        } else {
-            placeholderView
         }
     }
     

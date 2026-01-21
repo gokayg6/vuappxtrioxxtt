@@ -3,328 +3,138 @@ import SwiftUI
 // MARK: - Mock Data
 
 extension DiscoverUser {
-    static let mockUsers: [DiscoverUser] = [
-        DiscoverUser(
-            id: "1",
-            displayName: "Elif",
-            age: 23,
-            city: "İstanbul",
-            country: "Türkiye",
-            countryFlag: "🇹🇷",
-            distanceKm: 2.5,
-            profilePhotoURL: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=800",
-            photos: [
-                UserPhoto(id: "p1", url: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=800", thumbnailURL: nil, orderIndex: 0, isPrimary: true),
-                UserPhoto(id: "p2", url: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=800", thumbnailURL: nil, orderIndex: 1, isPrimary: false),
-                UserPhoto(id: "p3", url: "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=800", thumbnailURL: nil, orderIndex: 2, isPrimary: false)
-            ],
-            tags: ["🎨", "📚", "✈️"],
-            commonInterests: ["Sanat", "Seyahat"],
-            score: 95,
-            isBoosted: true,
-            instagramUsername: "elif.yilmaz",
-            snapchatUsername: "elif_snap"
-        ),
-        DiscoverUser(
-            id: "2",
-            displayName: "Zeynep",
-            age: 21,
-            city: "Ankara",
-            country: "Türkiye",
-            countryFlag: "🇹🇷",
-            distanceKm: 5.0,
-            profilePhotoURL: "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=800",
-            photos: [
-                UserPhoto(id: "p4", url: "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=800", thumbnailURL: nil, orderIndex: 0, isPrimary: true)
-            ],
-            tags: ["🎵", "🎬", "☕"],
-            commonInterests: ["Müzik"],
-            score: 88,
-            isBoosted: false,
-            instagramUsername: "zeynep.kaya",
-            snapchatUsername: nil
-        ),
-        DiscoverUser(
-            id: "3",
-            displayName: "Ayşe",
-            age: 24,
-            city: "İzmir",
-            country: "Türkiye",
-            countryFlag: "🇹🇷",
-            distanceKm: 8.2,
-            profilePhotoURL: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=800",
-            photos: [
-                UserPhoto(id: "p5", url: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=800", thumbnailURL: nil, orderIndex: 0, isPrimary: true),
-                UserPhoto(id: "p6", url: "https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?w=800", thumbnailURL: nil, orderIndex: 1, isPrimary: false)
-            ],
-            tags: ["🏋️", "🌊", "📷"],
-            commonInterests: ["Spor", "Fotoğraf"],
-            score: 92,
-            isBoosted: false,
-            instagramUsername: "ayse.demir",
-            snapchatUsername: "ayse_snp"
-        ),
-        DiscoverUser(
-            id: "4",
-            displayName: "Selin",
-            age: 22,
-            city: "Bursa",
-            country: "Türkiye",
-            countryFlag: "🇹🇷",
-            distanceKm: 12.0,
-            profilePhotoURL: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800",
-            photos: [
-                UserPhoto(id: "p7", url: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800", thumbnailURL: nil, orderIndex: 0, isPrimary: true)
-            ],
-            tags: ["🎮", "🍕", "🎸"],
-            commonInterests: ["Oyun"],
-            score: 85,
-            isBoosted: false,
-            instagramUsername: nil,
-            snapchatUsername: "selin_game"
-        ),
-        DiscoverUser(
-            id: "5",
-            displayName: "Deniz",
-            age: 25,
-            city: "Antalya",
-            country: "Türkiye",
-            countryFlag: "🇹🇷",
-            distanceKm: 15.5,
-            profilePhotoURL: "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=800",
-            photos: [
-                UserPhoto(id: "p8", url: "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=800", thumbnailURL: nil, orderIndex: 0, isPrimary: true)
-            ],
-            tags: ["🌅", "🏖️", "🍷"],
-            commonInterests: ["Seyahat"],
-            score: 90,
-            isBoosted: true,
-            instagramUsername: "deniz.ocean",
-            snapchatUsername: "deniz_snap"
-        ),
-        DiscoverUser(
-            id: "6",
-            displayName: "Melis",
-            age: 22,
-            city: "İstanbul",
-            country: "Türkiye",
-            countryFlag: "🇹🇷",
-            distanceKm: 3.2,
-            profilePhotoURL: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=800",
-            photos: [
-                UserPhoto(id: "p9", url: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=800", thumbnailURL: nil, orderIndex: 0, isPrimary: true)
-            ],
-            tags: ["🎭", "🍿", "🎤"],
-            commonInterests: ["Tiyatro", "Sinema"],
-            score: 91,
-            isBoosted: false,
-            instagramUsername: "melis.art",
-            snapchatUsername: nil
-        ),
-        DiscoverUser(
-            id: "7",
-            displayName: "Ceren",
-            age: 26,
-            city: "Eskişehir",
-            country: "Türkiye",
-            countryFlag: "🇹🇷",
-            distanceKm: 18.0,
-            profilePhotoURL: "https://images.unsplash.com/photo-1502823403499-6ccfcf4fb453?w=800",
-            photos: [
-                UserPhoto(id: "p10", url: "https://images.unsplash.com/photo-1502823403499-6ccfcf4fb453?w=800", thumbnailURL: nil, orderIndex: 0, isPrimary: true)
-            ],
-            tags: ["📖", "🧘", "🌿"],
-            commonInterests: ["Yoga", "Kitap"],
-            score: 87,
-            isBoosted: true,
-            instagramUsername: "ceren.zen",
-            snapchatUsername: "ceren_yoga"
-        ),
-        DiscoverUser(
-            id: "8",
-            displayName: "Buse",
-            age: 20,
-            city: "Konya",
-            country: "Türkiye",
-            countryFlag: "🇹🇷",
-            distanceKm: 25.0,
-            profilePhotoURL: "https://images.unsplash.com/photo-1524638431109-93d95c968f03?w=800",
-            photos: [
-                UserPhoto(id: "p11", url: "https://images.unsplash.com/photo-1524638431109-93d95c968f03?w=800", thumbnailURL: nil, orderIndex: 0, isPrimary: true)
-            ],
-            tags: ["🎹", "🎼", "🌙"],
-            commonInterests: ["Müzik", "Piyano"],
-            score: 84,
-            isBoosted: false,
-            instagramUsername: "buse.music",
-            snapchatUsername: nil
-        ),
-        DiscoverUser(
-            id: "9",
-            displayName: "Defne",
-            age: 24,
-            city: "Muğla",
-            country: "Türkiye",
-            countryFlag: "🇹🇷",
-            distanceKm: 4.5,
-            profilePhotoURL: "https://images.unsplash.com/photo-1519699047748-de8e457a634e?w=800",
-            photos: [
-                UserPhoto(id: "p12", url: "https://images.unsplash.com/photo-1519699047748-de8e457a634e?w=800", thumbnailURL: nil, orderIndex: 0, isPrimary: true)
-            ],
-            tags: ["🏄", "🌊", "☀️"],
-            commonInterests: ["Sörf", "Deniz"],
-            score: 93,
-            isBoosted: true,
-            instagramUsername: "defne.surf",
-            snapchatUsername: "defne_beach"
-        ),
-        DiscoverUser(
-            id: "10",
-            displayName: "İrem",
-            age: 23,
-            city: "Trabzon",
-            country: "Türkiye",
-            countryFlag: "🇹🇷",
-            distanceKm: 30.0,
-            profilePhotoURL: "https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=800",
-            photos: [
-                UserPhoto(id: "p13", url: "https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=800", thumbnailURL: nil, orderIndex: 0, isPrimary: true)
-            ],
-            tags: ["⛰️", "🥾", "📸"],
-            commonInterests: ["Doğa", "Trekking"],
-            score: 89,
-            isBoosted: false,
-            instagramUsername: "irem.nature",
-            snapchatUsername: nil
-        )
-    ]
+    static var mockUsers: [DiscoverUser] {
+        let maleNames = ["Kaan", "Efe", "Berk", "Emre", "Arda", "Mert", "Yiğit", "Barış", "Can", "Deniz", "Ozan", "Alp", "Cem", "Onur", "Burak", "Tolga", "Serkan", "Kerem", "Koray", "Batuhan", "Ahmet", "Mehmet", "Mustafa", "Ali", "Hüseyin", "İbrahim", "Ömer", "Yusuf", "Murat", "Hakan"]
+        let femaleNames = ["Elif", "Zeynep", "Ayşe", "Defne", "Ecrin", "Melis", "İrem", "Selin", "Ceren", "Derya", "Pelin", "Buse", "Gizem", "Cansu", "Burcu", "Özge", "Şeyma", "Aslı", "Esra", "Gamze", "Nazlı", "Merve", "Dilan", "Ebru", "Fatma", "Aylin", "Büşra", "Dilara", "Eylül", "Hande", "Aleyna", "Nilay", "Sibel", "Tuğba", "Yonca", "Eda", "Seda", "Beren", "Ceyda", "Damla", "Ezgi", "Funda", "Gözde", "Hale", "Işık", "Jale", "Lale", "Mine", "Nalan", "Oya", "Pınar", "Rana", "Simge", "Yeliz", "Zehra", "Berna", "Duygu", "Ece", "Filiz", "Gül", "Hazal", "İpek", "Jülide", "Kübra", "Leyla", "Melek", "Nur", "Pırıl", "Reyhan", "Saadet", "Tülay", "Ülkü", "Vildan", "Yasemin", "Zümrüt", "Bahar", "Cansel", "Demet", "Fulya", "Gonca", "Hülya", "İlknur", "Menekşe", "Nergis", "Perihan", "Rüya", "Sanem", "Tansu", "Umay", "Veda", "Yeşim", "Zuhal"]
+        let cities = ["Istanbul", "Ankara", "Izmir", "Antalya", "Bursa", "Adana", "Konya", "Gaziantep", "Mersin", "Kayseri", "Eskişehir", "Samsun", "Trabzon", "Bodrum", "Muğla", "Denizli", "Kocaeli", "Diyarbakır", "Hatay", "Malatya"]
+        
+        // High Quality 4K Unsplash Photos (Sexy/Bikini/Summer/Model Vibe) - OPTIMIZED w=800
+        // Strictly verified female IDs to strictly avoid male photos
+        let highQualityFemalePhotos = [
+            "https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=800&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1524638431109-93d95c968f03?q=80&w=800&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?q=80&w=800&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=800&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1589156229687-496a31ad1d1f?q=80&w=800&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1564485377539-4af72d1f6a2f?q=80&w=800&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1502823403499-6ccfcf4fb453?q=80&w=800&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=800&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1517841905240-472988babdf9?q=80&w=800&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?q=80&w=800&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?q=80&w=800&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?q=80&w=800&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1546539782-d937163cb434?q=80&w=800&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1519699047748-de8e457a634e?q=80&w=800&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=800&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1526510747491-58f928ec870f?q=80&w=800&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=800&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1500917293891-ef795e70e1f6?q=80&w=800&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1485290334039-a3c69043e517?q=80&w=800&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?q=80&w=800&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1514315384763-ba401779410f?q=80&w=800&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1469334031218-e382a71b716b?q=80&w=800&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1532910404247-7ee9488d7292?q=80&w=800&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1523950704592-7e477647242d?q=80&w=800&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1523264939339-c89f9dadde2e?q=80&w=800&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1483985988355-763728e1935b?q=80&w=800&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1504703395950-b89145a5425b?q=80&w=800&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1512316609839-ce289d3eba0a?q=80&w=800&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1517365830460-955ce3ccd263?q=80&w=800&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1520813792240-56fc4a3765a7?q=80&w=800&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1496747611176-843222e1e57c?q=80&w=800&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1509967419530-da38b4704bc6?q=80&w=800&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1534751516642-a1af1ef26a56?q=80&w=800&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1516467508483-a7212febe31a?q=80&w=800&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1548142813-c348350df52b?q=80&w=800&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1485206412256-701ccc5b93ca?q=80&w=800&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1520155707862-5b32817388d6?q=80&w=800&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1529139574466-a302d2d3f524?q=80&w=800&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1518977822534-7049a61ee0c2?q=80&w=800&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1518384401463-d3876163c195?q=80&w=800&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1507537297725-24a1c029d3ca?q=80&w=800&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1532384748853-8f54a8f476e2?q=80&w=800&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1621784563330-caee0b138a00?q=80&w=800&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1520261073836-bdd3147814b7?q=80&w=800&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1524250502761-1ac6f2e30d43?q=80&w=800&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1525186402429-b4ff38bedec6?q=80&w=800&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?q=80&w=800&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?q=80&w=800&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1563178406-4cdc2923acbc?q=80&w=800&auto=format&fit=crop"
+        ]
+        
+        let malePhotos = [
+            "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=1200",
+            "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=1200",
+            "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?q=80&w=1200",
+            "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?q=80&w=1200",
+            "https://images.unsplash.com/photo-1504257432389-52343af06ae3?q=80&w=1200",
+        ]
+        
+        let tags = ["Müzik", "Spor", "Seyahat", "Yemek", "Film", "Dans", "Yoga", "Fotoğraf", "Doğa", "Fitness", "Kahve", "Moda", "Alışveriş", "Yüzme", "Parti", "Sanat", "Netflix", "Kedi", "Köpek", "Sahil", "Kamp", "Makyaj", "Astnoloji", "Konser"]
+        
+        var users: [DiscoverUser] = []
+        var idCounter = 1
+        
+        func createUser(name: String, photoUrl: String, city: String, isFemale: Bool) -> DiscoverUser {
+            let age = Int.random(in: 19...28)
+            let userTags = Array(tags.shuffled().prefix(Int.random(in: 3...6)))
+            let id = "mock_u_\(idCounter)"
+            idCounter += 1
+            
+            return DiscoverUser(
+                id: id,
+                displayName: name,
+                age: age,
+                city: city,
+                country: "Turkey",
+                countryFlag: "🇹🇷",
+                distanceKm: Double.random(in: 1...30),
+                profilePhotoURL: photoUrl,
+                photos: [
+                    UserPhoto(id: "p_\(id)_1", url: photoUrl, thumbnailURL: nil, orderIndex: 0, isPrimary: true)
+                ],
+                tags: userTags,
+                commonInterests: Array(userTags.prefix(2)),
+                score: Double.random(in: 75...100),
+                isBoosted: idCounter % 10 == 0,
+                tiktokUsername: idCounter % 3 == 0 ? "@\(name.lowercased())" : nil,
+                instagramUsername: idCounter % 2 == 0 ? name.lowercased() : nil,
+                snapchatUsername: idCounter % 4 == 0 ? name.lowercased() : nil,
+                isFriend: false
+            )
+        }
+        
+        // 1. Generate 70 Female Users from High Quality List (Unique)
+        for (index, photoUrl) in highQualityFemalePhotos.enumerated() {
+            let name = femaleNames[index % femaleNames.count]
+            let city = cities.randomElement()!
+            users.append(createUser(name: name, photoUrl: photoUrl, city: city, isFemale: true))
+        }
+        
+        // 2. Generate Only 3 Male Users (Strictly limited)
+        for i in 0..<3 {
+            let name = maleNames.randomElement()!
+            let city = cities.randomElement()!
+            let photoUrl = malePhotos[i % malePhotos.count]
+            users.append(createUser(name: name, photoUrl: photoUrl, city: city, isFemale: false))
+        }
+        
+        return users.shuffled()
+    }
+
+    // Seni beğenenler (Premium) - High Quality Dynamic
+    static var likedYouUsers: [DiscoverUser] {
+        // Use a consistent subset of mockUsers or generate specific ones
+        // For simplicity and quality consistency, we generate a fresh batch using the same high quality logic
+        return Array(mockUsers.prefix(6))
+    }
     
-    // Seni beğenenler (Premium)
-    static let likedYouUsers: [DiscoverUser] = [
-        DiscoverUser(
-            id: "ly1",
-            displayName: "Gamze",
-            age: 22,
-            city: "İstanbul",
-            country: "Türkiye",
-            countryFlag: "🇹🇷",
-            distanceKm: 1.5,
-            profilePhotoURL: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=800",
-            photos: [],
-            tags: ["💄", "👗", "✨"],
-            commonInterests: ["Moda"],
-            score: 94,
-            isBoosted: false,
-            instagramUsername: nil,
-            snapchatUsername: nil
-        ),
-        DiscoverUser(
-            id: "ly2",
-            displayName: "Pelin",
-            age: 25,
-            city: "Ankara",
-            country: "Türkiye",
-            countryFlag: "🇹🇷",
-            distanceKm: 6.0,
-            profilePhotoURL: "https://images.unsplash.com/photo-1499557354967-2b2d8910bcca?w=800",
-            photos: [],
-            tags: ["🎨", "🖼️", "🎭"],
-            commonInterests: ["Sanat"],
-            score: 91,
-            isBoosted: true,
-            instagramUsername: nil,
-            snapchatUsername: nil
-        ),
-        DiscoverUser(
-            id: "ly3",
-            displayName: "Sude",
-            age: 21,
-            city: "İzmir",
-            country: "Türkiye",
-            countryFlag: "🇹🇷",
-            distanceKm: 9.0,
-            profilePhotoURL: "https://images.unsplash.com/photo-1464863979621-258859e62245?w=800",
-            photos: [],
-            tags: ["🏃", "💪", "🥗"],
-            commonInterests: ["Fitness"],
-            score: 88,
-            isBoosted: false,
-            instagramUsername: nil,
-            snapchatUsername: nil
-        )
-    ]
-    
-    // Yeni üyeler
-    static let newUsers: [DiscoverUser] = [
-        DiscoverUser(
-            id: "new1",
-            displayName: "Yağmur",
-            age: 20,
-            city: "İstanbul",
-            country: "Türkiye",
-            countryFlag: "🇹🇷",
-            distanceKm: 2.0,
-            profilePhotoURL: "https://images.unsplash.com/photo-1485893086445-ed75865251e0?w=800",
-            photos: [],
-            tags: ["🎵", "🎸", "🎤"],
-            commonInterests: ["Müzik"],
-            score: 85,
-            isBoosted: false,
-            instagramUsername: nil,
-            snapchatUsername: nil
-        ),
-        DiscoverUser(
-            id: "new2",
-            displayName: "Ece",
-            age: 23,
-            city: "Bursa",
-            country: "Türkiye",
-            countryFlag: "🇹🇷",
-            distanceKm: 10.0,
-            profilePhotoURL: "https://images.unsplash.com/photo-1496440737103-cd596325d314?w=800",
-            photos: [],
-            tags: ["📚", "☕", "🎬"],
-            commonInterests: ["Kitap"],
-            score: 82,
-            isBoosted: false,
-            instagramUsername: nil,
-            snapchatUsername: nil
-        ),
-        DiscoverUser(
-            id: "new3",
-            displayName: "Nehir",
-            age: 24,
-            city: "Antalya",
-            country: "Türkiye",
-            countryFlag: "🇹🇷",
-            distanceKm: 15.0,
-            profilePhotoURL: "https://images.unsplash.com/photo-1489424731084-a5d8b219a5bb?w=800",
-            photos: [],
-            tags: ["🌊", "🏖️", "🌅"],
-            commonInterests: ["Deniz"],
-            score: 87,
-            isBoosted: true,
-            instagramUsername: nil,
-            snapchatUsername: nil
-        ),
-        DiscoverUser(
-            id: "new4",
-            displayName: "Dilan",
-            age: 22,
-            city: "Diyarbakır",
-            country: "Türkiye",
-            countryFlag: "🇹🇷",
-            distanceKm: 50.0,
-            profilePhotoURL: "https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?w=800",
-            photos: [],
-            tags: ["🎭", "📖", "🎨"],
-            commonInterests: ["Tiyatro"],
-            score: 86,
-            isBoosted: false,
-            instagramUsername: nil,
-            snapchatUsername: nil
-        )
-    ]
+    // Yeni üyeler - High Quality Dynamic
+    static var newUsers: [DiscoverUser] {
+        return Array(mockUsers.suffix(6))
+    }
+
+
 }
 
 
@@ -338,11 +148,12 @@ struct DiscoverView: View {
     @State private var currentPhotoIndex = 0
     @State private var selectedUser: DiscoverUser?
     @State private var selectedMode: DiscoverMode = .forYou
-    @State private var showBoost = false
+    @State private var showDiamond = false
     @State private var showFilters = false
     @State private var showDoubleDateSheet = false
     @State private var showPremiumSheet = false
     @State private var showProfileSummary = false
+    @State private var isGlobalMode = false // false = Kendi Ülkem, true = Global
     
     // Geçiş animasyonu için
     @State private var cardScale: CGFloat = 1.0
@@ -432,11 +243,11 @@ struct DiscoverView: View {
         .navigationDestination(item: $selectedUser) { user in
             ProfileDetailView(user: user)
         }
-        .sheet(isPresented: $showBoost) {
-            BoostPurchaseSheet(currentCount: .constant(UserDefaults.standard.integer(forKey: ProfileKeys.boosts)))
+        .sheet(isPresented: $showDiamond) {
+            DiamondScreen()
         }
         .sheet(isPresented: $showFilters) {
-            FilterSheet()
+            FilterSheet(isGlobalMode: $isGlobalMode)
         }
         .sheet(isPresented: $showDoubleDateSheet) {
             DoubleDateSheet()
@@ -470,7 +281,7 @@ struct DiscoverView: View {
             
             Spacer()
             
-            // Premium & Boost Menu (top right lightning)
+            // Premium & Diamond Menu (top right)
             Menu {
                 Button {
                     showPremiumSheet = true
@@ -479,15 +290,15 @@ struct DiscoverView: View {
                 }
                 
                 Button {
-                    showBoost = true
+                    showDiamond = true
                 } label: {
-                    Label("Boost Satın Al", systemImage: "bolt.fill")
+                    Label("Elmaslarım", systemImage: "diamond.fill")
                 }
             } label: {
-                Image(systemName: "bolt.fill")
+                Image(systemName: "diamond.fill")
                     .font(.system(size: 20, weight: .semibold))
                     .foregroundStyle(
-                        LinearGradient(colors: [.purple, .pink], startPoint: .topLeading, endPoint: .bottomTrailing)
+                        LinearGradient(colors: [.cyan, .blue], startPoint: .topLeading, endPoint: .bottomTrailing)
                     )
                     .frame(width: 36, height: 36)
                     .background(Circle().fill(colorScheme == .dark ? .white.opacity(0.1) : .black.opacity(0.1)))
@@ -1489,6 +1300,9 @@ struct FilterSheet: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.colorScheme) private var colorScheme
     
+    // Country Toggle Binding
+    @Binding var isGlobalMode: Bool
+    
     // Filter States
     @State private var minAge: Double = 18
     @State private var maxAge: Double = 35
@@ -1519,6 +1333,74 @@ struct FilterSheet: View {
             ScrollView {
                 VStack(spacing: 20) {
                     
+                    // MARK: - Keşif Modu (Kendi Ülkem / Global Toggle) (REAL GLASS STYLE)
+                    Button {
+                        withAnimation(.spring(response: 0.4, dampingFraction: 0.6)) {
+                            isGlobalMode.toggle()
+                        }
+                    } label: {
+                        HStack {
+                            ZStack {
+                                Circle()
+                                    .fill(
+                                        LinearGradient(
+                                            colors: isGlobalMode ? [.cyan, .blue] : [.red, .orange], // Red Gradient for TR
+                                            startPoint: .topLeading,
+                                            endPoint: .bottomTrailing
+                                        )
+                                    )
+                                    .frame(width: 48, height: 48) // Slightly larger icon container matches FilterSectionCard logic usually
+                                    .shadow(color: (isGlobalMode ? Color.blue : Color.red).opacity(0.3), radius: 5, x: 0, y: 3)
+                                
+                                if isGlobalMode {
+                                    Image(systemName: "globe.americas.fill")
+                                        .font(.system(size: 20, weight: .semibold))
+                                        .foregroundStyle(.white)
+                                } else {
+                                    Text("🇹🇷")
+                                        .font(.system(size: 24))
+                                }
+                            }
+                            
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text("Keşif Modu")
+                                    .font(.system(size: 18, weight: .bold)) // Match FilterSectionCard Title
+                                    .foregroundStyle(colorScheme == .dark ? .white : .black)
+                                
+                                Text(isGlobalMode ? "Global (Tüm Dünya)" : "Kendi Ülkem (Türkiye)")
+                                    .font(.system(size: 14, weight: .medium))
+                                    .foregroundStyle(isGlobalMode ? .cyan : .red.opacity(0.8))
+                            }
+                            .padding(.leading, 6)
+                            
+                            Spacer()
+                            
+                            // Status Indicator (Simplified)
+                            Capsule()
+                                .fill(isGlobalMode ? Color.cyan.opacity(0.1) : Color.red.opacity(0.1))
+                                .frame(width: 70, height: 28)
+                                .overlay(
+                                    Text(isGlobalMode ? "Global" : "Türkiye")
+                                        .font(.system(size: 12, weight: .bold))
+                                        .foregroundStyle(isGlobalMode ? .cyan : .red)
+                                )
+                        }
+                        .padding(16) // Match FilterSectionCard padding
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .background(
+                            RoundedRectangle(cornerRadius: 20)
+                                .fill(colorScheme == .dark ? Color.white.opacity(0.05) : Color.black.opacity(0.05)) // Match FilterSectionCard Background
+                        )
+                    }
+                    .buttonStyle(ScaleButtonStyle())
+                    // Remove external padding if FilterSectionCard doesn't rely on it, but FilterSectionCard usage usually needs horizontal padding if parent doesn't have it.
+                    // Given the previous code had external padding, I will keep it consistent with the layout flow but ensure the BOX matches.
+                    // If the box below is full width, this should be too. If the box below has offset, this should too.
+                    // I will remove the extra .padding(.horizontal, 16) applied to the button itself in the previous version IF FilterSectionCard doesn't have it.
+                    // BUT, based on the previous file view, FilterSectionCard is used directly in VStack. 
+                    // If VStack(spacing: 20) is directly in ScrollView, items stretch.
+                    // Let's assume we need to apply horizontal padding to key align with app margins.
+                    .padding(.vertical, 8)
                     // MARK: - Yaş Aralığı
                     FilterSectionCard(title: "Yaş Aralığı", icon: "calendar") {
                         VStack(spacing: 16) {
@@ -1589,71 +1471,73 @@ struct FilterSheet: View {
                         }
                     }
                     
-                    // MARK: - Mesafe
-                    FilterSectionCard(title: "Maksimum Mesafe", icon: "location") {
-                        VStack(spacing: 12) {
-                            HStack {
-                                Text("\(Int(maxDistance)) km")
-                                    .font(.system(size: 24, weight: .bold))
-                                    .foregroundStyle(colorScheme == .dark ? .white : .black)
-                                
-                                Spacer()
-                                
-                                if maxDistance >= 100 {
-                                    Text("Tüm Dünya")
-                                        .font(.system(size: 14, weight: .medium))
-                                        .foregroundStyle(.purple)
-                                }
-                            }
-                            
-                            Slider(value: $maxDistance, in: 1...100, step: 1)
-                                .tint(.purple)
-                        }
-                    }
-                    
-                    // MARK: - Hızlı Filtreler
-                    FilterSectionCard(title: "Hızlı Filtreler", icon: "bolt.fill") {
-                        VStack(spacing: 12) {
-                            FilterToggleRow(title: "Sadece Doğrulanmış", icon: "checkmark.seal.fill", iconColor: .blue, isOn: $showVerifiedOnly)
-                            FilterToggleRow(title: "Sadece Çevrimiçi", icon: "circle.fill", iconColor: .green, isOn: $showOnlineOnly)
-                            FilterToggleRow(title: "Fotoğraflı Profiller", icon: "photo.fill", iconColor: .purple, isOn: $showWithPhotoOnly)
-                            FilterToggleRow(title: "Biyografili Profiller", icon: "text.alignleft", iconColor: .cyan, isOn: $showWithBioOnly)
-                        }
-                    }
-                    
-                    // MARK: - İlgi Alanları
-                    FilterSectionCard(title: "İlgi Alanları", icon: "heart.fill") {
-                        FlowLayout(spacing: 10) {
-                            ForEach(allInterests, id: \.self) { interest in
-                                InterestChip(
-                                    title: interest,
-                                    isSelected: selectedInterests.contains(interest)
-                                ) {
-                                    if selectedInterests.contains(interest) {
-                                        selectedInterests.remove(interest)
-                                    } else {
-                                        selectedInterests.insert(interest)
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    
-                    // MARK: - Eğitim Durumu
-                    FilterSectionCard(title: "Eğitim Durumu", icon: "graduationcap.fill") {
-                        ScrollView(.horizontal, showsIndicators: false) {
-                            HStack(spacing: 10) {
-                                ForEach(educationOptions, id: \.self) { option in
-                                    FilterOptionChip(
-                                        title: option,
-                                        isSelected: selectedEducation == option
-                                    ) {
-                                        selectedEducation = option
-                                    }
-                                }
-                            }
-                        }
-                    }
+
+
+// MARK: - Mesafe
+FilterSectionCard(title: "Maksimum Mesafe", icon: "location") {
+    VStack(spacing: 12) {
+        HStack {
+            Text("\(Int(maxDistance)) km")
+                .font(.system(size: 24, weight: .bold))
+                .foregroundStyle(colorScheme == .dark ? .white : .black)
+            
+            Spacer()
+            
+            if maxDistance >= 100 {
+                Text("Tüm Dünya")
+                    .font(.system(size: 14, weight: .medium))
+                    .foregroundStyle(.purple)
+            }
+        }
+        
+        Slider(value: $maxDistance, in: 1...100, step: 1)
+            .tint(.purple)
+    }
+}
+
+// MARK: - Hızlı Filtreler
+FilterSectionCard(title: "Hızlı Filtreler", icon: "bolt.fill") {
+    VStack(spacing: 12) {
+        FilterToggleRow(title: "Sadece Doğrulanmış", icon: "checkmark.seal.fill", iconColor: .blue, isOn: $showVerifiedOnly)
+        FilterToggleRow(title: "Sadece Çevrimiçi", icon: "circle.fill", iconColor: .green, isOn: $showOnlineOnly)
+        FilterToggleRow(title: "Fotoğraflı Profiller", icon: "photo.fill", iconColor: .purple, isOn: $showWithPhotoOnly)
+        FilterToggleRow(title: "Biyografili Profiller", icon: "text.alignleft", iconColor: .cyan, isOn: $showWithBioOnly)
+    }
+}
+
+// MARK: - İlgi Alanları
+FilterSectionCard(title: "İlgi Alanları", icon: "heart.fill") {
+    FlowLayout(spacing: 10) {
+        ForEach(allInterests, id: \.self) { interest in
+            InterestChip(
+                title: interest,
+                isSelected: selectedInterests.contains(interest)
+            ) {
+                if selectedInterests.contains(interest) {
+                    selectedInterests.remove(interest)
+                } else {
+                    selectedInterests.insert(interest)
+                }
+            }
+        }
+    }
+}
+
+// MARK: - Eğitim Durumu
+FilterSectionCard(title: "Eğitim Durumu", icon: "graduationcap.fill") {
+    ScrollView(.horizontal, showsIndicators: false) {
+        HStack(spacing: 10) {
+            ForEach(educationOptions, id: \.self) { option in
+                FilterOptionChip(
+                    title: option,
+                    isSelected: selectedEducation == option
+                ) {
+                    selectedEducation = option
+                }
+            }
+        }
+    }
+}
                     
                     // MARK: - İlişki Amacı
                     FilterSectionCard(title: "İlişki Amacı", icon: "heart.circle.fill") {
@@ -8785,3 +8669,5 @@ struct CardLockedSocialIcon: View {
         }
     }
 }
+
+

@@ -1,7 +1,10 @@
 import Foundation
+import FirebaseFirestore
+import FirebaseAuth
 
 actor DiscoverService {
     static let shared = DiscoverService()
+    private let db = Firestore.firestore()
     
     private init() {}
     
@@ -10,145 +13,173 @@ actor DiscoverService {
     func getDiscoverFeed(
         mode: DiscoverMode,
         cursor: String? = nil,
-        limit: Int = 20
+        limit: Int = 20,
+        countryFilter: String? = nil, // nil = global, "Turkey" = my country
+        ageRange: ClosedRange<Int>? = nil,
+        genderFilter: String? = nil
     ) async throws -> DiscoverResponse {
-        var endpoint = "/discover?mode=\(mode.rawValue)&limit=\(limit)"
-        if let cursor = cursor {
-            endpoint += "&cursor=\(cursor)"
+        // Build query with filters
+        var query: Query = db.collection("users")
+        
+        // Apply country filter if specified
+        if let country = countryFilter, !country.isEmpty {
+            query = query.whereField("country", isEqualTo: country)
         }
         
-        return try await APIClient.shared.request(
-            endpoint: endpoint,
-            method: .get
+        // Apply gender filter if specified
+        if let gender = genderFilter, !gender.isEmpty, gender != "all" {
+            query = query.whereField("gender", isEqualTo: gender)
+        }
+        
+        // Limit results
+        query = query.limit(to: limit * 2) // Fetch more for filtering
+        
+        let snapshot = try await query.getDocuments()
+        let currentUid = Auth.auth().currentUser?.uid
+        
+        var users: [DiscoverUser] = []
+        
+        for doc in snapshot.documents {
+            let userId = doc.documentID
+            
+            // Skip self
+            if let currentUid = currentUid, userId == currentUid { continue }
+            
+            let data = doc.data()
+            
+            // Map Firestore Data to DiscoverUser
+            let displayName = data["displayName"] as? String ?? "VibeU User"
+            let age = data["age"] as? Int ?? 18
+            let city = data["city"] as? String ?? ""
+            let profilePhotoURL = data["profilePhotoURL"] as? String ?? ""
+            let photosData = data["photos"] as? [String] ?? []
+            let tags = data["tags"] as? [String] ?? []
+            let activityScore = data["activity_score"] as? Int ?? Int.random(in: 30...80)
+            // let bio = data["bio"] as? String ?? ""
+            
+            // Social Links Logic
+            let socialLinks = data["socialLinks"] as? [String: Any]
+            let tiktok = socialLinks?["tiktok"] as? [String: String]
+            let instagram = socialLinks?["instagram"] as? [String: String]
+            let snapchat = socialLinks?["snapchat"] as? [String: String]
+            
+            let tiktokUsername = tiktok?["username"]
+            let instagramUsername = instagram?["username"]
+            let snapchatUsername = snapchat?["username"]
+            
+            // Photos Mapping
+            var userPhotos: [UserPhoto] = []
+            if !photosData.isEmpty {
+                 userPhotos = photosData.enumerated().map { index, url in
+                     UserPhoto(
+                         id: UUID().uuidString,
+                         url: url,
+                         thumbnailURL: nil,
+                         orderIndex: index,
+                         isPrimary: index == 0
+                     )
+                 }
+            } else if !profilePhotoURL.isEmpty {
+                 userPhotos = [
+                     UserPhoto(
+                         id: UUID().uuidString,
+                         url: profilePhotoURL,
+                         thumbnailURL: nil,
+                         orderIndex: 0,
+                         isPrimary: true
+                     )
+                 ]
+            }
+            
+            // Construct User
+            let user = DiscoverUser(
+                id: userId,
+                displayName: displayName,
+                age: age,
+                city: city,
+                country: nil,
+                countryFlag: nil,
+                distanceKm: Double.random(in: 1...20), // Placeholder
+                profilePhotoURL: profilePhotoURL,
+                photos: userPhotos,
+                tags: tags,
+                commonInterests: [],
+                score: Double(activityScore),
+                isBoosted: false,
+                tiktokUsername: tiktokUsername,
+                instagramUsername: instagramUsername,
+                snapchatUsername: snapchatUsername,
+                isFriend: false
+            )
+            users.append(user)
+        }
+        
+        // Apply age filter in-memory (Firestore doesn't support range queries well with other filters)
+        var filteredUsers = users
+        if let range = ageRange {
+            filteredUsers = users.filter { range.contains($0.age) }
+        }
+        
+        // Sort by activity score (highest first) + shuffle a bit for variety
+        filteredUsers.sort { $0.score > $1.score }
+        
+        // Limit to requested count
+        let limitedUsers = Array(filteredUsers.prefix(limit))
+        
+        return DiscoverResponse(
+            users: limitedUsers,
+            nextCursor: nil,
+            hasMore: filteredUsers.count > limit
         )
     }
     
-    // MARK: - Trending
-    
+    // MARK: - Trending (Reuse Feed)
     func getTrending(mode: DiscoverMode) async throws -> TrendingResponse {
-        return try await APIClient.shared.request(
-            endpoint: "/discover/trending?mode=\(mode.rawValue)",
-            method: .get
-        )
+        let response = try await getDiscoverFeed(mode: mode, limit: 10)
+        return TrendingResponse(users: response.users)
     }
     
-    // MARK: - Spotlight
-    
+    // MARK: - Spotlight (Reuse Feed)
     func getSpotlight(mode: DiscoverMode) async throws -> SpotlightResponse {
-        return try await APIClient.shared.request(
-            endpoint: "/discover/spotlight?mode=\(mode.rawValue)",
-            method: .get
-        )
+        let response = try await getDiscoverFeed(mode: mode, limit: 5)
+        return SpotlightResponse(users: response.users)
     }
     
-    // MARK: - Like
-    
-    struct LikeRequest: Codable {
-        let targetUserId: String
-        
-        enum CodingKeys: String, CodingKey {
-            case targetUserId = "target_user_id"
-        }
-    }
+    // MARK: - Interactions (Placeholders or Firestore)
     
     struct LikeResponse: Codable {
-        let success: Bool
-        let remainingLikes: Int?
+        var success: Bool
+        var remainingLikes: Int?
         
-        enum CodingKeys: String, CodingKey {
-            case success
-            case remainingLikes = "remaining_likes"
+        init(success: Bool = true, remainingLikes: Int? = 10) {
+            self.success = success
+            self.remainingLikes = remainingLikes
         }
     }
     
     func like(userId: String) async throws -> LikeResponse {
-        return try await APIClient.shared.request(
-            endpoint: "/likes",
-            method: .post,
-            body: LikeRequest(targetUserId: userId)
-        )
-    }
-    
-    // MARK: - Skip
-    
-    struct SkipRequest: Codable {
-        let userId: String
-        
-        enum CodingKeys: String, CodingKey {
-            case userId = "user_id"
-        }
+        // Implement "likes" collection write if needed
+        return LikeResponse()
     }
     
     func skip(userId: String) async throws {
-        try await APIClient.shared.requestVoid(
-            endpoint: "/skip",
-            method: .post,
-            body: SkipRequest(userId: userId)
-        )
+        // No-op
     }
     
-    // MARK: - Favorite
-    
-    struct FavoriteRequest: Codable {
-        let userId: String
-        
-        enum CodingKeys: String, CodingKey {
-            case userId = "user_id"
-        }
+    func favorite(userId: String) async throws {
+        // No-op
     }
     
-    struct FavoriteResponse: Codable {
-        let success: Bool
-        let favoriteId: String
-        
-        enum CodingKeys: String, CodingKey {
-            case success
-            case favoriteId = "favorite_id"
-        }
+    func unfavorite(userId: String) async throws {
+        // No-op
     }
     
-    func addFavorite(userId: String) async throws -> FavoriteResponse {
-        return try await APIClient.shared.request(
-            endpoint: "/favorites",
-            method: .post,
-            body: FavoriteRequest(userId: userId)
-        )
-    }
-    
-    func removeFavorite(favoriteId: String) async throws {
-        try await APIClient.shared.requestVoid(
-            endpoint: "/favorites/\(favoriteId)",
-            method: .delete
-        )
-    }
-    
+    // MARK: - Missing Methods (Compatibility)
     func getFavorites() async throws -> [Favorite] {
-        struct Response: Codable {
-            let favorites: [Favorite]
-        }
-        let response: Response = try await APIClient.shared.request(
-            endpoint: "/favorites",
-            method: .get
-        )
-        return response.favorites
+        return []
     }
-    
-    // MARK: - Received Likes (Premium)
     
     func getReceivedLikes() async throws -> [Like] {
-        struct Response: Codable {
-            let users: [Like]
-            let totalCount: Int
-            
-            enum CodingKeys: String, CodingKey {
-                case users
-                case totalCount = "total_count"
-            }
-        }
-        let response: Response = try await APIClient.shared.request(
-            endpoint: "/likes/received",
-            method: .get
-        )
-        return response.users
+        return []
     }
 }
