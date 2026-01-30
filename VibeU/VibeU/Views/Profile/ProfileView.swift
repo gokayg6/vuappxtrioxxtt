@@ -99,40 +99,59 @@ struct ProfileView: View {
         var completed = 0
         let total = 6 // Total fields to check
         
-        // Check displayName
-        if let name = UserDefaults.standard.string(forKey: ProfileKeys.displayName), !name.isEmpty {
+        // Check displayName - önce appState.currentUser'dan, sonra UserDefaults'tan
+        if let name = appState.currentUser?.displayName, !name.isEmpty {
+            completed += 1
+        } else if let name = UserDefaults.standard.string(forKey: ProfileKeys.displayName), !name.isEmpty {
             completed += 1
         }
         
-        // Check bio
-        if let bio = UserDefaults.standard.string(forKey: ProfileKeys.bio), !bio.isEmpty {
+        // Check bio - önce appState.currentUser'dan, sonra UserDefaults'tan
+        if let bio = appState.currentUser?.bio, !bio.isEmpty {
+            completed += 1
+        } else if let bio = UserDefaults.standard.string(forKey: ProfileKeys.bio), !bio.isEmpty {
             completed += 1
         }
         
-        // Check city
-        if let city = UserDefaults.standard.string(forKey: ProfileKeys.city), !city.isEmpty {
+        // Check city - önce appState.currentUser'dan, sonra UserDefaults'tan
+        if let city = appState.currentUser?.city, !city.isEmpty {
+            completed += 1
+        } else if let city = UserDefaults.standard.string(forKey: ProfileKeys.city), !city.isEmpty {
             completed += 1
         }
         
-        // Check photos
-        if let photos = UserDefaults.standard.array(forKey: ProfileKeys.photos) as? [Data], !photos.isEmpty {
+        // Check photos - önce appState.currentUser'dan, sonra UserDefaults'tan
+        if let photos = appState.currentUser?.photos, !photos.isEmpty {
+            completed += 1
+        } else if let photos = UserDefaults.standard.array(forKey: ProfileKeys.photos) as? [Data], !photos.isEmpty {
             completed += 1
         }
         
-        // Check interests
-        if let interests = UserDefaults.standard.array(forKey: ProfileKeys.interests) as? [String], !interests.isEmpty {
+        // Check interests - önce appState.currentUser'dan, sonra UserDefaults'tan
+        if let interests = appState.currentUser?.interests, !interests.isEmpty {
+            completed += 1
+        } else if let interests = UserDefaults.standard.array(forKey: ProfileKeys.interests) as? [String], !interests.isEmpty {
             completed += 1
         }
         
-        // Check social links (at least one)
-        let instagram = UserDefaults.standard.string(forKey: ProfileKeys.instagram) ?? ""
-        let tiktok = UserDefaults.standard.string(forKey: ProfileKeys.tiktok) ?? ""
-        let snapchat = UserDefaults.standard.string(forKey: ProfileKeys.snapchat) ?? ""
-        if !instagram.isEmpty || !tiktok.isEmpty || !snapchat.isEmpty {
+        // Check social links (at least one) - önce appState.currentUser'dan, sonra UserDefaults'tan
+        let userInstagram = appState.currentUser?.socialLinks?.instagram?.username ?? ""
+        let userTiktok = appState.currentUser?.socialLinks?.tiktok?.username ?? ""
+        let userSnapchat = appState.currentUser?.socialLinks?.snapchat?.username ?? ""
+        
+        if !userInstagram.isEmpty || !userTiktok.isEmpty || !userSnapchat.isEmpty {
             completed += 1
+        } else {
+            let instagram = UserDefaults.standard.string(forKey: ProfileKeys.instagram) ?? ""
+            let tiktok = UserDefaults.standard.string(forKey: ProfileKeys.tiktok) ?? ""
+            let snapchat = UserDefaults.standard.string(forKey: ProfileKeys.snapchat) ?? ""
+            if !instagram.isEmpty || !tiktok.isEmpty || !snapchat.isEmpty {
+                completed += 1
+            }
         }
         
         localCompletion = Int((Double(completed) / Double(total)) * 100)
+        print("📊 Profile Completion: \(completed)/\(total) = \(localCompletion)%")
     }
 }
 
@@ -213,21 +232,9 @@ struct ProfileHeaderCard: View {
                         // FIX: Do NOT load if URL contains "dicebear" (it causes "GG" initals)
                         let urlString = user?.profilePhotoURL ?? ""
                         if !urlString.isEmpty && !urlString.contains("dicebear") {
-                            AsyncImage(url: URL(string: urlString)) { image in
-                                image
-                                    .resizable()
-                                    .scaledToFill()
-                                    .frame(width: 82, height: 82)
-                                    .clipped()
-                            } placeholder: {
-                                Circle()
-                                    .fill(colors.secondaryBackground)
-                                    .overlay {
-                                        Image(systemName: "person.fill")
-                                            .font(.system(size: 36))
-                                            .foregroundStyle(colors.tertiaryText)
-                                    }
-                            }
+                            CachedAsyncImage(url: urlString)
+                                .frame(width: 82, height: 82)
+                                .clipped()
                         } else {
                              Circle()
                                 .fill(colors.secondaryBackground)
@@ -319,29 +326,67 @@ struct ProfileHeaderCard: View {
                 )
                 .shadow(color: Color.black.opacity(isDark ? 0.3 : 0.1), radius: 12, x: 0, y: 6)
         )
-        .onAppear { loadSavedPhoto() }
+        .onAppear { 
+            loadSavedPhoto()
+            prefetchPhotos()
+        }
+    }
+    
+    private func prefetchPhotos() {
+        Task {
+            var urlsToPrefetch: [String] = []
+            
+            // Prefetch all user photos
+            if let photos = user?.photos {
+                for photo in photos {
+                    urlsToPrefetch.append(photo.url)
+                }
+            }
+            
+            // Prefetch profile photo
+            if let profileUrl = user?.profilePhotoURL, !profileUrl.isEmpty, !profileUrl.contains("dicebear") {
+                urlsToPrefetch.append(profileUrl)
+            }
+            
+            await ImageCacheService.shared.prefetchImages(urls: urlsToPrefetch)
+        }
     }
     
     private func loadSavedPhoto() {
-        // Priority 1: User photos array from Firebase subcollection
-        var photoUrlString = user?.photos.first?.url
-        
-        // Priority 2: profilePhotoURL if not a dicebear placeholder
-        if photoUrlString == nil || photoUrlString?.isEmpty == true {
-            if let profileUrl = user?.profilePhotoURL, 
-               !profileUrl.contains("dicebear"),
-               !profileUrl.isEmpty {
-                photoUrlString = profileUrl
-            }
+        print("🖼️ [ProfileView] Loading saved photo...")
+        print("🖼️ [ProfileView] profilePhotoURL: \(user?.profilePhotoURL ?? "nil")")
+        print("🖼️ [ProfileView] photos.count: \(user?.photos.count ?? 0)")
+        if let firstPhoto = user?.photos.first {
+            print("🖼️ [ProfileView] First gallery photo: \(firstPhoto.url)")
         }
         
-        guard let urlString = photoUrlString, let url = URL(string: urlString) else { return }
+        // Priority 1: profilePhotoURL (dedicated profile photo)
+        var photoUrlString: String? = nil
+        
+        if let profileUrl = user?.profilePhotoURL, 
+           !profileUrl.contains("dicebear"),
+           !profileUrl.isEmpty {
+            photoUrlString = profileUrl
+            print("✅ [ProfileView] Using profilePhotoURL: \(profileUrl)")
+        }
+        
+        // Priority 2: Fallback to first gallery photo if no profile photo set
+        if photoUrlString == nil || photoUrlString?.isEmpty == true {
+            photoUrlString = user?.photos.first?.url
+            print("⚠️ [ProfileView] Falling back to first gallery photo: \(photoUrlString ?? "nil")")
+        }
+        
+        guard let urlString = photoUrlString, let url = URL(string: urlString) else { 
+            print("❌ [ProfileView] No valid photo URL found")
+            return 
+        }
         
         Task {
             if let data = try? await URLSession.shared.data(from: url).0,
                let image = UIImage(data: data) {
                 await MainActor.run {
                     savedPhoto = image
+                    print("✅ [ProfileView] Photo loaded successfully")
                 }
             }
         }
@@ -1262,13 +1307,69 @@ struct AccountSection: View {
     let appState: AppState
     var colors: ThemeColors = .dark
     
+    #if DEBUG
+    @State private var isAddingMockUsers = false
+    @State private var showMockResult = false
+    @State private var mockResultMessage = ""
+    #endif
+    
     var body: some View {
         VStack(spacing: 0) {
+            #if DEBUG
+            // DEBUG ONLY - Mock Users Button
+            Button {
+                Task {
+                    isAddingMockUsers = true
+                    let result = try? await MockUserService.shared.addAllMockUsers()
+                    isAddingMockUsers = false
+                    mockResultMessage = "✅ \(result?.success ?? 0) kullanıcı eklendi\n❌ \(result?.failed ?? 0) hata"
+                    showMockResult = true
+                }
+            } label: {
+                HStack {
+                    Image(systemName: "person.3.fill")
+                        .font(.system(size: 18))
+                        .foregroundStyle(.white)
+                        .frame(width: 32, height: 32)
+                        .background(Color.purple, in: Circle())
+                    
+                    Text(isAddingMockUsers ? "Ekleniyor..." : "60 Mock Kullanıcı Ekle (DEBUG)")
+                        .font(.system(size: 15, weight: .medium))
+                        .foregroundStyle(colors.primaryText)
+                    
+                    Spacer()
+                    
+                    if isAddingMockUsers {
+                        ProgressView()
+                            .tint(colors.primaryText)
+                    } else {
+                        Image(systemName: "chevron.right")
+                            .font(.system(size: 13, weight: .semibold))
+                            .foregroundStyle(colors.tertiaryText)
+                    }
+                }
+                .padding(.horizontal, 16)
+                .padding(.vertical, 14)
+                .background(colors.cardBackground)
+            }
+            .disabled(isAddingMockUsers)
+            
+            Divider()
+                .background(colors.border)
+            #endif
+            
             Button { viewModel.showLogoutConfirm = true } label: {
                 ProfileMenuRow(icon: "rectangle.portrait.and.arrow.right", title: "Çıkış Yap", color: .orange, colors: colors)
             }
         }
         .background(colors.cardBackground, in: RoundedRectangle(cornerRadius: 12))
+        #if DEBUG
+        .alert("Mock Kullanıcılar", isPresented: $showMockResult) {
+            Button("Tamam") { }
+        } message: {
+            Text(mockResultMessage)
+        }
+        #endif
     }
 }
 
@@ -1920,3 +2021,141 @@ struct BoostDiamondCombinedSheet: View {
         isClaiming = false
     }
 }
+
+
+// MARK: - Mock User Service (DEBUG ONLY)
+#if DEBUG
+actor MockUserService {
+    static let shared = MockUserService()
+    private let db = Firestore.firestore()
+    
+    private init() {}
+    
+    // 60 Mock Users - 40 Female (Kadın ağırlıklı, sarışın kızlar dahil), 20 Male
+    // Fotoğraflar: Unsplash'tan gerçek insan portreleri (4K, 9:16 format)
+    // Tuple: (Ad, Soyad, Yaş, Cinsiyet, Şehir, Ülke, Bio, İlgi Alanları, Hobiler, Burç, Fotoğraf URL)
+    private let mockUsers: [(String, String, Int, String, String, String, String, [String], [String], String, String)] = [
+        // FEMALE (40) - Kadın ağırlıklı, sarışın kızlar dahil
+        ("Ayşe", "Yılmaz", 24, "female", "İstanbul", "Türkiye", "Müzik ve sanat tutkunu 🎨", ["Müzik", "Sanat", "Sinema"], ["Gitar", "Resim"], "Koç", "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=1080&h=1920&fit=crop"),
+        ("Zeynep", "Kaya", 23, "female", "Ankara", "Türkiye", "Kitap kurdu 📚", ["Kitap", "Yazı", "Şiir"], ["Okuma", "Yazma"], "Boğa", "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=1080&h=1920&fit=crop"),
+        ("Elif", "Demir", 25, "female", "İzmir", "Türkiye", "Kahve ve derin sohbetler ☕", ["Kahve", "Felsefe", "Psikoloji"], ["Kahve", "Sohbet"], "İkizler", "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=1080&h=1920&fit=crop"),
+        ("Selin", "Çelik", 24, "female", "Antalya", "Türkiye", "Yoga ve meditasyon 🧘‍♀️", ["Yoga", "Meditasyon", "Wellness"], ["Yoga", "Pilates"], "Yengeç", "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=1080&h=1920&fit=crop"),
+        ("Deniz", "Arslan", 26, "female", "Bursa", "Türkiye", "Seyahat tutkunu ✈️", ["Seyahat", "Fotoğraf", "Doğa"], ["Fotoğrafçılık", "Hiking"], "Aslan", "https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?w=1080&h=1920&fit=crop"),
+        ("Ece", "Öztürk", 22, "female", "İstanbul", "Türkiye", "Dans ve müzik 💃", ["Dans", "Müzik", "Parti"], ["Dans", "Salsa"], "Başak", "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=1080&h=1920&fit=crop"),
+        ("Ceren", "Aydın", 27, "female", "Ankara", "Türkiye", "Fitness ve sağlıklı yaşam 💪", ["Spor", "Fitness", "Sağlık"], ["Gym", "Koşu"], "Terazi", "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=1080&h=1920&fit=crop"),
+        ("Gizem", "Şahin", 25, "female", "İzmir", "Türkiye", "Moda ve stil 👗", ["Moda", "Alışveriş", "Stil"], ["Shopping", "Styling"], "Akrep", "https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=1080&h=1920&fit=crop"),
+        ("Pınar", "Yıldız", 26, "female", "Adana", "Türkiye", "Yemek yapmayı seviyorum 🍳", ["Yemek", "Mutfak", "Gastronomi"], ["Cooking", "Baking"], "Yay", "https://images.unsplash.com/photo-1502823403499-6ccfcf4fb453?w=1080&h=1920&fit=crop"),
+        ("Merve", "Koç", 24, "female", "Gaziantep", "Türkiye", "Doğa ve kamp 🏕️", ["Doğa", "Kamp", "Trekking"], ["Camping", "Hiking"], "Oğlak", "https://images.unsplash.com/photo-1509967419530-da38b4704bc6?w=1080&h=1920&fit=crop"),
+        ("Aylin", "Erdoğan", 23, "female", "İstanbul", "Türkiye", "Sinema aşığı 🎬", ["Sinema", "Dizi", "Film"], ["Film izleme"], "Kova", "https://images.unsplash.com/photo-1500917293891-ef795e70e1f6?w=1080&h=1920&fit=crop"),
+        ("Seda", "Güneş", 28, "female", "Ankara", "Türkiye", "Teknoloji meraklısı 💻", ["Teknoloji", "Bilim", "Oyun"], ["Gaming", "Coding"], "Balık", "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=1080&h=1920&fit=crop"),
+        ("Burcu", "Aksoy", 25, "female", "İzmir", "Türkiye", "Sanat galerilerini gezmeyi severim 🖼️", ["Sanat", "Müze", "Galeri"], ["Müze gezme"], "Koç", "https://images.unsplash.com/photo-1479936343636-73cdc5aae0c3?w=1080&h=1920&fit=crop"),
+        ("Nil", "Polat", 24, "female", "Antalya", "Türkiye", "Plaj ve deniz 🏖️", ["Plaj", "Deniz", "Güneş"], ["Yüzme", "Sörf"], "Boğa", "https://images.unsplash.com/photo-1506863530036-1efeddceb993?w=1080&h=1920&fit=crop"),
+        ("Esra", "Kurt", 26, "female", "Bursa", "Türkiye", "Müzik festivalleri 🎵", ["Müzik", "Festival", "Konser"], ["Konser gitme"], "İkizler", "https://images.unsplash.com/photo-1513956589380-bad6acb9b9d4?w=1080&h=1920&fit=crop"),
+        ("Duygu", "Özkan", 23, "female", "İstanbul", "Türkiye", "Yoga eğitmeni 🧘", ["Yoga", "Wellness", "Meditasyon"], ["Yoga", "Meditasyon"], "Yengeç", "https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?w=1080&h=1920&fit=crop"),
+        ("Cansu", "Yavuz", 27, "female", "Ankara", "Türkiye", "Girişimci ve iş kadını 💼", ["İş", "Girişimcilik", "Networking"], ["Okuma", "Networking"], "Aslan", "https://images.unsplash.com/photo-1496440737103-cd596325d314?w=1080&h=1920&fit=crop"),
+        ("Begüm", "Tekin", 25, "female", "İzmir", "Türkiye", "Fotoğraf sanatçısı 📸", ["Fotoğraf", "Sanat", "Seyahat"], ["Fotoğrafçılık"], "Başak", "https://images.unsplash.com/photo-1515077678510-ce3bdf418862?w=1080&h=1920&fit=crop"),
+        ("Tuğba", "Çakır", 24, "female", "Adana", "Türkiye", "Pilates eğitmeni 🤸", ["Pilates", "Fitness", "Sağlık"], ["Pilates", "Yoga"], "Terazi", "https://images.unsplash.com/photo-1499952127939-9bbf5af6c51c?w=1080&h=1920&fit=crop"),
+        ("Özge", "Acar", 26, "female", "Gaziantep", "Türkiye", "Grafik tasarımcı 🎨", ["Tasarım", "Sanat", "Dijital"], ["Tasarım", "İllüstrasyon"], "Akrep", "https://images.unsplash.com/photo-1503185912284-5271ff81b9a8?w=1080&h=1920&fit=crop"),
+        ("Simge", "Bulut", 23, "female", "İstanbul", "Türkiye", "Müzisyen ve şarkıcı 🎤", ["Müzik", "Şarkı", "Sahne"], ["Şarkı söyleme", "Gitar"], "Yay", "https://images.unsplash.com/photo-1521146764736-56c929d59c83?w=1080&h=1920&fit=crop"),
+        ("Melis", "Kılıç", 28, "female", "Ankara", "Türkiye", "Psikolog 🧠", ["Psikoloji", "İnsan", "Gelişim"], ["Okuma", "Araştırma"], "Oğlak", "https://images.unsplash.com/photo-1529139574466-a303027c1d8b?w=1080&h=1920&fit=crop"),
+        ("Damla", "Şen", 25, "female", "İzmir", "Türkiye", "Blogger ve influencer 📱", ["Sosyal Medya", "Moda", "Lifestyle"], ["Blogging", "Vlogging"], "Kova", "https://images.unsplash.com/photo-1524502397800-2eeaad7c3fe5?w=1080&h=1920&fit=crop"),
+        ("Yasemin", "Doğan", 24, "female", "Antalya", "Türkiye", "Veteriner 🐾", ["Hayvanlar", "Doğa", "Bakım"], ["Hayvan bakımı"], "Balık", "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=1080&h=1920&fit=crop"),
+        ("İrem", "Yurt", 26, "female", "Bursa", "Türkiye", "Öğretmen 📚", ["Eğitim", "Kitap", "Çocuk"], ["Okuma", "Öğretme"], "Koç", "https://images.unsplash.com/photo-1532170579297-281918c8ae72?w=1080&h=1920&fit=crop"),
+        ("Naz", "Eren", 23, "female", "İstanbul", "Türkiye", "Mimar 🏛️", ["Mimarlık", "Tasarım", "Sanat"], ["Çizim", "Tasarım"], "Boğa", "https://images.unsplash.com/photo-1522556189639-b150ed9c4330?w=1080&h=1920&fit=crop"),
+        ("Dilara", "Aslan", 27, "female", "Ankara", "Türkiye", "Avukat ⚖️", ["Hukuk", "Adalet", "Okuma"], ["Okuma", "Tartışma"], "İkizler", "https://images.unsplash.com/photo-1504439904031-93ded9f93e4e?w=1080&h=1920&fit=crop"),
+        ("Buse", "Çetin", 25, "female", "İzmir", "Türkiye", "Doktor 👩‍⚕️", ["Tıp", "Sağlık", "Bilim"], ["Araştırma", "Okuma"], "Yengeç", "https://images.unsplash.com/photo-1505033575518-a36ea2ef75ae?w=1080&h=1920&fit=crop"),
+        ("Eda", "Yalçın", 24, "female", "Adana", "Türkiye", "Mühendis 🔧", ["Mühendislik", "Teknoloji", "İnovasyon"], ["Proje geliştirme"], "Aslan", "https://images.unsplash.com/photo-1520813792240-56fc4a3765a7?w=1080&h=1920&fit=crop"),
+        ("Gamze", "Özer", 26, "female", "Gaziantep", "Türkiye", "Pazarlama uzmanı 📊", ["Pazarlama", "Dijital", "Sosyal Medya"], ["Analiz", "Strateji"], "Başak", "https://images.unsplash.com/photo-1509783236416-c9ad59bae472?w=1080&h=1920&fit=crop"),
+        ("Hande", "Taş", 23, "female", "Berlin", "Almanya", "Oyuncu 🎭", ["Tiyatro", "Sinema", "Sanat"], ["Oyunculuk", "Dans"], "Terazi", "https://images.unsplash.com/photo-1501196354995-cbb51c65aaea?w=1080&h=1920&fit=crop"),
+        ("Sinem", "Kara", 28, "female", "München", "Almanya", "Yazılım geliştirici 💻", ["Yazılım", "Teknoloji", "AI"], ["Coding", "Gaming"], "Akrep", "https://images.unsplash.com/photo-1516726817505-f5ed825624d8?w=1080&h=1920&fit=crop"),
+        ("Ebru", "Çiftçi", 25, "female", "Paris", "Fransa", "İç mimar 🛋️", ["İç Mimarlık", "Dekorasyon", "Tasarım"], ["Dekorasyon", "DIY"], "Yay", "https://images.unsplash.com/photo-1519699047748-de8e457a634e?w=1080&h=1920&fit=crop"),
+        ("Derya", "Güler", 24, "female", "Lyon", "Fransa", "Diyetisyen 🥗", ["Beslenme", "Sağlık", "Spor"], ["Yemek yapma", "Spor"], "Oğlak", "https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=1080&h=1920&fit=crop"),
+        ("Aslı", "Bayrak", 26, "female", "London", "İngiltere", "Gazeteci 📰", ["Gazetecilik", "Haber", "Yazı"], ["Yazma", "Araştırma"], "Kova", "https://images.unsplash.com/photo-1517677129300-07b130802f46?w=1080&h=1920&fit=crop"),
+        ("Sevgi", "Özkaya", 23, "female", "Manchester", "İngiltere", "Hemşire 💉", ["Sağlık", "Bakım", "İnsanlık"], ["Gönüllülük"], "Balık", "https://images.unsplash.com/photo-1512310604669-443f26c35f52?w=1080&h=1920&fit=crop"),
+        ("Gül", "Demirci", 27, "female", "New York", "ABD", "Eczacı 💊", ["Eczacılık", "Sağlık", "Bilim"], ["Okuma", "Araştırma"], "Koç", "https://images.unsplash.com/photo-1514315384763-ba401779410f?w=1080&h=1920&fit=crop"),
+        ("Fulya", "Yıldırım", 25, "female", "Los Angeles", "ABD", "Fizyoterapist 🏥", ["Fizyoterapi", "Sağlık", "Spor"], ["Spor", "Yoga"], "Boğa", "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=1080&h=1920&fit=crop"),
+        ("Serap", "Koçak", 24, "female", "Amsterdam", "Hollanda", "Muhasebeci 📊", ["Finans", "Matematik", "İş"], ["Okuma", "Analiz"], "İkizler", "https://images.unsplash.com/photo-1525134479668-1bee5c7c6845?w=1080&h=1920&fit=crop"),
+        ("Tuba", "Sarı", 26, "female", "Brussels", "Belçika", "İnsan kaynakları uzmanı 👥", ["İK", "İnsan", "Gelişim"], ["Networking", "Okuma"], "Yengeç", "https://images.unsplash.com/photo-1502685104226-ee32379fefbe?w=1080&h=1920&fit=crop"),
+        
+        // MALE (20)
+        ("Mehmet", "Yılmaz", 27, "male", "İstanbul", "Türkiye", "Seyahat etmeyi seviyorum ✈️", ["Seyahat", "Fotoğraf", "Doğa"], ["Fotoğrafçılık", "Hiking"], "Aslan", "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=1080&h=1920&fit=crop"),
+        ("Can", "Kaya", 26, "male", "Ankara", "Türkiye", "Spor ve fitness 💪", ["Spor", "Fitness", "Sağlık"], ["Gym", "Basketbol"], "Başak", "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=1080&h=1920&fit=crop"),
+        ("Burak", "Demir", 28, "male", "İzmir", "Türkiye", "Teknoloji meraklısı 💻", ["Teknoloji", "Bilim", "Oyun"], ["Gaming", "Coding"], "Terazi", "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=1080&h=1920&fit=crop"),
+        ("Emre", "Çelik", 29, "male", "Antalya", "Türkiye", "Fotoğrafçılık tutkunu 📸", ["Fotoğraf", "Sanat", "Seyahat"], ["Fotoğrafçılık"], "Akrep", "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=1080&h=1920&fit=crop"),
+        ("Arda", "Arslan", 27, "male", "Bursa", "Türkiye", "Kahve içip kitap okumayı seviyorum ☕", ["Kahve", "Kitap", "Müzik"], ["Okuma", "Kahve"], "Yay", "https://images.unsplash.com/photo-1504257432389-52343af06ae3?w=1080&h=1920&fit=crop"),
+        ("Kaan", "Öztürk", 26, "male", "İstanbul", "Türkiye", "Müzik prodüktörü 🎵", ["Müzik", "Prodüksiyon", "Sanat"], ["Müzik yapma"], "Oğlak", "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=1080&h=1920&fit=crop"),
+        ("Onur", "Aydın", 28, "male", "Ankara", "Türkiye", "Girişimci 💼", ["İş", "Girişimcilik", "Teknoloji"], ["Okuma", "Networking"], "Kova", "https://images.unsplash.com/photo-1506277886164-e25aa3f4ef7f?w=1080&h=1920&fit=crop"),
+        ("Barış", "Şahin", 27, "male", "İzmir", "Türkiye", "DJ ve müzik sevdalısı 🎧", ["Müzik", "DJ", "Parti"], ["DJ", "Müzik"], "Balık", "https://images.unsplash.com/photo-1531427186611-ecfd6d936c79?w=1080&h=1920&fit=crop"),
+        ("Tolga", "Yıldız", 29, "male", "Adana", "Türkiye", "Yazılım mühendisi 💻", ["Yazılım", "Teknoloji", "AI"], ["Coding", "Gaming"], "Koç", "https://images.unsplash.com/photo-1488161628813-04466f872be2?w=1080&h=1920&fit=crop"),
+        ("Mert", "Koç", 27, "male", "Gaziantep", "Türkiye", "Psikoloji ve felsefe tutkunu 🧠", ["Psikoloji", "Felsefe", "Sanat"], ["Okuma", "Düşünme"], "Boğa", "https://images.unsplash.com/photo-1463453091185-61582044d556?w=1080&h=1920&fit=crop"),
+        ("Alp", "Erdoğan", 28, "male", "İstanbul", "Türkiye", "Dağcı ve doğa sever 🏔️", ["Dağcılık", "Doğa", "Macera"], ["Tırmanış", "Kamp"], "İkizler", "https://images.unsplash.com/photo-1489980557514-251d61e3eeb6?w=1080&h=1920&fit=crop"),
+        ("Eren", "Güneş", 29, "male", "Ankara", "Türkiye", "Kitaplar, müzik ve derin düşünceler 📚", ["Kitap", "Müzik", "Felsefe"], ["Okuma", "Müzik"], "Yengeç", "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=1080&h=1920&fit=crop"),
+        ("Serkan", "Aksoy", 27, "male", "İzmir", "Türkiye", "Aşçı ve gurme 🍳", ["Yemek", "Mutfak", "Gastronomi"], ["Yemek yapma"], "Aslan", "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=1080&h=1920&fit=crop"),
+        ("Deniz", "Polat", 26, "male", "Antalya", "Türkiye", "Sörf ve deniz sporları 🏄", ["Sörf", "Deniz", "Spor"], ["Sörf", "Dalış"], "Başak", "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=1080&h=1920&fit=crop"),
+        ("Oğuz", "Kurt", 28, "male", "Bursa", "Türkiye", "Mimar ve tasarımcı 🏛️", ["Mimarlık", "Tasarım", "Sanat"], ["Çizim", "Tasarım"], "Terazi", "https://images.unsplash.com/photo-1504257432389-52343af06ae3?w=1080&h=1920&fit=crop"),
+        ("Cem", "Özkan", 27, "male", "Frankfurt", "Almanya", "Sinema ve dizi bağımlısı 🎬", ["Sinema", "Dizi", "Film"], ["Film izleme"], "Akrep", "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=1080&h=1920&fit=crop"),
+        ("Umut", "Yavuz", 29, "male", "Vienna", "Avusturya", "Doktor 👨‍⚕️", ["Tıp", "Sağlık", "Bilim"], ["Araştırma", "Okuma"], "Yay", "https://images.unsplash.com/photo-1506277886164-e25aa3f4ef7f?w=1080&h=1920&fit=crop"),
+        ("Hakan", "Tekin", 28, "male", "Zürich", "İsviçre", "Avukat ⚖️", ["Hukuk", "Adalet", "Okuma"], ["Okuma", "Tartışma"], "Oğlak", "https://images.unsplash.com/photo-1531427186611-ecfd6d936c79?w=1080&h=1920&fit=crop"),
+        ("Volkan", "Çakır", 27, "male", "Dubai", "BAE", "Pazarlama uzmanı 📊", ["Pazarlama", "Dijital", "Sosyal Medya"], ["Analiz", "Strateji"], "Kova", "https://images.unsplash.com/photo-1488161628813-04466f872be2?w=1080&h=1920&fit=crop"),
+        ("Kerem", "Acar", 26, "male", "Toronto", "Kanada", "Müzisyen ve besteci 🎸", ["Müzik", "Beste", "Sanat"], ["Gitar", "Beste"], "Balık", "https://images.unsplash.com/photo-1463453091185-61582044d556?w=1080&h=1920&fit=crop")
+    ]
+    
+    func addAllMockUsers() async throws -> (success: Int, failed: Int) {
+        var successCount = 0
+        var failedCount = 0
+        
+        print("🚀 Mock kullanıcılar ekleniyor...")
+        
+        for user in mockUsers {
+            do {
+                try await addSingleUser(user)
+                successCount += 1
+                print("✅ \(user.0) \(user.1)")
+            } catch {
+                failedCount += 1
+                print("❌ \(user.0) \(user.1): \(error.localizedDescription)")
+            }
+        }
+        
+        print("\n📊 Tamamlandı!")
+        print("✅ Başarılı: \(successCount)")
+        print("❌ Hata: \(failedCount)")
+        
+        return (successCount, failedCount)
+    }
+    
+    private func addSingleUser(_ user: (String, String, Int, String, String, String, String, [String], [String], String, String)) async throws {
+        let email = "\(user.0.lowercased()).\(user.1.lowercased())@vibeumock.com"
+        let photoUrl = user.10 // Unsplash URL
+        
+        // Firestore'a direkt ekle
+        let userId = UUID().uuidString
+        
+        try await db.collection("users").document(userId).setData([
+            "name": user.0,
+            "surname": user.1,
+            "display_name": "\(user.0) \(user.1)",
+            "age": user.2,
+            "gender": user.3,
+            "city": user.4,
+            "country": user.5,  // Ülke parametresi
+            "bio": user.6,
+            "interests": user.7,
+            "hobbies": user.8,
+            "zodiac_sign": user.9,
+            "email": email,
+            "photo_url": photoUrl,
+            "profile_photo_url": photoUrl,
+            "is_verified": true,
+            "is_premium": false,
+            "diamond_balance": 100,
+            "profile_completion": 100,
+            "age_group": user.2 >= 18 ? "adult" : "minor",
+            "username": "\(user.0.lowercased())\(user.2)",
+            "tags": [],
+            "created_at": FieldValue.serverTimestamp(),
+            "last_active_at": FieldValue.serverTimestamp()
+        ])
+    }
+}
+#endif

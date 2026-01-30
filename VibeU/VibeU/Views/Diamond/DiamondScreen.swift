@@ -94,16 +94,13 @@ struct DiamondScreen: View {
                     .frame(width: 120, height: 120)
                     .blur(radius: 20)
                 
-                Image(systemName: "diamond.fill")
-                    .font(.system(size: 60))
-                    .foregroundStyle(
-                        LinearGradient(
-                            colors: [.cyan, .blue],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
-                    .shadow(color: .cyan.opacity(0.5), radius: 10)
+                Image("diamond-icon")
+                    .resizable()
+                    .renderingMode(.template)
+                    .scaledToFit()
+                    .frame(width: 60, height: 60)
+                    .foregroundStyle(Color(red: 1.0, green: 0.84, blue: 0.0))
+                    .shadow(color: Color(red: 1.0, green: 0.84, blue: 0.0).opacity(0.5), radius: 10)
             }
             
             // Balance
@@ -148,10 +145,14 @@ struct DiamondScreen: View {
                 
                 Text("+100")
                     .font(.headline.weight(.bold))
-                    .foregroundStyle(.cyan)
+                    .foregroundStyle(Color(red: 1.0, green: 0.84, blue: 0.0))
                 
-                Image(systemName: "diamond.fill")
-                    .foregroundStyle(.cyan)
+                Image("diamond-icon")
+                    .resizable()
+                    .renderingMode(.template)
+                    .scaledToFit()
+                    .frame(width: 16, height: 16)
+                    .foregroundStyle(Color(red: 1.0, green: 0.84, blue: 0.0))
             }
             
             if canClaimReward {

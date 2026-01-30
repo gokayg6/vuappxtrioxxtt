@@ -7,10 +7,7 @@
     "-" : {
 
     },
-    "\"%@\"" : {
-
-    },
-    "(%@)" : {
+    "-10" : {
 
     },
     "@%@" : {
@@ -21,16 +18,6 @@
     },
     "%@" : {
 
-    },
-    "%@ / %@" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "%1$@ / %2$@"
-          }
-        }
-      }
     },
     "%@ • %%%@" : {
       "localizations" : {
@@ -54,13 +41,13 @@
     "%@ Beğeni" : {
 
     },
+    "%@ Boost" : {
+
+    },
     "%@ Boost hesabına eklendi!" : {
 
     },
-    "%@ Burcu İçin" : {
-
-    },
-    "%@ değerlendirme" : {
+    "%@ Elmas" : {
 
     },
     "%@ En Seçkin Profil" : {
@@ -72,22 +59,22 @@
     "%@ Günlük Seri!" : {
 
     },
-    "%@ ile" : {
-
-    },
-    "%@ ile eşleştin!" : {
-
-    },
     "%@ ilgi alanı kaydedildi." : {
-
-    },
-    "%@ kilometre uzaklıkta" : {
 
     },
     "%@ kişi" : {
 
     },
+    "%@ kişi kaldı" : {
+
+    },
     "%@ kişi seni beğendi" : {
+
+    },
+    "%@ kişi seninle çok uyumlu" : {
+
+    },
+    "%@ kişisine arkadaşlık isteği gönderildi." : {
 
     },
     "%@ km" : {
@@ -96,22 +83,32 @@
     "%@ km away" : {
 
     },
-    "%@ oyun" : {
+    "%@ km uzaklıkta" : {
 
     },
-    "%@ Oyuncu Bulundu" : {
+    "%@ Mood" : {
+
+    },
+    "%@ okuyucu" : {
+
+    },
+    "%@ ortak ilgi alanı" : {
 
     },
     "%@ profil" : {
 
     },
-    "%@ sayfa" : {
-
+    "%@ sayfa • %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ sayfa • %2$@"
+          }
+        }
+      }
     },
     "%@ Super Like hesabına eklendi!" : {
-
-    },
-    "%@ üye" : {
 
     },
     "%@, %@" : {
@@ -144,17 +141,13 @@
         }
       }
     },
-    "%@/%@ sayfa" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "%1$@/%2$@ sayfa"
-          }
-        }
-      }
+    "%@/3" : {
+
     },
     "%@/5" : {
+
+    },
+    "%@/5 seçildi" : {
 
     },
     "%@/10" : {
@@ -166,13 +159,13 @@
     "%@%%" : {
 
     },
-    "%@%% Win" : {
-
-    },
     "%%%@" : {
 
     },
     "%%%@ tamamlandı" : {
+
+    },
+    "%%%@ uyum" : {
 
     },
     "%%%@ Uyum" : {
@@ -193,125 +186,79 @@
     "+15%" : {
 
     },
-    "⏰" : {
+    "+100" : {
 
     },
-    "♫ %@" : {
+    "⚡ Boost" : {
 
     },
-    "♫ %@ - %@" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "♫ %1$@ - %2$@"
-          }
-        }
-      }
-    },
-    "⚡" : {
+    "🇹🇷" : {
 
     },
-    "✈️ Gezginler" : {
-
-    },
-    "✨" : {
-
-    },
-    "❤️ %@" : {
-
-    },
-    "🍴 Restoranlar" : {
+    "✈️" : {
 
     },
     "🍽️" : {
 
     },
-    "🍽️ Gurme Keşfi" : {
-
-    },
-    "🎉" : {
-
-    },
-    "🎙️" : {
-
-    },
     "🎭" : {
 
     },
-    "🎸" : {
+    "💎 Elmas" : {
 
     },
-    "👤" : {
+    "💡 İpuçları" : {
 
     },
-    "👥 Okuma Arkadaşları" : {
+    "📈 +23%" : {
 
     },
-    "👥 Yemek Arkadaşı" : {
+    "📚" : {
 
     },
-    "💬" : {
+    "1" : {
 
     },
-    "💬 Tartışma Odaları" : {
+    "1/3 tamamlandı • 120 puan kazan" : {
 
     },
-    "💭" : {
+    "2/5" : {
 
     },
-    "📅 Buluşma Planla" : {
+    "5 Boost = Öne Çık" : {
 
     },
-    "📅 Rezervasyon" : {
+    "8 soruluk kişilik testini tamamla ve ruh eşini bul!" : {
 
     },
-    "📖 %@" : {
+    "10 soru ile kişiliğini keşfet!" : {
 
     },
-    "📚 %@" : {
-
-    },
-    "📚 Kitap Kulübü" : {
-
-    },
-    "🔍" : {
-
-    },
-    "🔮" : {
-
-    },
-    "🕐 %@" : {
-
-    },
-    "🤔" : {
-
-    },
-    "0/3" : {
-
-    },
-    "2 gün" : {
-
-    },
-    "3 dakikada tanış, sorulara cevap ver" : {
-
-    },
-    "3 Uyumlu Eşleşme!" : {
+    "15 yaşından küçükler kayıt olamaz" : {
 
     },
     "30 dakika boyunca profilini öne çıkar ve 10 kat daha fazla görüntülenme al!" : {
 
     },
-    "30 saniyelik ses kaydı oluştur" : {
+    "30 dakika boyunca profilini öne çıkar!" : {
 
     },
-    "48/60" : {
+    "30 saniyelik sesli mesaj kaydet" : {
+
+    },
+    "100+ restoran, rezervasyon yap, eşleş" : {
 
     },
     "Abonelik otomatik olarak yenilenir. İstediğin zaman iptal edebilirsin." : {
 
     },
     "Abonelik otomatik olarak yenilenir. İstediğiniz zaman iptal edebilirsiniz." : {
+
+    },
+    "Abonelik otomatik yenilenir. İstediğin zaman iptal edebilirsin." : {
+
+    },
+    "Aç" : {
 
     },
     "accepted" : {
@@ -337,26 +284,15 @@
     "add_photo" : {
 
     },
-    "Adım 1/4" : {
-
-    },
-    "Adım 2/4" : {
-
-    },
-    "Adım 3/4" : {
-
-    },
-    "Adım 4/4" : {
-
-    },
-    "Aktif" : {
-
-    },
-    "Aktivite Seç" : {
-
-    },
-    "Akustik performanslar eşliğinde yeni insanlarla tanışma fırsatı. Rahat bir ortamda müzik dinleyip sohbet edebilirsiniz." : {
-
+    "Adım %@/%@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Adım %1$@/%2$@"
+          }
+        }
+      }
     },
     "Ana" : {
 
@@ -364,7 +300,7 @@
     "ANA" : {
 
     },
-    "Aradığım" : {
+    "Ana Fotoğraf" : {
 
     },
     "Aramıza Katıl" : {
@@ -374,6 +310,9 @@
 
     },
     "Arkadaş ol, sosyal medyasını gör" : {
+
+    },
+    "Arkadaş olunca sosyal medya hesaplarını görebilirsin" : {
 
     },
     "Arkadaşlar" : {
@@ -386,6 +325,12 @@
 
     },
     "Arkadaşlarınla birlikte eşleş" : {
+
+    },
+    "Arkadaşlık isteği göndermek için 10 elmas gerekiyor. Günlük ücretsiz elmasını alabilirsin!" : {
+
+    },
+    "Arkadaşlık isteği göndermek için en az %@ elmasa ihtiyacınız var." : {
 
     },
     "Arkadaşlık isteği kabul edildiğinde hesapların paylaşılır" : {
@@ -411,10 +356,10 @@
         }
       }
     },
-    "Ayarlar" : {
+    "Aynı kitabı okuyan insanlarla tanış" : {
 
     },
-    "Aynı şarkıları dinleyenlerle eşleş" : {
+    "Aynı müzik zevkine sahip insanlarla tanış" : {
 
     },
     "Bağlantı Gönder" : {
@@ -423,13 +368,16 @@
     "Bağlantının yeni çağı" : {
 
     },
-    "Başka Birini Bul" : {
-
-    },
     "Başla" : {
 
     },
+    "BEĞENDİN" : {
+
+    },
     "Beğenenler" : {
+
+    },
+    "Bekleyen istek yok" : {
 
     },
     "Beni Hatırla" : {
@@ -441,10 +389,13 @@
     "Bildirimler" : {
 
     },
+    "Bilet Al" : {
+
+    },
     "Bio" : {
 
     },
-    "Bitir" : {
+    "Birlikte oynayacak arkadaş bul" : {
 
     },
     "block" : {
@@ -484,6 +435,9 @@
     "Boost" : {
 
     },
+    "Boost Nasıl Çalışır?" : {
+
+    },
     "boost_benefit" : {
 
     },
@@ -496,16 +450,13 @@
     "Bu adımı atla" : {
 
     },
+    "Bu Hafta" : {
+
+    },
     "Bu isim profilinde görünecek" : {
 
     },
     "Bu işlem geri alınamaz. Tüm verileriniz silinecektir." : {
-
-    },
-    "Bu kişiyle devam etmek ister misin?" : {
-
-    },
-    "Bu restorana gitmek isteyen kişiler" : {
 
     },
     "Bu uygulama 15 yaş altı kullanıcılar için uygun değildir" : {
@@ -514,16 +465,22 @@
     "Bugün Nasıl Hissediyorsun?" : {
 
     },
+    "Bugünkü ödülünü aldın!" : {
+
+    },
+    "Bugünkü ödülünüzü aldınız!" : {
+
+    },
     "Bugünün Önerisi" : {
 
     },
-    "Buluşmayı Onayla" : {
+    "Bul" : {
 
     },
-    "Burç Eşleşmesi" : {
+    "Burç" : {
 
     },
-    "Burcunu seç, uyumlu eşleşmeleri bul" : {
+    "Burç Eşleş" : {
 
     },
     "by" : {
@@ -549,7 +506,7 @@
     "CANLI" : {
 
     },
-    "Canlı Müzik Gecesi" : {
+    "Çevrimiçi" : {
 
     },
     "Çifte Randevu" : {
@@ -559,6 +516,9 @@
 
     },
     "Çifte Randevu davetlerini burada göreceksin." : {
+
+    },
+    "Çifte Randevu Hakkında" : {
 
     },
     "Çifte Randevu, arkadaşlarınla birlikte diğer gruplarla tanışmanı sağlar. En fazla 3 arkadaşınla takım oluşturabilir ve diğer takımlarla eşleşebilirsin." : {
@@ -688,13 +648,16 @@
         }
       }
     },
+    "daha" : {
+
+    },
+    "Daha fazla bilgi edin" : {
+
+    },
     "Daha fazla En Seçkin Profil için\nVibeU Gold'a yükselt!" : {
 
     },
-    "Daha sonra tekrar dene" : {
-
-    },
-    "Daha sonra tekrar gel,\nyeni kişiler eklenecek" : {
+    "Davet edilecek arkadaş bulunamadı" : {
 
     },
     "delete_account" : {
@@ -714,10 +677,19 @@
         }
       }
     },
+    "Devam Et" : {
+
+    },
     "Diğer" : {
 
     },
     "Dil Seçin" : {
+
+    },
+    "Doğrulama" : {
+
+    },
+    "Doğrulama Kodu" : {
 
     },
     "Doğum Tarihi" : {
@@ -742,6 +714,9 @@
           }
         }
       }
+    },
+    "Dünyayı birlikte keşfet" : {
+
     },
     "E-posta" : {
 
@@ -803,13 +778,34 @@
     "Ekle" : {
 
     },
+    "Elmas" : {
+
+    },
+    "Elmas Kullanımı" : {
+
+    },
+    "Elmas Nasıl Kullanılır?" : {
+
+    },
+    "Elmas Satın Al" : {
+
+    },
+    "Elmaslarım" : {
+
+    },
+    "Email Adresi" : {
+
+    },
+    "En az %@ fotoğraf ekleyin" : {
+
+    },
     "En az 1 fotoğrafın olmalı. Son fotoğrafı silemezsin." : {
 
     },
-    "En az 1 mutfak seç" : {
+    "En az 1, en fazla %@ fotoğraf ekleyebilirsin" : {
 
     },
-    "En az 1, en fazla %@ fotoğraf ekleyebilirsin" : {
+    "En az 5 hobi seçmelisiniz" : {
 
     },
     "En az bir hesap eklendi" : {
@@ -824,6 +820,9 @@
     "EN İYİ" : {
 
     },
+    "En iyi değer" : {
+
+    },
     "EN İYİ FİYAT" : {
 
     },
@@ -831,9 +830,6 @@
 
     },
     "EN SEÇKİN PROFİLLERİ AÇ" : {
-
-    },
-    "En uyumlu 5 profil" : {
 
     },
     "Engellenen kullanıcı yok" : {
@@ -872,13 +868,10 @@
         }
       }
     },
-    "Eşleşme Ara" : {
+    "Eşleşme isteği göndermek: 10 elmas" : {
 
     },
-    "Eşleşme aranıyor..." : {
-
-    },
-    "Eşleşme bulunuyor..." : {
+    "Eşleşme isteği: 10 elmas" : {
 
     },
     "Eşleşmeden önce ona mesaj göndererek dikkatini çek. Ona profilinde hoşuna giden şeyin ne olduğunu söyleyebilir, iltifat edebilir veya onu güldürebilirsin." : {
@@ -887,16 +880,13 @@
     "Eşleşmeler" : {
 
     },
-    "Eşleşmeleri Bul" : {
+    "Eşleşmeye Başla" : {
 
     },
-    "Eşleşmeleri Gör" : {
+    "Etkinlik Detayları" : {
 
     },
-    "Eşleşmeyi Başlat" : {
-
-    },
-    "Evet" : {
+    "Favori Sanatçılar" : {
 
     },
     "favorites" : {
@@ -916,10 +906,13 @@
         }
       }
     },
-    "Fotoğraf Ekle" : {
+    "Filtreleri değiştirmeyi dene" : {
 
     },
-    "Fotoğraf yok, sadece sohbet" : {
+    "Filtreleri Sıfırla" : {
+
+    },
+    "Fotoğraf Ekle" : {
 
     },
     "Fotoğrafı Değiştir" : {
@@ -932,6 +925,12 @@
 
     },
     "Fotoğrafların" : {
+
+    },
+    "Fotoğraflarınız" : {
+
+    },
+    "Fotoğrafsız tanış" : {
 
     },
     "friends" : {
@@ -952,6 +951,12 @@
       }
     },
     "Geç" : {
+
+    },
+    "GEÇ" : {
+
+    },
+    "GEÇÇ" : {
 
     },
     "Geri" : {
@@ -975,12 +980,6 @@
       }
     },
     "Giriş Yap" : {
-
-    },
-    "Gitmek istediğin yerleri seç" : {
-
-    },
-    "Gizemli Eşleşme" : {
 
     },
     "Gizlilik" : {
@@ -1018,25 +1017,31 @@
     "Google ile Kayıt Ol" : {
 
     },
+    "Görevleri tamamla, ödüller kazan!" : {
+
+    },
     "Göz At" : {
 
     },
     "Güler yüzlü fotoğraflar daha çok ilgi çeker" : {
 
     },
+    "Günlük 100 Elmas Al" : {
+
+    },
+    "Günlük Görevler" : {
+
+    },
+    "Günlük Ödül" : {
+
+    },
+    "Gurme Deneyimi" : {
+
+    },
+    "Hakkımda" : {
+
+    },
     "Hakkında" : {
-
-    },
-    "Hangi mutfakları seviyorsun?" : {
-
-    },
-    "Harika bir akşam yemeği sizi bekliyor" : {
-
-    },
-    "Harita" : {
-
-    },
-    "Hayır" : {
 
     },
     "help_center" : {
@@ -1056,10 +1061,13 @@
         }
       }
     },
-    "Henüz karar vermedim" : {
+    "Henüz Beğeni Yok" : {
 
     },
-    "Her gün giriş yap, ödül kazan" : {
+    "Hepsi Bu Kadar!" : {
+
+    },
+    "Her gün ücretsiz 100 elmas al" : {
 
     },
     "Hesabı Sil" : {
@@ -1074,6 +1082,9 @@
     "Hesap Oluştur" : {
 
     },
+    "Hesaplar Gizli" : {
+
+    },
     "Hesapların profilinde görünecek" : {
 
     },
@@ -1083,25 +1094,16 @@
     "Hikayende Paylaş" : {
 
     },
-    "Hızlı Filtreler" : {
-
-    },
-    "Hızlı Tanışma" : {
+    "Hızlı Tanış" : {
 
     },
     "Hobiler" : {
 
     },
+    "Hobilerinizi Seçin" : {
+
+    },
     "Hoş Geldin" : {
-
-    },
-    "ile %@" : {
-
-    },
-    "ile kitap buluşması" : {
-
-    },
-    "İlgi Alanları" : {
 
     },
     "İlgi Alanlarını Seç" : {
@@ -1116,28 +1118,31 @@
     "İlk İzlenim ile öne çık" : {
 
     },
+    "Instagram" : {
+
+    },
+    "Instagram, TikTok, Snapchat..." : {
+
+    },
     "İptal" : {
 
     },
     "İstek kabul edildiğinde sosyal medya hesapları görünür olacak" : {
 
     },
-    "Kadıköy, İstanbul" : {
-
-    },
-    "Kapat" : {
-
-    },
     "Kategori Puanların" : {
-
-    },
-    "Katılımcılar" : {
 
     },
     "Kaydet" : {
 
     },
     "Kayıt Ol" : {
+
+    },
+    "Kendinizi tanımlayın" : {
+
+    },
+    "Kendinizi tanıtın" : {
 
     },
     "Keşfet" : {
@@ -1149,13 +1154,10 @@
     "Keşif Modu" : {
 
     },
-    "kişi" : {
+    "Kilitli" : {
 
     },
-    "Kişi Sayısı" : {
-
-    },
-    "Kişilik profilin oluşturuldu\nEşleşmelerin hazırlanıyor..." : {
+    "Kişilik Analizi" : {
 
     },
     "Kişilik Testi" : {
@@ -1167,7 +1169,16 @@
     "Kişilik testine göre eşleş" : {
 
     },
-    "Konu: %@" : {
+    "Kişilik testini tamamla ve seninle uyumlu kişileri bul!" : {
+
+    },
+    "Kişilik Tipin" : {
+
+    },
+    "Kişisel Bilgiler" : {
+
+    },
+    "Kitap Kulübü" : {
 
     },
     "Kör Randevu" : {
@@ -1247,37 +1258,25 @@
     "Loegs Studio" : {
 
     },
-    "Maksimum Mesafe" : {
-
-    },
     "Merhaba! Ben %@. Müzik dinlemeyi, seyahat etmeyi ve yeni insanlarla tanışmayı seviyorum. 🎵✈️" : {
 
     },
     "Merhaba! Ben..." : {
 
     },
-    "Mesaj Gönder" : {
+    "Mesajın gönderildi!" : {
 
     },
-    "Mesajın gönderildi!" : {
+    "Mevcut Boost" : {
 
     },
     "Mevcut: %@" : {
 
     },
-    "Moda Sahili yakını" : {
+    "Müzik Eşleş" : {
 
     },
-    "Müzik Eşleşmesi!" : {
-
-    },
-    "Müzik Uyumu" : {
-
-    },
-    "Müzik Zevkin Ne?" : {
-
-    },
-    "Müzik Zevkini Analiz Ediyoruz..." : {
+    "Müzik sevgili bulunamadı" : {
 
     },
     "my_qr_code" : {
@@ -1296,9 +1295,6 @@
           }
         }
       }
-    },
-    "Ne oynuyorsun?" : {
-
     },
     "neon_frame" : {
       "extractionState" : "stale",
@@ -1368,6 +1364,9 @@
         }
       }
     },
+    "Ödülümü Al" : {
+
+    },
     "ok" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -1385,10 +1384,10 @@
         }
       }
     },
-    "Okuma Arkadaşı Bul" : {
+    "Okuma Grubuna Katıl" : {
 
     },
-    "Okuma İlerlemen" : {
+    "Okuyucu" : {
 
     },
     "onboarding_subtitle_1" : {
@@ -1511,6 +1510,9 @@
         }
       }
     },
+    "Öne Çıkanlar" : {
+
+    },
     "Öneriler" : {
 
     },
@@ -1566,9 +1568,6 @@
         }
       }
     },
-    "Ortak Zevkler" : {
-
-    },
     "otp_sent_to" : {
       "localizations" : {
         "en" : {
@@ -1585,16 +1584,10 @@
         }
       }
     },
-    "Oyun arkadaşı bulmak için oyunlarını seç" : {
+    "Oyun Arkadaşı" : {
 
     },
-    "Oyuna Davet Et" : {
-
-    },
-    "Oyuncu Ara" : {
-
-    },
-    "Oyuncu Aranıyor..." : {
+    "Oyuncu bulunamadı" : {
 
     },
     "Özel Deneyimler" : {
@@ -1642,10 +1635,22 @@
     "POPÜLER" : {
 
     },
+    "Popüler Şehirler" : {
+
+    },
     "Premium" : {
 
     },
+    "Premium deneyimi yaşa" : {
+
+    },
+    "Premium ile Aç" : {
+
+    },
     "Premium ile kimlerin beğendiğini gör" : {
+
+    },
+    "Premium özellik" : {
 
     },
     "Premium üyeliğiniz aktif edildi!" : {
@@ -1655,6 +1660,9 @@
 
     },
     "Premium'a Geç" : {
+
+    },
+    "Premium'u Keşfet" : {
 
     },
     "privacy" : {
@@ -1703,10 +1711,13 @@
         }
       }
     },
-    "QR kod fotoğraflarına kaydedildi." : {
+    "Profilini öne çıkar ve daha fazla kişiye ulaş!" : {
 
     },
-    "QR kodu taratarak bağlan" : {
+    "Puan" : {
+
+    },
+    "QR kod fotoğraflarına kaydedildi." : {
 
     },
     "received" : {
@@ -1813,12 +1824,6 @@
     "resend_in_seconds %@" : {
 
     },
-    "Restoranlar aranıyor..." : {
-
-    },
-    "Restoranları Gör" : {
-
-    },
     "retry" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -1836,10 +1841,7 @@
         }
       }
     },
-    "Rezervasyon Onaylandı! 🎉" : {
-
-    },
-    "Rezervasyonu Onayla" : {
+    "Rezervasyon Yap" : {
 
     },
     "Rozetler" : {
@@ -1848,16 +1850,10 @@
     "Rozetler profilinde görünür ve ortak ilgi alanlarını bulmana yardımcı olur" : {
 
     },
+    "Ruh Eşini" : {
+
+    },
     "Ruh Eşini Bul" : {
-
-    },
-    "Saat Seç" : {
-
-    },
-    "Sadece Çevrimiçi" : {
-
-    },
-    "Sadece Doğrulanmış" : {
 
     },
     "Sana Özel" : {
@@ -1885,6 +1881,9 @@
           }
         }
       }
+    },
+    "Sayfa" : {
+
     },
     "scan_to_connect" : {
       "extractionState" : "stale",
@@ -1966,19 +1965,34 @@
         }
       }
     },
+    "Seni beğenen herkesi görmek için Premium'a geç!" : {
+
+    },
+    "Seni beğenen kişiler burada görünecek." : {
+
+    },
     "Seni beğenen kişileri\ngörmek için Gold'a yükselt" : {
 
     },
     "Seni Beğenenler" : {
 
     },
-    "Seni beğenenleri gör ve daha fazlasını keşfet" : {
+    "Seni beğenenleri gör, sınırsız beğen ve daha fazlası" : {
+
+    },
+    "Seni Çifte Randevu'ya davet etti" : {
 
     },
     "Seni kimlerin beğendiğini gör" : {
 
     },
-    "Senin İçin Seçtik" : {
+    "Senin için özel seçilmiş en uyumlu profiller!" : {
+
+    },
+    "Seninle en uyumlu kişiler" : {
+
+    },
+    "Seninle en uyumlu profiller" : {
 
     },
     "sent" : {
@@ -1998,10 +2012,13 @@
         }
       }
     },
-    "Ses Tanışması" : {
+    "Ses Tanış" : {
 
     },
     "Seyahat Arkadaşı" : {
+
+    },
+    "Seyahat Arkadaşı Bul" : {
 
     },
     "share" : {
@@ -2067,13 +2084,28 @@
         }
       }
     },
-    "Şimdilik bu kadar!" : {
+    "Şimdi Başla" : {
+
+    },
+    "Şimdi Değil" : {
+
+    },
+    "Şimdilik bu kadar" : {
 
     },
     "Şimdilik Geç" : {
 
     },
-    "Sıfırla" : {
+    "Sıfırla (Debug)" : {
+
+    },
+    "Sınırsız" : {
+
+    },
+    "Sınırsız beğeni, seni beğenenleri gör" : {
+
+    },
+    "Sınırsız beğeni, seni beğenenleri gör!" : {
 
     },
     "Sınırsız eşleşme, sınırsız bağlantı" : {
@@ -2099,6 +2131,9 @@
         }
       }
     },
+    "Snapchat" : {
+
+    },
     "social_links" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -2116,16 +2151,7 @@
         }
       }
     },
-    "Sohbet" : {
-
-    },
-    "Sohbete Başla" : {
-
-    },
     "Son Zamanlarda Aktif" : {
-
-    },
-    "Sonraki" : {
 
     },
     "Soru %@/%@" : {
@@ -2144,13 +2170,25 @@
     "Sosyal medya bağlantısı isteği" : {
 
     },
+    "Sosyal Medya Hesapları" : {
+
+    },
     "Sosyal medya hesapların güncellendi." : {
 
     },
     "Sosyal medya hesapların sadece arkadaşlarına görünür" : {
 
     },
+    "Sosyal medya hesaplarını görmek için arkadaş olmalısın." : {
+
+    },
     "Soyad" : {
+
+    },
+    "Spotlight" : {
+
+    },
+    "Spotlight Aktifleştir" : {
 
     },
     "spotlight_global" : {
@@ -2187,19 +2225,10 @@
         }
       }
     },
-    "Şu an kimse yok" : {
-
-    },
-    "Şu an: %@" : {
-
-    },
     "Super Like" : {
 
     },
     "Super Like ile öne çık ve eşleşme şansını 3 kat artır!" : {
-
-    },
-    "Süre Doldu!" : {
 
     },
     "Sürüm" : {
@@ -2256,22 +2285,28 @@
         }
       }
     },
+    "Takım Bilgisi" : {
+
+    },
     "Takımdan Ayrıl" : {
+
+    },
+    "Takımdan ayrılmak istediğine emin misin? Bu işlem geri alınamaz." : {
 
     },
     "Takımı Sil" : {
 
     },
+    "Takımı silmek istediğine emin misin? Tüm üyeler takımdan çıkarılacak ve eşleşmeler silinecek." : {
+
+    },
     "Takma ad, rumuz veya gerçek adını kullanabilirsin" : {
 
     },
-    "Tamamlandı!" : {
+    "Tamam" : {
 
     },
-    "Tarih Seç" : {
-
-    },
-    "Tartışmalara Katıl" : {
+    "Tarat ve Bağlan" : {
 
     },
     "Tehlikeli Bölge" : {
@@ -2283,7 +2318,28 @@
     "Telefon ile Kayıt Ol" : {
 
     },
+    "Telefon Numarası" : {
+
+    },
+    "Telefon veya email ile doğrulayın" : {
+
+    },
     "Temel Bilgiler" : {
+
+    },
+    "Test modunda kod gerekmez" : {
+
+    },
+    "Teste Başla" : {
+
+    },
+    "TikTok" : {
+
+    },
+    "Top Picks" : {
+
+    },
+    "Trend Profiller" : {
 
     },
     "trending_global" : {
@@ -2320,19 +2376,22 @@
         }
       }
     },
-    "Tüm Dünya" : {
-
-    },
-    "Tüm gezginleri gördün!" : {
-
-    },
     "Tüm premium özelliklere eriş!" : {
+
+    },
+    "Tümü" : {
+
+    },
+    "Tümünü Gör" : {
 
     },
     "Tümünü Oku" : {
 
     },
     "U" : {
+
+    },
+    "Uçak Bileti Al" : {
 
     },
     "Ülke" : {
@@ -2389,13 +2448,10 @@
         }
       }
     },
-    "Uygula" : {
-
-    },
     "Uygulama dilini değiştirin" : {
 
     },
-    "Uyumlu Eşleşmeleri Gör" : {
+    "Uyum" : {
 
     },
     "Uyumluluk & Yakınlık" : {
@@ -2426,10 +2482,22 @@
     "Vibe" : {
 
     },
+    "Vibe Match" : {
+
+    },
+    "Vibe Quiz" : {
+
+    },
     "VibeU" : {
 
     },
+    "VibeU Gold" : {
+
+    },
     "VibeU Gold %@ aboneliğin aktif edildi!" : {
+
+    },
+    "VibeU Premium" : {
 
     },
     "vibeu_premium" : {
@@ -2466,19 +2534,28 @@
         }
       }
     },
-    "Win Rate" : {
+    "𝕏" : {
 
     },
-    "𝕏" : {
+    "Yakında yeni etkinlikler..." : {
+
+    },
+    "Yakınındakiler" : {
 
     },
     "Yaklaşan Etkinlikler" : {
 
     },
-    "Yaş Aralığı" : {
+    "Yaşam Tarzınız" : {
 
     },
     "Yaşın:" : {
+
+    },
+    "Yaşınız: %@" : {
+
+    },
+    "YENİ" : {
 
     },
     "Yeni bildirimler geldiğinde burada görünecek" : {
@@ -2487,7 +2564,25 @@
     "Yeni bir maceraya başla" : {
 
     },
+    "Yeni kullanıcılar için tekrar gel" : {
+
+    },
+    "Yeni ödül: %@" : {
+
+    },
+    "Yeni profiller için daha sonra tekrar gel" : {
+
+    },
+    "Yeni Üyeler" : {
+
+    },
+    "Yenile" : {
+
+    },
     "Yükleniyor..." : {
+
+    },
+    "Yüksek Uyumluluk" : {
 
     },
     "Zaten hesabın var mı?" : {

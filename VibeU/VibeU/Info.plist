@@ -24,7 +24,7 @@
 	<key>CFBundleShortVersionString</key>
 	<string>1.0</string>
 	<key>GIDClientID</key>
-	<string>191874368460-0ia4ul3f0ici7hjf0pgmkedgk1gmc2i5.apps.googleusercontent.com</string>
+	<string>901614024126-jk45khdkb2gegbuk8o9u7h5ngmhso765.apps.googleusercontent.com</string>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
@@ -40,7 +40,7 @@
 			<string>REVERSED_CLIENT_ID</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>com.googleusercontent.apps.191874368460-0ia4ul3f0ici7hjf0pgmkedgk1gmc2i5</string>
+				<string>com.googleusercontent.apps.901614024126-jk45khdkb2gegbuk8o9u7h5ngmhso765</string>
 			</array>
 		</dict>
 	</array>

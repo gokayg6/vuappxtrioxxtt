@@ -1,143 +1,6 @@
 import SwiftUI
-
-// MARK: - Mock Data
-
-extension DiscoverUser {
-    static var mockUsers: [DiscoverUser] {
-        let maleNames = ["Kaan", "Efe", "Berk", "Emre", "Arda", "Mert", "Yiğit", "Barış", "Can", "Deniz", "Ozan", "Alp", "Cem", "Onur", "Burak", "Tolga", "Serkan", "Kerem", "Koray", "Batuhan", "Ahmet", "Mehmet", "Mustafa", "Ali", "Hüseyin", "İbrahim", "Ömer", "Yusuf", "Murat", "Hakan"]
-        let femaleNames = ["Elif", "Zeynep", "Ayşe", "Defne", "Ecrin", "Melis", "İrem", "Selin", "Ceren", "Derya", "Pelin", "Buse", "Gizem", "Cansu", "Burcu", "Özge", "Şeyma", "Aslı", "Esra", "Gamze", "Nazlı", "Merve", "Dilan", "Ebru", "Fatma", "Aylin", "Büşra", "Dilara", "Eylül", "Hande", "Aleyna", "Nilay", "Sibel", "Tuğba", "Yonca", "Eda", "Seda", "Beren", "Ceyda", "Damla", "Ezgi", "Funda", "Gözde", "Hale", "Işık", "Jale", "Lale", "Mine", "Nalan", "Oya", "Pınar", "Rana", "Simge", "Yeliz", "Zehra", "Berna", "Duygu", "Ece", "Filiz", "Gül", "Hazal", "İpek", "Jülide", "Kübra", "Leyla", "Melek", "Nur", "Pırıl", "Reyhan", "Saadet", "Tülay", "Ülkü", "Vildan", "Yasemin", "Zümrüt", "Bahar", "Cansel", "Demet", "Fulya", "Gonca", "Hülya", "İlknur", "Menekşe", "Nergis", "Perihan", "Rüya", "Sanem", "Tansu", "Umay", "Veda", "Yeşim", "Zuhal"]
-        let cities = ["Istanbul", "Ankara", "Izmir", "Antalya", "Bursa", "Adana", "Konya", "Gaziantep", "Mersin", "Kayseri", "Eskişehir", "Samsun", "Trabzon", "Bodrum", "Muğla", "Denizli", "Kocaeli", "Diyarbakır", "Hatay", "Malatya"]
-        
-        // High Quality 4K Unsplash Photos (Sexy/Bikini/Summer/Model Vibe) - OPTIMIZED w=800
-        // Strictly verified female IDs to strictly avoid male photos
-        let highQualityFemalePhotos = [
-            "https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=800&auto=format&fit=crop",
-            "https://images.unsplash.com/photo-1524638431109-93d95c968f03?q=80&w=800&auto=format&fit=crop",
-            "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?q=80&w=800&auto=format&fit=crop",
-            "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=800&auto=format&fit=crop",
-            "https://images.unsplash.com/photo-1589156229687-496a31ad1d1f?q=80&w=800&auto=format&fit=crop",
-            "https://images.unsplash.com/photo-1564485377539-4af72d1f6a2f?q=80&w=800&auto=format&fit=crop",
-            "https://images.unsplash.com/photo-1502823403499-6ccfcf4fb453?q=80&w=800&auto=format&fit=crop",
-            "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=800&auto=format&fit=crop",
-            "https://images.unsplash.com/photo-1517841905240-472988babdf9?q=80&w=800&auto=format&fit=crop",
-            "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?q=80&w=800&auto=format&fit=crop",
-            "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?q=80&w=800&auto=format&fit=crop",
-            "https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?q=80&w=800&auto=format&fit=crop",
-            "https://images.unsplash.com/photo-1546539782-d937163cb434?q=80&w=800&auto=format&fit=crop",
-            "https://images.unsplash.com/photo-1519699047748-de8e457a634e?q=80&w=800&auto=format&fit=crop",
-            "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=800&auto=format&fit=crop",
-            "https://images.unsplash.com/photo-1526510747491-58f928ec870f?q=80&w=800&auto=format&fit=crop",
-            "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=800&auto=format&fit=crop",
-            "https://images.unsplash.com/photo-1500917293891-ef795e70e1f6?q=80&w=800&auto=format&fit=crop",
-            "https://images.unsplash.com/photo-1485290334039-a3c69043e517?q=80&w=800&auto=format&fit=crop",
-            "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?q=80&w=800&auto=format&fit=crop",
-            "https://images.unsplash.com/photo-1514315384763-ba401779410f?q=80&w=800&auto=format&fit=crop",
-            "https://images.unsplash.com/photo-1469334031218-e382a71b716b?q=80&w=800&auto=format&fit=crop",
-            "https://images.unsplash.com/photo-1532910404247-7ee9488d7292?q=80&w=800&auto=format&fit=crop",
-            "https://images.unsplash.com/photo-1523950704592-7e477647242d?q=80&w=800&auto=format&fit=crop",
-            "https://images.unsplash.com/photo-1523264939339-c89f9dadde2e?q=80&w=800&auto=format&fit=crop",
-            "https://images.unsplash.com/photo-1483985988355-763728e1935b?q=80&w=800&auto=format&fit=crop",
-            "https://images.unsplash.com/photo-1504703395950-b89145a5425b?q=80&w=800&auto=format&fit=crop",
-            "https://images.unsplash.com/photo-1512316609839-ce289d3eba0a?q=80&w=800&auto=format&fit=crop",
-            "https://images.unsplash.com/photo-1517365830460-955ce3ccd263?q=80&w=800&auto=format&fit=crop",
-            "https://images.unsplash.com/photo-1520813792240-56fc4a3765a7?q=80&w=800&auto=format&fit=crop",
-            "https://images.unsplash.com/photo-1496747611176-843222e1e57c?q=80&w=800&auto=format&fit=crop",
-            "https://images.unsplash.com/photo-1509967419530-da38b4704bc6?q=80&w=800&auto=format&fit=crop",
-            "https://images.unsplash.com/photo-1534751516642-a1af1ef26a56?q=80&w=800&auto=format&fit=crop",
-            "https://images.unsplash.com/photo-1516467508483-a7212febe31a?q=80&w=800&auto=format&fit=crop",
-            "https://images.unsplash.com/photo-1548142813-c348350df52b?q=80&w=800&auto=format&fit=crop",
-            "https://images.unsplash.com/photo-1485206412256-701ccc5b93ca?q=80&w=800&auto=format&fit=crop",
-            "https://images.unsplash.com/photo-1520155707862-5b32817388d6?q=80&w=800&auto=format&fit=crop",
-            "https://images.unsplash.com/photo-1529139574466-a302d2d3f524?q=80&w=800&auto=format&fit=crop",
-            "https://images.unsplash.com/photo-1518977822534-7049a61ee0c2?q=80&w=800&auto=format&fit=crop",
-            "https://images.unsplash.com/photo-1518384401463-d3876163c195?q=80&w=800&auto=format&fit=crop",
-            "https://images.unsplash.com/photo-1507537297725-24a1c029d3ca?q=80&w=800&auto=format&fit=crop",
-            "https://images.unsplash.com/photo-1532384748853-8f54a8f476e2?q=80&w=800&auto=format&fit=crop",
-            "https://images.unsplash.com/photo-1621784563330-caee0b138a00?q=80&w=800&auto=format&fit=crop",
-            "https://images.unsplash.com/photo-1520261073836-bdd3147814b7?q=80&w=800&auto=format&fit=crop",
-            "https://images.unsplash.com/photo-1524250502761-1ac6f2e30d43?q=80&w=800&auto=format&fit=crop",
-            "https://images.unsplash.com/photo-1525186402429-b4ff38bedec6?q=80&w=800&auto=format&fit=crop",
-            "https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?q=80&w=800&auto=format&fit=crop",
-            "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?q=80&w=800&auto=format&fit=crop",
-            "https://images.unsplash.com/photo-1563178406-4cdc2923acbc?q=80&w=800&auto=format&fit=crop"
-        ]
-        
-        let malePhotos = [
-            "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=1200",
-            "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=1200",
-            "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?q=80&w=1200",
-            "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?q=80&w=1200",
-            "https://images.unsplash.com/photo-1504257432389-52343af06ae3?q=80&w=1200",
-        ]
-        
-        let tags = ["Müzik", "Spor", "Seyahat", "Yemek", "Film", "Dans", "Yoga", "Fotoğraf", "Doğa", "Fitness", "Kahve", "Moda", "Alışveriş", "Yüzme", "Parti", "Sanat", "Netflix", "Kedi", "Köpek", "Sahil", "Kamp", "Makyaj", "Astnoloji", "Konser"]
-        
-        var users: [DiscoverUser] = []
-        var idCounter = 1
-        
-        func createUser(name: String, photoUrl: String, city: String, isFemale: Bool) -> DiscoverUser {
-            let age = Int.random(in: 19...28)
-            let userTags = Array(tags.shuffled().prefix(Int.random(in: 3...6)))
-            let id = "mock_u_\(idCounter)"
-            idCounter += 1
-            
-            return DiscoverUser(
-                id: id,
-                displayName: name,
-                age: age,
-                city: city,
-                country: "Turkey",
-                countryFlag: "🇹🇷",
-                distanceKm: Double.random(in: 1...30),
-                profilePhotoURL: photoUrl,
-                photos: [
-                    UserPhoto(id: "p_\(id)_1", url: photoUrl, thumbnailURL: nil, orderIndex: 0, isPrimary: true)
-                ],
-                tags: userTags,
-                commonInterests: Array(userTags.prefix(2)),
-                score: Double.random(in: 75...100),
-                isBoosted: idCounter % 10 == 0,
-                tiktokUsername: idCounter % 3 == 0 ? "@\(name.lowercased())" : nil,
-                instagramUsername: idCounter % 2 == 0 ? name.lowercased() : nil,
-                snapchatUsername: idCounter % 4 == 0 ? name.lowercased() : nil,
-                isFriend: false
-            )
-        }
-        
-        // 1. Generate 70 Female Users from High Quality List (Unique)
-        for (index, photoUrl) in highQualityFemalePhotos.enumerated() {
-            let name = femaleNames[index % femaleNames.count]
-            let city = cities.randomElement()!
-            users.append(createUser(name: name, photoUrl: photoUrl, city: city, isFemale: true))
-        }
-        
-        // 2. Generate Only 3 Male Users (Strictly limited)
-        for i in 0..<3 {
-            let name = maleNames.randomElement()!
-            let city = cities.randomElement()!
-            let photoUrl = malePhotos[i % malePhotos.count]
-            users.append(createUser(name: name, photoUrl: photoUrl, city: city, isFemale: false))
-        }
-        
-        return users.shuffled()
-    }
-
-    // Seni beğenenler (Premium) - High Quality Dynamic
-    static var likedYouUsers: [DiscoverUser] {
-        // Use a consistent subset of mockUsers or generate specific ones
-        // For simplicity and quality consistency, we generate a fresh batch using the same high quality logic
-        return Array(mockUsers.prefix(6))
-    }
-    
-    // Yeni üyeler - High Quality Dynamic
-    static var newUsers: [DiscoverUser] {
-        return Array(mockUsers.suffix(6))
-    }
-
-
-}
-
-
+import FirebaseAuth
+import FirebaseFirestore
 
 // MARK: - Main Discover View (Tinder Style)
 
@@ -154,16 +17,30 @@ struct DiscoverView: View {
     @State private var showPremiumSheet = false
     @State private var showProfileSummary = false
     @State private var isGlobalMode = false // false = Kendi Ülkem, true = Global
+    @State private var showingFullProfile = false // Track if full profile detail is shown
     
     // Geçiş animasyonu için
     @State private var cardScale: CGFloat = 1.0
     @State private var cardBlur: CGFloat = 0
     @State private var cardOpacity: Double = 1.0
     
+    // Real data from Firestore
+    @State private var users: [DiscoverUser] = []
+    @State private var isLoading = true
+    @State private var loadError: String?
+    
+    // Friend request toast notification
+    @State private var showRequestToast = false
+    @State private var requestSuccess = false
+    @State private var requestMessage = ""
+    
+    // Diamond float animation
+    @State private var showDiamondFloat = false
+    @State private var diamondFloatOffset: CGFloat = 0
+    @State private var diamondFloatOpacity: Double = 0
+    
     @Environment(AppState.self) private var appState
     @Environment(\.colorScheme) private var colorScheme
-    
-    private let users = DiscoverUser.mockUsers
     
     var currentUser: DiscoverUser? {
         guard currentIndex < users.count else { return nil }
@@ -188,11 +65,13 @@ struct DiscoverView: View {
                                 currentPhotoIndex: $currentPhotoIndex,
                                 cardOffset: $cardOffset,
                                 cardRotation: $cardRotation,
+                                showingFullProfile: $showingFullProfile,
                                 onLike: likeCurrentUser,
                                 onSkip: skipCurrentUser,
                                 onTap: { selectedUser = user },
                                 onOpenProfile: { selectedUser = user }
                             )
+                            .id("\(user.id)-\(currentIndex)") // Unique ID to force refresh
                             .frame(width: geo.size.width - 24, height: geo.size.height + 30)
                             .offset(cardOffset)
                             .rotationEffect(.degrees(cardRotation))
@@ -213,7 +92,8 @@ struct DiscoverView: View {
                                         } else if value.translation.height < -100 {
                                             superLikeUser()
                                         } else {
-                                            withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                                            // Daha smooth geri dönüş animasyonu
+                                            withAnimation(.spring(response: 0.4, dampingFraction: 0.75)) {
                                                 cardOffset = .zero
                                                 cardRotation = 0
                                             }
@@ -228,16 +108,19 @@ struct DiscoverView: View {
                 }
                 
                 // Action Bar (Tinder Style) - Kartın üzerine binecek
-                TinderActionBar(
-                    onRewind: rewindUser,
-                    onSkip: skipCurrentUser,
-                    onSuperLike: { superLikeUser() },
-                    onLike: likeCurrentUser,
-                    onAddFriend: { showProfileSummary = true },
-                    cardOffset: cardOffset
-                )
-                .padding(.bottom, 8)
-                .padding(.top, -35)
+                // Hide when full profile is shown
+                if !showingFullProfile {
+                    TinderActionBar(
+                        onRewind: rewindUser,
+                        onSkip: skipCurrentUser,
+                        onSuperLike: { superLikeUser() },
+                        onLike: likeCurrentUser,
+                        onAddFriend: { showProfileSummary = true },
+                        cardOffset: cardOffset
+                    )
+                    .padding(.bottom, 8)
+                    .padding(.top, -35)
+                }
             }
         }
         .navigationDestination(item: $selectedUser) { user in
@@ -257,7 +140,123 @@ struct DiscoverView: View {
         }
         .sheet(isPresented: $showProfileSummary) {
             if let user = currentUser {
-                ProfileSummarySheet(user: user)
+                ProfileSummarySheet(user: user) { success, message in
+                    print("✅ Friend request callback: success=\(success), message=\(message)")
+                    
+                    // Show toast notification
+                    requestSuccess = success
+                    requestMessage = message
+                    
+                    withAnimation(.spring(response: 0.5, dampingFraction: 0.7)) {
+                        showRequestToast = true
+                    }
+                    
+                    // Hide toast after 3 seconds
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
+                        withAnimation(.spring(response: 0.5, dampingFraction: 0.7)) {
+                            showRequestToast = false
+                        }
+                    }
+                    
+                    // Show diamond float animation if success
+                    if success {
+                        showDiamondFloat = true
+                        diamondFloatOffset = 100 // Start from below
+                        diamondFloatOpacity = 0
+                        
+                        withAnimation(.spring(response: 0.6, dampingFraction: 0.7)) {
+                            diamondFloatOffset = 120 // Float up
+                            diamondFloatOpacity = 1.0
+                        }
+                        
+                        // Fade out after 1.5 seconds
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                            withAnimation(.easeOut(duration: 0.5)) {
+                                diamondFloatOffset = 80
+                                diamondFloatOpacity = 0
+                            }
+                            
+                            // Reset after animation
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                                showDiamondFloat = false
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        .onAppear {
+            loadUsers()
+        }
+        .onChange(of: isGlobalMode) { _, _ in
+            loadUsers()
+        }
+        .onChange(of: selectedMode) { _, _ in
+            loadUsers()
+        }
+        .overlay(alignment: .topTrailing) {
+            // Floating Diamond Animation (-10 💎) - Sağ üstte
+            if showDiamondFloat {
+                HStack(spacing: 6) {
+                    Text("-10")
+                        .font(.system(size: 24, weight: .bold))
+                        .foregroundStyle(.white)
+                    
+                    Image("diamond-icon")
+                        .resizable()
+                        .renderingMode(.original)
+                        .scaledToFit()
+                        .frame(width: 20, height: 20)
+                }
+                .padding(.horizontal, 16)
+                .padding(.vertical, 10)
+                .background(
+                    Capsule()
+                        .fill(Color.black.opacity(0.85))
+                        .overlay(
+                            Capsule()
+                                .stroke(
+                                    LinearGradient(
+                                        colors: [Color(red: 1.0, green: 0.84, blue: 0.0), Color(red: 1.0, green: 0.65, blue: 0.0)],
+                                        startPoint: .leading,
+                                        endPoint: .trailing
+                                    ),
+                                    lineWidth: 2
+                                )
+                        )
+                )
+                .shadow(color: Color(red: 1.0, green: 0.84, blue: 0.0).opacity(0.5), radius: 15, y: 8)
+                .offset(x: -20, y: diamondFloatOffset)
+                .opacity(diamondFloatOpacity)
+            }
+        }
+        .overlay(alignment: .bottom) {
+            // Toast Notification (Premium gibi)
+            if showRequestToast {
+                VStack {
+                    Spacer()
+                    
+                    HStack(spacing: 12) {
+                        Image(systemName: requestSuccess ? "checkmark.circle.fill" : "xmark.circle.fill")
+                            .font(.system(size: 24))
+                            .foregroundStyle(requestSuccess ? .green : .red)
+                        
+                        Text(requestMessage)
+                            .font(.system(size: 16, weight: .semibold))
+                            .foregroundStyle(.white)
+                        
+                        Spacer()
+                    }
+                    .padding(16)
+                    .background(
+                        RoundedRectangle(cornerRadius: 16)
+                            .fill(Color(red: 0.1, green: 0.1, blue: 0.1))
+                            .shadow(color: .black.opacity(0.3), radius: 20, y: 10)
+                    )
+                    .padding(.horizontal, 20)
+                    .padding(.bottom, 120)
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
+                }
             }
         }
     }
@@ -292,16 +291,23 @@ struct DiscoverView: View {
                 Button {
                     showDiamond = true
                 } label: {
-                    Label("Elmaslarım", systemImage: "diamond.fill")
+                    HStack {
+                        Image("diamond-icon")
+                            .resizable()
+                            .renderingMode(.original)
+                            .scaledToFit()
+                            .frame(width: 16, height: 16)
+                        Text("Elmaslarım")
+                    }
                 }
             } label: {
-                Image(systemName: "diamond.fill")
-                    .font(.system(size: 20, weight: .semibold))
-                    .foregroundStyle(
-                        LinearGradient(colors: [.cyan, .blue], startPoint: .topLeading, endPoint: .bottomTrailing)
-                    )
-                    .frame(width: 36, height: 36)
-                    .background(Circle().fill(colorScheme == .dark ? .white.opacity(0.1) : .black.opacity(0.1)))
+                Image("diamond-icon")
+                    .resizable()
+                    .renderingMode(.original)
+                    .scaledToFit()
+                    .frame(width: 28, height: 28)
+                    .frame(width: 40, height: 40)
+                    .background(Circle().fill(colorScheme == .dark ? Color(red: 0.04, green: 0.02, blue: 0.08) : Color.white))
             }
         }
         .padding(.horizontal, 16)
@@ -309,6 +315,161 @@ struct DiscoverView: View {
     }
     
     // MARK: - Actions
+    
+    private func loadUsers() {
+        // First, use cached data if available
+        if !appState.cachedDiscoverUsers.isEmpty && !appState.shouldRefreshDiscoverCache() {
+            self.users = appState.cachedDiscoverUsers
+            self.isLoading = false
+            print("✅ Using cached discover users: \(users.count)")
+            prefetchNextImages()
+            return
+        }
+        
+        Task {
+            // Don't show loading if we have cached data
+            if appState.cachedDiscoverUsers.isEmpty {
+                isLoading = true
+            }
+            loadError = nil
+            
+            do {
+                let countryFilter = isGlobalMode ? nil : "Türkiye"
+                let response = try await DiscoverService.shared.getDiscoverFeed(
+                    mode: selectedMode,
+                    limit: 50,
+                    countryFilter: countryFilter
+                )
+                
+                await MainActor.run {
+                    // Filter out current user from the list - check both ID and email
+                    let currentUserId = appState.currentUser?.id ?? ""
+                    let currentUserEmail = appState.currentUser?.username.lowercased() ?? ""
+                    let currentUserName = appState.currentUser?.displayName ?? ""
+                    
+                    print("🔍 Filtering discover users")
+                    print("   Current User ID: \(currentUserId)")
+                    print("   Current User Email: \(currentUserEmail)")
+                    print("   Current User Name: \(currentUserName)")
+                    print("📊 Total users before filter: \(response.users.count)")
+                    
+                    let filteredUsers = response.users.filter { user in
+                        // Check ID match
+                        if user.id == currentUserId {
+                            print("⛔️ Filtered out self by ID: \(user.id) - \(user.displayName)")
+                            return false
+                        }
+                        
+                        // Check name match (case insensitive)
+                        if !currentUserName.isEmpty && user.displayName.lowercased() == currentUserName.lowercased() {
+                            print("⛔️ Filtered out self by Name: \(user.displayName)")
+                            return false
+                        }
+                        
+                        return true
+                    }
+                    
+                    print("✅ Users after self-filter: \(filteredUsers.count)")
+                    
+                    // Apply user filters (age, distance, etc.)
+                    let finalUsers = applyUserFilters(to: filteredUsers)
+                    print("✅ Users after all filters: \(finalUsers.count)")
+                    
+                    self.users = finalUsers
+                    self.appState.cachedDiscoverUsers = finalUsers
+                    self.appState.lastDiscoverFetch = Date()
+                    self.isLoading = false
+                    
+                    if users.isEmpty {
+                        loadError = "Filtrelerinize uygun kullanıcı bulunamadı"
+                    } else {
+                        // Prefetch images for first 5 cards
+                        prefetchNextImages()
+                    }
+                }
+            } catch {
+                await MainActor.run {
+                    // If we have cached data, use it on error
+                    if !appState.cachedDiscoverUsers.isEmpty {
+                        self.users = appState.cachedDiscoverUsers
+                    } else {
+                        self.loadError = "Kullanıcılar yüklenirken hata oluştu: \(error.localizedDescription)"
+                    }
+                    self.isLoading = false
+                }
+            }
+        }
+    }
+    
+    // Prefetch images for next 5 cards
+    private func prefetchNextImages() {
+        Task {
+            let endIndex = min(currentIndex + 5, users.count)
+            var urlsToPrefetch: [String] = []
+            
+            for i in currentIndex..<endIndex {
+                let user = users[i]
+                // Prefetch all photos for each user
+                for photo in user.photos {
+                    urlsToPrefetch.append(photo.url)
+                }
+                // Also prefetch profile photo
+                if !user.profilePhotoURL.isEmpty {
+                    urlsToPrefetch.append(user.profilePhotoURL)
+                }
+            }
+            
+            await ImageCacheService.shared.prefetchImages(urls: urlsToPrefetch)
+        }
+    }
+    
+    // Apply user filters (age, distance, verified, etc.)
+    private func applyUserFilters(to users: [DiscoverUser]) -> [DiscoverUser] {
+        // Load filter settings
+        let minAge = UserDefaults.standard.double(forKey: "filter_minAge")
+        let maxAge = UserDefaults.standard.double(forKey: "filter_maxAge")
+        let maxDistance = UserDefaults.standard.double(forKey: "filter_maxDistance")
+        let showVerifiedOnly = UserDefaults.standard.bool(forKey: "filter_verifiedOnly")
+        let showWithPhotoOnly = UserDefaults.standard.bool(forKey: "filter_withPhoto")
+        let showWithBioOnly = UserDefaults.standard.bool(forKey: "filter_withBio")
+        
+        return users.filter { user in
+            // Age filter
+            if minAge > 0 && maxAge > 0 {
+                if Double(user.age) < minAge || Double(user.age) > maxAge {
+                    return false
+                }
+            }
+            
+            // Distance filter (only if location is enabled)
+            if maxDistance > 0 && maxDistance < 100 && LocationManager.shared.isLocationEnabled {
+                if let distance = user.distanceKm, distance > maxDistance {
+                    return false
+                }
+            }
+            
+            // Verified filter
+            if showVerifiedOnly && !user.isBoosted {
+                return false
+            }
+            
+            // Photo filter
+            if showWithPhotoOnly && user.photos.isEmpty {
+                return false
+            }
+            
+            // Bio filter
+            if showWithBioOnly {
+                if let bio = user.bio, bio.isEmpty {
+                    return false
+                } else if user.bio == nil {
+                    return false
+                }
+            }
+            
+            return true
+        }
+    }
     
     private func likeCurrentUser() {
         withAnimation(.easeOut(duration: 0.3)) {
@@ -320,7 +481,9 @@ struct DiscoverView: View {
                 try? await ChatService.shared.likeUser(userId: user.id)
             }
         }
-        moveToNextUser()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            moveToNextUser()
+        }
     }
     
     private func skipCurrentUser() {
@@ -328,14 +491,75 @@ struct DiscoverView: View {
             cardOffset = CGSize(width: -500, height: 0)
             cardRotation = -15
         }
-        moveToNextUser()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            moveToNextUser()
+        }
     }
     
     private func superLikeUser() {
+        // Deduct 100 diamonds for Super Like
+        Task {
+            guard let uid = Auth.auth().currentUser?.uid else { return }
+            
+            do {
+                let db = Firestore.firestore()
+                let userRef = db.collection("users").document(uid)
+                
+                // Get current diamond balance
+                let doc = try await userRef.getDocument()
+                let currentBalance = doc.data()?["diamond_balance"] as? Int ?? 0
+                
+                // Check if user has enough diamonds
+                guard currentBalance >= 100 else {
+                    await MainActor.run {
+                        // Show error - not enough diamonds
+                        print("❌ Not enough diamonds for Super Like")
+                    }
+                    return
+                }
+                
+                // Deduct 100 diamonds
+                try await userRef.updateData([
+                    "diamond_balance": currentBalance - 100
+                ])
+                
+                // Update local state
+                await MainActor.run {
+                    if var user = appState.currentUser {
+                        user.diamondBalance = currentBalance - 100
+                        appState.currentUser = user
+                    }
+                    print("✅ Super Like: -100 💎 (Balance: \(currentBalance - 100))")
+                }
+                
+                // Log the transaction
+                try await db.collection("diamond_transactions").addDocument(data: [
+                    "user_id": uid,
+                    "amount": -100,
+                    "type": "superlike",
+                    "description": "Super Like kullanıldı",
+                    "created_at": FieldValue.serverTimestamp()
+                ])
+                
+                // Log super like action
+                if let user = currentUser {
+                    try? await db.collection("super_likes").addDocument(data: [
+                        "from_user_id": uid,
+                        "to_user_id": user.id,
+                        "created_at": FieldValue.serverTimestamp()
+                    ])
+                }
+            } catch {
+                print("❌ Error deducting diamonds: \(error)")
+            }
+        }
+        
         withAnimation(.easeOut(duration: 0.3)) {
             cardOffset = CGSize(width: 0, height: -500)
         }
-        moveToNextUser()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            moveToNextUser()
+        }
     }
     
     private func rewindUser() {
@@ -355,20 +579,22 @@ struct DiscoverView: View {
     }
     
     private func moveToNextUser() {
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-            cardScale = 1.15
-            cardBlur = 10
-            cardOpacity = 0
-            currentIndex += 1
-            cardOffset = .zero
-            cardRotation = 0
-            currentPhotoIndex = 0
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
-                withAnimation(.easeOut(duration: 0.35)) {
-                    cardScale = 1.0
-                    cardBlur = 0
-                    cardOpacity = 1.0
-                }
+        cardScale = 1.15
+        cardBlur = 10
+        cardOpacity = 0
+        currentIndex += 1
+        cardOffset = .zero
+        cardRotation = 0
+        currentPhotoIndex = 0
+        
+        // Prefetch next images
+        prefetchNextImages()
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+            withAnimation(.easeOut(duration: 0.35)) {
+                cardScale = 1.0
+                cardBlur = 0
+                cardOpacity = 1.0
             }
         }
     }
@@ -500,6 +726,7 @@ struct TinderStyleCard: View {
     @Binding var currentPhotoIndex: Int
     @Binding var cardOffset: CGSize
     @Binding var cardRotation: Double
+    @Binding var showingFullProfile: Bool
     let onLike: () -> Void
     let onSkip: () -> Void
     let onTap: () -> Void
@@ -518,23 +745,12 @@ struct TinderStyleCard: View {
         GeometryReader { geo in
             ZStack(alignment: .bottom) {
                 // Photo
-                AsyncImage(url: URL(string: photos[currentPhotoIndex])) { phase in
-                    switch phase {
-                    case .success(let image):
-                        image
-                            .resizable()
-                            .scaledToFill()
-                    default:
-                        Rectangle()
-                            .fill(Color(white: 0.15))
-                            .overlay {
-                                ProgressView()
-                                    .tint(.white)
-                            }
-                    }
-                }
-                .frame(width: geo.size.width, height: geo.size.height)
-                .clipped()
+                CachedAsyncImage(url: photos[currentPhotoIndex])
+                    .frame(width: geo.size.width, height: geo.size.height)
+                    .clipped()
+                
+                // Swipe Overlays - Gradient + Icon
+                swipeOverlay
                 
                 // Photo Progress Indicators
                 VStack {
@@ -619,14 +835,13 @@ struct TinderStyleCard: View {
                                     .foregroundStyle(.white)
                                     .shadow(color: .black.opacity(0.5), radius: 4, x: 0, y: 2)
                                     
-                                    // University/School
+                                    // Country
                                     HStack(spacing: 6) {
-                                        Image(systemName: "graduationcap.fill")
-                                            .font(.system(size: 14))
-                                        Text(user.city + " Üniversitesi")
+                                        Text(countryFlag(for: user.country ?? "TR"))
+                                            .font(.system(size: 16))
+                                        Text(countryName(for: user.country ?? "TR"))
                                             .font(.system(size: 15))
                                     }
-
                                     .foregroundStyle(.white.opacity(0.9))
                                     .shadow(color: .black.opacity(0.5), radius: 2, x: 0, y: 1)
                                     
@@ -660,6 +875,7 @@ struct TinderStyleCard: View {
                         Button {
                             withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
                                 isInfoExpanded.toggle()
+                                showingFullProfile = isInfoExpanded
                             }
                         } label: {
                             ZStack {
@@ -688,6 +904,7 @@ struct TinderStyleCard: View {
                         onClose: {
                             withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
                                 isInfoExpanded = false
+                                showingFullProfile = false
                             }
                         },
                         onSkip: onSkip,
@@ -697,7 +914,7 @@ struct TinderStyleCard: View {
                     .transition(.move(edge: .bottom).combined(with: .opacity))
                 }
                 
-                // Like/Nope/SuperLike Indicators
+                // Like/Nope/SuperLike Indicators with enhanced styling
                 if cardOffset.width > 50 {
                     likeIndicator
                 }
@@ -709,6 +926,95 @@ struct TinderStyleCard: View {
                 }
             }
             .clipShape(RoundedRectangle(cornerRadius: 16))
+        }
+    }
+    
+    // MARK: - Swipe Overlay with Gradient
+    @ViewBuilder
+    private var swipeOverlay: some View {
+        let swipeStrength = max(abs(cardOffset.width), abs(cardOffset.height))
+        let opacity = min(swipeStrength / 120, 0.5) // Max 50% opacity - daha hafif
+        
+        if cardOffset.width > 20 {
+            // Sağa kaydırma - Yeşil gradient (Like) - İkonun renklerini kullan
+            ZStack {
+                LinearGradient(
+                    colors: [
+                        Color(red: 0.5, green: 1.0, blue: 0.3).opacity(opacity * 0.6),
+                        Color(red: 0.2, green: 0.9, blue: 0.4).opacity(opacity * 0.4),
+                        Color(red: 0.2, green: 0.9, blue: 0.4).opacity(opacity * 0.2),
+                        Color.clear
+                    ],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+                
+                // Ekstra glow effect - daha subtle
+                RadialGradient(
+                    colors: [
+                        Color(red: 0.3, green: 0.9, blue: 0.3).opacity(opacity * 0.4),
+                        Color.clear
+                    ],
+                    center: .topLeading,
+                    startRadius: 80,
+                    endRadius: 450
+                )
+            }
+            .allowsHitTesting(false)
+            
+        } else if cardOffset.width < -20 {
+            // Sola kaydırma - Kırmızı/Pembe gradient (Skip) - İkonun renklerini kullan
+            ZStack {
+                LinearGradient(
+                    colors: [
+                        Color(red: 1.0, green: 0.3, blue: 0.5).opacity(opacity * 0.6),
+                        Color(red: 1.0, green: 0.15, blue: 0.4).opacity(opacity * 0.4),
+                        Color(red: 1.0, green: 0.15, blue: 0.4).opacity(opacity * 0.2),
+                        Color.clear
+                    ],
+                    startPoint: .topTrailing,
+                    endPoint: .bottomLeading
+                )
+                
+                // Ekstra glow effect - daha subtle
+                RadialGradient(
+                    colors: [
+                        Color(red: 1.0, green: 0.3, blue: 0.5).opacity(opacity * 0.4),
+                        Color.clear
+                    ],
+                    center: .topTrailing,
+                    startRadius: 80,
+                    endRadius: 450
+                )
+            }
+            .allowsHitTesting(false)
+            
+        } else if cardOffset.height < -20 {
+            // Yukarı kaydırma - Mavi gradient (Super Like) - İkonun renklerini kullan
+            ZStack {
+                LinearGradient(
+                    colors: [
+                        Color(red: 0.3, green: 0.85, blue: 1.0).opacity(opacity * 0.6),
+                        Color(red: 0.1, green: 0.5, blue: 1.0).opacity(opacity * 0.4),
+                        Color(red: 0.1, green: 0.5, blue: 1.0).opacity(opacity * 0.2),
+                        Color.clear
+                    ],
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+                
+                // Ekstra glow effect - daha subtle
+                RadialGradient(
+                    colors: [
+                        Color(red: 0.2, green: 0.7, blue: 1.0).opacity(opacity * 0.4),
+                        Color.clear
+                    ],
+                    center: .top,
+                    startRadius: 80,
+                    endRadius: 450
+                )
+            }
+            .allowsHitTesting(false)
         }
     }
     
@@ -882,32 +1188,31 @@ struct ProfileInfoPanel: View {
                     .clipShape(RoundedRectangle(cornerRadius: 16))
                     .padding(.horizontal, 16)
                     
-                    // Aradığım Section
-                    VStack(alignment: .leading, spacing: 12) {
-                        HStack(spacing: 8) {
-                            Image(systemName: "magnifyingglass")
-                                .font(.system(size: 14, weight: .medium))
-                                .foregroundStyle(secondaryTextColor)
-                            Text("Aradığım")
-                                .font(.system(size: 14, weight: .medium))
-                                .foregroundStyle(secondaryTextColor)
-                        }
-                        
-                        HStack(spacing: 8) {
-                            Text("🤔")
-                                .font(.system(size: 20))
-                            Text("Henüz karar vermedim")
-                                .font(.system(size: 16, weight: .semibold))
+                    // Aradığım Section - Gerçek data kullan
+                    if let bio = user.bio, !bio.isEmpty {
+                        VStack(alignment: .leading, spacing: 12) {
+                            HStack(spacing: 8) {
+                                Image(systemName: "text.quote")
+                                    .font(.system(size: 14, weight: .medium))
+                                    .foregroundStyle(secondaryTextColor)
+                                Text("Hakkımda")
+                                    .font(.system(size: 14, weight: .medium))
+                                    .foregroundStyle(secondaryTextColor)
+                            }
+                            
+                            Text(bio)
+                                .font(.system(size: 16))
                                 .foregroundStyle(primaryTextColor)
+                                .lineSpacing(4)
                         }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(16)
+                        .background(.ultraThinMaterial, in: sectionShape)
+                        .glassEffect(.regular.interactive(), in: sectionShape)
+                        .padding(.horizontal, 16)
                     }
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(16)
-                    .background(.ultraThinMaterial, in: sectionShape)
-                    .glassEffect(.regular.interactive(), in: sectionShape)
-                    .padding(.horizontal, 16)
                     
-                    // Temel Bilgiler Section
+                    // Temel Bilgiler Section - Gerçek data kullan
                     VStack(alignment: .leading, spacing: 12) {
                         HStack {
                             HStack(spacing: 8) {
@@ -920,31 +1225,41 @@ struct ProfileInfoPanel: View {
                             }
                             
                             Spacer()
-                            
-                            Button { } label: {
-                                Image(systemName: "ellipsis")
-                                    .font(.system(size: 16, weight: .medium))
-                                    .foregroundStyle(secondaryTextColor)
-                            }
                         }
                         
                         VStack(alignment: .leading, spacing: 10) {
+                            // Konum bilgisi - gerçek km hesaplaması
+                            if let distance = user.distanceKm {
+                                HStack(spacing: 10) {
+                                    Image(systemName: "location.fill")
+                                        .font(.system(size: 16))
+                                        .foregroundStyle(secondaryTextColor)
+                                    Text("\(Int(distance)) km uzaklıkta")
+                                        .font(.system(size: 15))
+                                        .foregroundStyle(primaryTextColor)
+                                }
+                            }
+                            
+                            // Şehir bilgisi
                             HStack(spacing: 10) {
-                                Image(systemName: "location")
+                                Image(systemName: "mappin.circle.fill")
                                     .font(.system(size: 16))
                                     .foregroundStyle(secondaryTextColor)
-                                Text("\(Int(user.distanceKm ?? 0)) kilometre uzaklıkta")
+                                Text(user.city)
                                     .font(.system(size: 15))
                                     .foregroundStyle(primaryTextColor)
                             }
                             
-                            HStack(spacing: 10) {
-                                Image(systemName: "graduationcap")
-                                    .font(.system(size: 16))
-                                    .foregroundStyle(secondaryTextColor)
-                                Text(user.city + " Üniversitesi")
-                                    .font(.system(size: 15))
-                                    .foregroundStyle(primaryTextColor)
+                            // Ortak ilgi alanları
+                            if !user.commonInterests.isEmpty {
+                                HStack(spacing: 10) {
+                                    Image(systemName: "heart.circle.fill")
+                                        .font(.system(size: 16))
+                                        .foregroundStyle(secondaryTextColor)
+                                    Text("\(user.commonInterests.count) ortak ilgi alanı")
+                                        .font(.system(size: 15))
+                                        .foregroundStyle(primaryTextColor)
+                                }
                             }
                         }
                     }
@@ -1053,8 +1368,22 @@ struct FirstImpressionSection: View {
     @State private var showPremiumSheet = false
     @State private var showSentConfirmation = false
     @Environment(AppState.self) private var appState
+    @Environment(\.colorScheme) private var colorScheme
     
+    private var isDark: Bool { colorScheme == .dark }
     private let sectionShape = RoundedRectangle(cornerRadius: 16)
+    
+    private var primaryTextColor: Color {
+        isDark ? .white : .black
+    }
+    
+    private var secondaryTextColor: Color {
+        isDark ? .white.opacity(0.7) : .black.opacity(0.6)
+    }
+    
+    private var inputBackgroundColor: Color {
+        isDark ? Color(white: 0.15) : Color(white: 0.95)
+    }
     
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -1064,7 +1393,7 @@ struct FirstImpressionSection: View {
                     .foregroundStyle(.blue)
                 Text("İlk İzlenim ile öne çık")
                     .font(.system(size: 14, weight: .semibold))
-                    .foregroundStyle(.white)
+                    .foregroundStyle(primaryTextColor)
                 
                 Spacer()
                 
@@ -1084,16 +1413,16 @@ struct FirstImpressionSection: View {
             
             Text("Eşleşmeden önce ona mesaj göndererek dikkatini çek. Ona profilinde hoşuna giden şeyin ne olduğunu söyleyebilir, iltifat edebilir veya onu güldürebilirsin.")
                 .font(.system(size: 14))
-                .foregroundStyle(.white.opacity(0.7))
+                .foregroundStyle(secondaryTextColor)
                 .lineSpacing(4)
             
-            // Message Input
+            // Message Input - Açık tema uyumlu
             HStack(spacing: 12) {
                 TextField("Mesajın...", text: $messageText)
                     .font(.system(size: 15))
-                    .foregroundStyle(.white)
+                    .foregroundStyle(primaryTextColor)
                     .padding(14)
-                    .background(Color(white: 0.15), in: RoundedRectangle(cornerRadius: 12))
+                    .background(inputBackgroundColor, in: RoundedRectangle(cornerRadius: 12))
                 
                 Button {
                     sendMessage()
@@ -1102,7 +1431,7 @@ struct FirstImpressionSection: View {
                         .font(.system(size: 36))
                         .foregroundStyle(
                             messageText.isEmpty ? 
-                            AnyShapeStyle(Color.white.opacity(0.3)) :
+                            AnyShapeStyle(primaryTextColor.opacity(0.3)) :
                             AnyShapeStyle(LinearGradient(colors: [.blue, .cyan], startPoint: .top, endPoint: .bottom))
                         )
                 }
@@ -1220,11 +1549,11 @@ struct TinderActionBar: View {
                 isHighlighted: highlightLike
             )
             
-            // Arkadaş Ekle (Mor gradient)
+            // Arkadaş Ekle (Mor gradient) - Modern SF Symbol
             GlassActionButton(
-                icon: "plus",
+                icon: "person.badge.plus.fill",
                 size: 54,
-                iconSize: 28,
+                iconSize: 24,
                 colors: [Color(red: 0.6, green: 0.3, blue: 1.0), Color(red: 0.4, green: 0.2, blue: 0.8)],
                 action: onAddFriend
             )
@@ -1308,17 +1637,11 @@ struct FilterSheet: View {
     @State private var maxAge: Double = 35
     @State private var maxDistance: Double = 50
     @State private var showVerifiedOnly: Bool = false
-    @State private var showOnlineOnly: Bool = false
     @State private var showWithPhotoOnly: Bool = true
-    @State private var showWithBioOnly: Bool = false
     
     // İlgi Alanları
     @State private var selectedInterests: Set<String> = []
     let allInterests = ["Müzik", "Spor", "Seyahat", "Yemek", "Film", "Kitap", "Oyun", "Sanat", "Dans", "Yoga", "Fotoğraf", "Doğa"]
-    
-    // Eğitim
-    @State private var selectedEducation: String = "Hepsi"
-    let educationOptions = ["Hepsi", "Lise", "Üniversite", "Yüksek Lisans", "Doktora"]
     
     // İlişki Amacı
     @State private var selectedRelationshipGoal: String = "Hepsi"
@@ -1367,7 +1690,7 @@ struct FilterSheet: View {
                                     .font(.system(size: 18, weight: .bold)) // Match FilterSectionCard Title
                                     .foregroundStyle(colorScheme == .dark ? .white : .black)
                                 
-                                Text(isGlobalMode ? "Global (Tüm Dünya)" : "Kendi Ülkem (Türkiye)")
+                                Text(isGlobalMode ? "Global" : "Türkiye")
                                     .font(.system(size: 14, weight: .medium))
                                     .foregroundStyle(isGlobalMode ? .cyan : .red.opacity(0.8))
                             }
@@ -1380,9 +1703,8 @@ struct FilterSheet: View {
                                 .fill(isGlobalMode ? Color.cyan.opacity(0.1) : Color.red.opacity(0.1))
                                 .frame(width: 70, height: 28)
                                 .overlay(
-                                    Text(isGlobalMode ? "Global" : "Türkiye")
-                                        .font(.system(size: 12, weight: .bold))
-                                        .foregroundStyle(isGlobalMode ? .cyan : .red)
+                                    Text(isGlobalMode ? "🌍" : "🇹🇷")
+                                        .font(.system(size: 16))
                                 )
                         }
                         .padding(16) // Match FilterSectionCard padding
@@ -1473,8 +1795,8 @@ struct FilterSheet: View {
                     
 
 
-// MARK: - Mesafe
-FilterSectionCard(title: "Maksimum Mesafe", icon: "location") {
+// MARK: - Mesafe (Konum Bazlı)
+FilterSectionCard(title: "Maksimum Mesafe", icon: "location.fill") {
     VStack(spacing: 12) {
         HStack {
             Text("\(Int(maxDistance)) km")
@@ -1484,14 +1806,40 @@ FilterSectionCard(title: "Maksimum Mesafe", icon: "location") {
             Spacer()
             
             if maxDistance >= 100 {
-                Text("Tüm Dünya")
+                Text("Sınırsız")
                     .font(.system(size: 14, weight: .medium))
                     .foregroundStyle(.purple)
             }
         }
         
+        // Konum durumu göstergesi
+        HStack(spacing: 6) {
+            Image(systemName: LocationManager.shared.isLocationEnabled ? "location.fill" : "location.slash.fill")
+                .font(.system(size: 12))
+                .foregroundStyle(LocationManager.shared.isLocationEnabled ? .green : .orange)
+            
+            Text(LocationManager.shared.isLocationEnabled ? "Konum aktif" : "Konum izni gerekli")
+                .font(.system(size: 12, weight: .medium))
+                .foregroundStyle(colorScheme == .dark ? .white.opacity(0.6) : .black.opacity(0.6))
+            
+            if !LocationManager.shared.isLocationEnabled {
+                Button {
+                    LocationManager.shared.requestLocationPermission()
+                } label: {
+                    Text("Aç")
+                        .font(.system(size: 11, weight: .bold))
+                        .foregroundStyle(.white)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
+                        .background(Capsule().fill(.orange))
+                }
+            }
+        }
+        .padding(.vertical, 4)
+        
         Slider(value: $maxDistance, in: 1...100, step: 1)
             .tint(.purple)
+            .disabled(!LocationManager.shared.isLocationEnabled && maxDistance < 100)
     }
 }
 
@@ -1499,9 +1847,7 @@ FilterSectionCard(title: "Maksimum Mesafe", icon: "location") {
 FilterSectionCard(title: "Hızlı Filtreler", icon: "bolt.fill") {
     VStack(spacing: 12) {
         FilterToggleRow(title: "Sadece Doğrulanmış", icon: "checkmark.seal.fill", iconColor: .blue, isOn: $showVerifiedOnly)
-        FilterToggleRow(title: "Sadece Çevrimiçi", icon: "circle.fill", iconColor: .green, isOn: $showOnlineOnly)
         FilterToggleRow(title: "Fotoğraflı Profiller", icon: "photo.fill", iconColor: .purple, isOn: $showWithPhotoOnly)
-        FilterToggleRow(title: "Biyografili Profiller", icon: "text.alignleft", iconColor: .cyan, isOn: $showWithBioOnly)
     }
 }
 
@@ -1523,22 +1869,6 @@ FilterSectionCard(title: "İlgi Alanları", icon: "heart.fill") {
     }
 }
 
-// MARK: - Eğitim Durumu
-FilterSectionCard(title: "Eğitim Durumu", icon: "graduationcap.fill") {
-    ScrollView(.horizontal, showsIndicators: false) {
-        HStack(spacing: 10) {
-            ForEach(educationOptions, id: \.self) { option in
-                FilterOptionChip(
-                    title: option,
-                    isSelected: selectedEducation == option
-                ) {
-                    selectedEducation = option
-                }
-            }
-        }
-    }
-}
-                    
                     // MARK: - İlişki Amacı
                     FilterSectionCard(title: "İlişki Amacı", icon: "heart.circle.fill") {
                         ScrollView(.horizontal, showsIndicators: false) {
@@ -1628,38 +1958,16 @@ FilterSectionCard(title: "Eğitim Durumu", icon: "graduationcap.fill") {
         maxDistance = UserDefaults.standard.double(forKey: "filter_maxDistance")
         if maxDistance < 1 { maxDistance = 50 }
         showVerifiedOnly = UserDefaults.standard.bool(forKey: "filter_verifiedOnly")
-        showOnlineOnly = UserDefaults.standard.bool(forKey: "filter_onlineOnly")
         showWithPhotoOnly = UserDefaults.standard.bool(forKey: "filter_withPhoto")
-        showWithBioOnly = UserDefaults.standard.bool(forKey: "filter_withBio")
     }
     
     private func applyFilters() {
-        // Save to UserDefaults
         UserDefaults.standard.set(minAge, forKey: "filter_minAge")
         UserDefaults.standard.set(maxAge, forKey: "filter_maxAge")
         UserDefaults.standard.set(maxDistance, forKey: "filter_maxDistance")
         UserDefaults.standard.set(showVerifiedOnly, forKey: "filter_verifiedOnly")
-        UserDefaults.standard.set(showOnlineOnly, forKey: "filter_onlineOnly")
         UserDefaults.standard.set(showWithPhotoOnly, forKey: "filter_withPhoto")
-        UserDefaults.standard.set(showWithBioOnly, forKey: "filter_withBio")
         UserDefaults.standard.synchronize()
-        
-        // Log filter changes
-        Task {
-            await LogService.shared.info("Filtreler uygulandı", category: "Filters", metadata: [
-                "minAge": "\(Int(minAge))",
-                "maxAge": "\(Int(maxAge))",
-                "maxDistance": "\(Int(maxDistance))",
-                "verifiedOnly": "\(showVerifiedOnly)",
-                "onlineOnly": "\(showOnlineOnly)",
-                "withPhoto": "\(showWithPhotoOnly)",
-                "withBio": "\(showWithBioOnly)",
-                "interests": Array(selectedInterests).joined(separator: ","),
-                "education": selectedEducation,
-                "relationshipGoal": selectedRelationshipGoal,
-                "zodiac": selectedZodiac
-            ])
-        }
     }
     
     private func resetFilters() {
@@ -1667,22 +1975,15 @@ FilterSectionCard(title: "Eğitim Durumu", icon: "graduationcap.fill") {
         maxAge = 35
         maxDistance = 50
         showVerifiedOnly = false
-        showOnlineOnly = false
         showWithPhotoOnly = true
-        showWithBioOnly = false
         selectedInterests = []
-        selectedEducation = "Hepsi"
-        selectedRelationshipGoal = "Hepsi"
-        selectedZodiac = "Hepsi"
         
         // Clear UserDefaults
         UserDefaults.standard.removeObject(forKey: "filter_minAge")
         UserDefaults.standard.removeObject(forKey: "filter_maxAge")
         UserDefaults.standard.removeObject(forKey: "filter_maxDistance")
         UserDefaults.standard.removeObject(forKey: "filter_verifiedOnly")
-        UserDefaults.standard.removeObject(forKey: "filter_onlineOnly")
         UserDefaults.standard.removeObject(forKey: "filter_withPhoto")
-        UserDefaults.standard.removeObject(forKey: "filter_withBio")
         UserDefaults.standard.synchronize()
     }
 }
@@ -1990,7 +2291,7 @@ struct DoubleDateSheet: View {
     
     private func leaveTeam() async {
         // Takımdan ayrıl (owner değilse)
-        guard let team = team else { return }
+        guard team != nil else { return }
         do {
             try await DoubleDateService.shared.leaveTeam()
             await loadData()
@@ -5465,7 +5766,7 @@ struct DiscoverGridSection: View {
     
     // Tüm kullanıcıları birleştir ve karıştır
     private var allUsers: [DiscoverUser] {
-        var combined = newUsers + users.prefix(4)
+        let combined = newUsers + users.prefix(4)
         return Array(combined.prefix(8))
     }
     
@@ -5703,7 +6004,7 @@ struct ActivitySection: View {
                 ZStack(alignment: .bottomLeading) {
                     // Background
                     LinearGradient(
-                        colors: [Color(hex: "FF416C"), Color(hex: "FF4B2B")],
+                        colors: [Color(red: 1.0, green: 0.25, blue: 0.42), Color(red: 1.0, green: 0.29, blue: 0.17)],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     )
@@ -5744,7 +6045,7 @@ struct ActivitySection: View {
                 }
                 .frame(height: 140)
                 .clipShape(RoundedRectangle(cornerRadius: 20))
-                .shadow(color: Color(hex: "FF416C").opacity(0.3), radius: 8, y: 4)
+                .shadow(color: Color(red: 1.0, green: 0.25, blue: 0.42).opacity(0.3), radius: 8, y: 4)
             }
             .buttonStyle(MinimalButtonStyle())
         }
@@ -8443,158 +8744,10 @@ struct ExploreUserCardNew: View {
     }
 }
 
-// MARK: - Profile Summary Sheet
-struct ProfileSummarySheet: View {
-    let user: DiscoverUser
-    @Environment(\.dismiss) private var dismiss
-    @Environment(\.colorScheme) private var colorScheme
-    @State private var isRequestSent = false
-    @State private var isLoading = false
-    
-    var body: some View {
-        NavigationStack {
-            ScrollView {
-                VStack(spacing: 24) {
-                    // Profil Fotoğrafı
-                    AsyncImage(url: URL(string: user.profilePhotoURL)) { image in
-                        image
-                            .resizable()
-                            .aspectRatio(contentMode: .fill)
-                    } placeholder: {
-                        Rectangle()
-                            .fill(Color.gray.opacity(0.3))
-                    }
-                    .frame(width: 120, height: 120)
-                    .clipShape(Circle())
-                    .overlay(Circle().stroke(LinearGradient(colors: [.purple, .pink], startPoint: .topLeading, endPoint: .bottomTrailing), lineWidth: 3))
-                    
-                    // İsim ve Şehir
-                    VStack(spacing: 8) {
-                        Text("\(user.displayName), \(user.age)")
-                            .font(.system(size: 24, weight: .bold))
-                            .foregroundStyle(colorScheme == .dark ? .white : .black)
-                        
-                        HStack(spacing: 4) {
-                            Image(systemName: "location.fill")
-                                .font(.system(size: 14))
-                            Text(user.city)
-                                .font(.system(size: 16))
-                        }
-                        .foregroundStyle(colorScheme == .dark ? .white.opacity(0.6) : .black.opacity(0.6))
-                    }
-                    
-                    // İlgi Alanları
-                    if !user.tags.isEmpty {
-                        HStack(spacing: 8) {
-                            ForEach(user.tags.prefix(4), id: \.self) { tag in
-                                Text(tag)
-                                    .font(.system(size: 12, weight: .medium))
-                                    .foregroundStyle(colorScheme == .dark ? .white : .black)
-                                    .padding(.horizontal, 10)
-                                    .padding(.vertical, 6)
-                                    .background(Capsule().fill(colorScheme == .dark ? Color.white.opacity(0.1) : Color.black.opacity(0.1)))
-                            }
-                        }
-                    }
-                    
-                    // Sosyal Medya Hesapları (Kilitli)
-                    VStack(spacing: 16) {
-                        Text("Sosyal Medya Hesapları")
-                            .font(.system(size: 16, weight: .semibold))
-                            .foregroundStyle(colorScheme == .dark ? .white : .black)
-                        
-                        HStack(spacing: 20) {
-                            LockedSocialIcon(platform: "instagram", hasAccount: user.instagramUsername != nil)
-                            LockedSocialIcon(platform: "tiktok", hasAccount: user.tiktokUsername != nil)
-                            LockedSocialIcon(platform: "snapchat", hasAccount: user.snapchatUsername != nil)
-                        }
-                        
-                        Text("Arkadaş olunca sosyal medya hesaplarını görebilirsin")
-                            .font(.system(size: 13))
-                            .foregroundStyle(colorScheme == .dark ? .white.opacity(0.5) : .black.opacity(0.5))
-                            .multilineTextAlignment(.center)
-                    }
-                    .padding(20)
-                    .background(
-                        RoundedRectangle(cornerRadius: 16)
-                            .fill(colorScheme == .dark ? Color.white.opacity(0.05) : Color.black.opacity(0.05))
-                    )
-                    .padding(.horizontal, 20)
-                    
-                    Spacer(minLength: 20)
-                    
-                    // Arkadaşlık İsteği Gönder Butonu
-                    Button {
-                        sendFriendRequest()
-                    } label: {
-                        HStack(spacing: 10) {
-                            if isLoading {
-                                ProgressView()
-                                    .tint(.white)
-                            } else {
-                                Image(systemName: isRequestSent ? "checkmark.circle.fill" : "person.badge.plus")
-                                    .font(.system(size: 20, weight: .semibold))
-                            }
-                            Text(isRequestSent ? "İstek Gönderildi" : "Arkadaşlık İsteği Gönder")
-                                .font(.system(size: 17, weight: .semibold))
-                        }
-                        .foregroundStyle(.white)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 16)
-                        .background(
-                            Capsule()
-                                .fill(isRequestSent ? 
-                                      LinearGradient(colors: [.green, .green.opacity(0.8)], startPoint: .leading, endPoint: .trailing) :
-                                      LinearGradient(colors: [.purple, .pink], startPoint: .leading, endPoint: .trailing)
-                                )
-                        )
-                    }
-                    .disabled(isLoading || isRequestSent)
-                    .padding(.horizontal, 20)
-                    .padding(.bottom, 20)
-                }
-                .padding(.top, 20)
-            }
-            .background((colorScheme == .dark ? Color(red: 0.04, green: 0.02, blue: 0.08) : Color(UIColor.systemBackground)).ignoresSafeArea())
-            .navigationTitle("Profil Özeti")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button {
-                        dismiss()
-                    } label: {
-                        Image(systemName: "xmark.circle.fill")
-                            .font(.system(size: 24))
-                            .foregroundStyle(colorScheme == .dark ? .white.opacity(0.6) : .black.opacity(0.6))
-                    }
-                }
-            }
-        }
-        .presentationDetents([.medium, .large])
-        .presentationDragIndicator(.visible)
-    }
-    
-    private func sendFriendRequest() {
-        isLoading = true
-        
-        Task {
-            do {
-                _ = try await SocialService.shared.sendRequest(toUserId: user.id)
-                await MainActor.run {
-                    isLoading = false
-                    isRequestSent = true
-                }
-            } catch {
-                await MainActor.run {
-                    isLoading = false
-                }
-            }
-        }
-    }
-}
+// MARK: - Profile Summary Sheet (moved to ProfileSummarySheet.swift)
 
-// MARK: - Locked Social Icon
-struct LockedSocialIcon: View {
+// MARK: - Discover Locked Social Icon
+struct DiscoverLockedSocialIcon: View {
     let platform: String
     let hasAccount: Bool
     @Environment(\.colorScheme) private var colorScheme
@@ -8671,3 +8824,21 @@ struct CardLockedSocialIcon: View {
 }
 
 
+
+
+// MARK: - Country Helpers
+func countryFlag(for countryCode: String) -> String {
+    let base: UInt32 = 127397
+    var flag = ""
+    for scalar in countryCode.uppercased().unicodeScalars {
+        if let scalarValue = UnicodeScalar(base + scalar.value) {
+            flag.append(String(scalarValue))
+        }
+    }
+    return flag
+}
+
+func countryName(for countryCode: String) -> String {
+    let locale = Locale(identifier: "tr_TR")
+    return locale.localizedString(forRegionCode: countryCode) ?? countryCode
+}

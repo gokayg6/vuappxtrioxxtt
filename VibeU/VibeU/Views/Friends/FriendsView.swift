@@ -244,7 +244,7 @@ struct FriendsView: View {
         VStack(spacing: 12) {
             HStack(spacing: 10) {
                 ForEach(FriendFilter.allCases, id: \.self) { filter in
-                    FilterChip(
+                    FriendsFilterChip(
                         title: filter.rawValue,
                         count: filter == .all ? friends.count : onlineCount,
                         isSelected: selectedFilter == filter,
@@ -452,7 +452,7 @@ private struct FriendStatCard: View {
 }
 
 // MARK: - Filter Chip (Liquid Glass Design)
-private struct FilterChip: View {
+private struct FriendsFilterChip: View {
     let title: String
     let count: Int
     let isSelected: Bool
@@ -516,23 +516,13 @@ private struct FriendRowView: View {
                 // Profile Photo with Online Indicator (NO GREEN BORDER)
                 ZStack(alignment: .bottomTrailing) {
                     // Photo with subtle border
-                    AsyncImage(url: URL(string: friend.profilePhotoURL)) { image in
-                        image.resizable().scaledToFill()
-                    } placeholder: {
-                        Circle()
-                            .fill(isDark ? colors.cardBackground.opacity(0.5) : Color.white.opacity(0.8))
-                            .overlay(
-                                Image(systemName: "person.fill")
-                                    .font(.system(size: 24))
-                                    .foregroundStyle(colors.tertiaryText)
-                            )
-                    }
-                    .frame(width: 58, height: 58)
-                    .clipShape(Circle())
-                    .overlay(
-                        Circle()
-                            .stroke(isDark ? Color.white.opacity(0.1) : Color.gray.opacity(0.2), lineWidth: 1.5)
-                    )
+                    CachedAsyncImage(url: friend.profilePhotoURL)
+                        .frame(width: 58, height: 58)
+                        .clipShape(Circle())
+                        .overlay(
+                            Circle()
+                                .stroke(isDark ? Color.white.opacity(0.1) : Color.gray.opacity(0.2), lineWidth: 1.5)
+                        )
                     
                     // Online indicator (small dot only)
                     if friend.isOnline {
@@ -709,22 +699,13 @@ struct FriendDetailSheet: View {
     private var profileHeader: some View {
         HStack(spacing: 12) {
             // Profile photo
-            AsyncImage(url: URL(string: friend.profilePhotoURL)) { image in
-                image.resizable().scaledToFill()
-            } placeholder: {
-                Circle()
-                    .fill(isDark ? colors.cardBackground.opacity(0.5) : Color.white.opacity(0.8))
-                    .overlay(
-                        Image(systemName: "person.fill")
-                            .foregroundStyle(colors.tertiaryText)
-                    )
-            }
-            .frame(width: 60, height: 60)
-            .clipShape(Circle())
-            .overlay(
-                Circle()
-                    .stroke(colors.accent.opacity(0.5), lineWidth: 2)
-            )
+            CachedAsyncImage(url: friend.profilePhotoURL)
+                .frame(width: 60, height: 60)
+                .clipShape(Circle())
+                .overlay(
+                    Circle()
+                        .stroke(colors.accent.opacity(0.5), lineWidth: 2)
+                )
             
             VStack(alignment: .leading, spacing: 4) {
                 Text(friend.displayName)
@@ -802,16 +783,9 @@ struct FriendDetailSheet: View {
         VStack(spacing: 0) {
             TabView(selection: $currentPhotoIndex) {
                 ForEach(Array(mockPhotos.enumerated()), id: \.offset) { index, url in
-                    AsyncImage(url: URL(string: url)) { image in
-                        image
-                            .resizable()
-                            .scaledToFill()
-                    } placeholder: {
-                        Rectangle()
-                            .fill(isDark ? colors.cardBackground.opacity(0.5) : Color.white.opacity(0.8))
-                            .overlay(ProgressView().tint(colors.accent))
-                    }
-                    .tag(index)
+                    CachedAsyncImage(url: url)
+                        .aspectRatio(contentMode: .fill)
+                        .tag(index)
                 }
             }
             .tabViewStyle(.page(indexDisplayMode: .never))
@@ -1212,14 +1186,10 @@ private struct RequestRow: View {
     var body: some View {
         HStack(spacing: 12) {
             // Avatar
-            AsyncImage(url: URL(string: request.fromUser?.profilePhotoURL ?? "")) { image in
-                image.resizable().scaledToFill()
-            } placeholder: {
-                Circle().fill(Color.gray.opacity(0.3))
-            }
-            .frame(width: 56, height: 56)
-            .clipShape(Circle())
-            .overlay(Circle().stroke(Color.gray.opacity(0.2), lineWidth: 1))
+            CachedAsyncImage(url: request.fromUser?.profilePhotoURL ?? "")
+                .frame(width: 56, height: 56)
+                .clipShape(Circle())
+                .overlay(Circle().stroke(Color.gray.opacity(0.2), lineWidth: 1))
             
             // Info
             VStack(alignment: .leading, spacing: 4) {

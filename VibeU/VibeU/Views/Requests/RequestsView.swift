@@ -488,17 +488,28 @@ struct PremiumFriendCard: View {
         HStack(spacing: 12) {
             // Avatar with online indicator
             ZStack(alignment: .bottomTrailing) {
-                AsyncImage(url: URL(string: friendship.friend.profilePhotoURL ?? "")) { image in
-                    image
-                        .resizable()
-                        .scaledToFill()
-                } placeholder: {
-                    Circle()
-                        .fill(.white.opacity(0.1))
-                        .overlay {
-                            Image(systemName: "person.fill")
-                                .foregroundStyle(.white.opacity(0.3))
+                Group {
+                    if !friendship.friend.profilePhotoURL.isEmpty, let url = URL(string: friendship.friend.profilePhotoURL) {
+                        AsyncImage(url: url) { image in
+                            image
+                                .resizable()
+                                .scaledToFill()
+                        } placeholder: {
+                            Circle()
+                                .fill(.white.opacity(0.1))
+                                .overlay {
+                                    Image(systemName: "person.fill")
+                                        .foregroundStyle(.white.opacity(0.3))
+                                }
                         }
+                    } else {
+                        Circle()
+                            .fill(.white.opacity(0.1))
+                            .overlay {
+                                Image(systemName: "person.fill")
+                                    .foregroundStyle(.white.opacity(0.3))
+                            }
+                    }
                 }
                 .frame(width: 50, height: 50)
                 .clipShape(Circle())
@@ -508,7 +519,10 @@ struct PremiumFriendCard: View {
                     Circle()
                         .fill(.green)
                         .frame(width: 12, height: 12)
-                        .overlay(Circle().stroke(Color(red: 0.04, green: 0.02, blue: 0.08), lineWidth: 2))
+                        .overlay {
+                            Circle()
+                                .stroke(Color(red: 0.04, green: 0.02, blue: 0.08), lineWidth: 2)
+                        }
                 }
             }
             

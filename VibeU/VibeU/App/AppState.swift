@@ -7,6 +7,7 @@ enum AuthState: Equatable {
     case onboarding
     case unauthenticated
     case authenticated
+    case needsProfileSetup // Yeni durum - kayıt sonrası profil tamamlama
 }
 
 enum AppTheme: String, CaseIterable {
@@ -244,30 +245,42 @@ final class AppState {
         // Load saved language
         Bundle.setLanguage(currentLanguage.rawValue)
         checkAuthState()
+        
+        // Start location services
+        Task { @MainActor in
+            LocationManager.shared.requestLocationPermission()
+        }
     }
     
     func checkAuthState() {
         Task {
             try? await Task.sleep(for: .seconds(1))
             
+            print("🔐 [AppState] Checking auth state...")
+            
             // Check if AuthService has a token
             if AuthService.shared.isAuthenticated {
+                print("✅ [AppState] User is authenticated")
                 do {
                     // Get user from backend
                     currentUser = try await AuthService.shared.getCurrentUser()
+                    print("✅ [AppState] User loaded: \(currentUser?.displayName ?? "Unknown")")
                     authState = .authenticated
                     isLoggedIn = true
                     checkPremiumStatus()
                     return
                 } catch {
                     // Token expired or invalid
+                    print("❌ [AppState] Failed to load user: \(error.localizedDescription)")
                     AuthService.shared.clearAuth()
                     authState = .unauthenticated
                     isLoggedIn = false
                 }
             } else if !hasCompletedOnboarding {
+                print("📱 [AppState] Showing onboarding")
                 authState = .onboarding
             } else {
+                print("🔓 [AppState] User not authenticated")
                 authState = .unauthenticated
             }
         }
@@ -298,8 +311,16 @@ final class AppState {
         KeychainManager.shared.saveRefreshToken(refreshToken)
         currentUser = user
         isLoggedIn = true
-        authState = .authenticated
-        checkPremiumStatus()
+        
+        // Check if user has completed onboarding (profile_completed_at exists)
+        if user.profileCompletedAt == nil {
+            print("📝 [AppState] User needs to complete onboarding")
+            authState = .needsProfileSetup
+        } else {
+            print("✅ [AppState] User profile is complete")
+            authState = .authenticated
+            checkPremiumStatus()
+        }
         
         // Sync user to backend database for friend requests
         Task {
@@ -454,5 +475,33 @@ final class AppState {
         pendingConversation = newConversation
         shouldNavigateToChat = true
         selectedTab = 3 // Chat tab
+    }
+    
+    // MARK: - Discover Users Cache
+    var cachedDiscoverUsers: [DiscoverUser] = []
+    var lastDiscoverFetch: Date?
+    
+    func prefetchDiscoverUsers() {
+        Task {
+            do {
+                let response = try await DiscoverService.shared.getDiscoverFeed(
+                    mode: .forYou,
+                    limit: 50,
+                    countryFilter: nil
+                )
+                await MainActor.run {
+                    self.cachedDiscoverUsers = response.users
+                    self.lastDiscoverFetch = Date()
+                }
+                print("✅ Prefetched \(response.users.count) discover users")
+            } catch {
+                print("⚠️ Failed to prefetch discover users: \(error)")
+            }
+        }
+    }
+    
+    func shouldRefreshDiscoverCache() -> Bool {
+        guard let lastFetch = lastDiscoverFetch else { return true }
+        return Date().timeIntervalSince(lastFetch) > 300 // 5 minutes
     }
 }

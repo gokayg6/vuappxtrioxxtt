@@ -1,6 +1,7 @@
 import Foundation
 import FirebaseFirestore
 import FirebaseAuth
+import CoreLocation
 
 actor DiscoverService {
     static let shared = DiscoverService()
@@ -18,6 +19,8 @@ actor DiscoverService {
         ageRange: ClosedRange<Int>? = nil,
         genderFilter: String? = nil
     ) async throws -> DiscoverResponse {
+        print("🔍 DiscoverService: Fetching users with countryFilter=\(countryFilter ?? "nil"), limit=\(limit)")
+        
         // Build query with filters
         var query: Query = db.collection("users")
         
@@ -35,30 +38,52 @@ actor DiscoverService {
         query = query.limit(to: limit * 2) // Fetch more for filtering
         
         let snapshot = try await query.getDocuments()
+        print("📊 DiscoverService: Fetched \(snapshot.documents.count) documents from Firestore")
+        
         let currentUid = Auth.auth().currentUser?.uid
+        let currentEmail = Auth.auth().currentUser?.email
+        print("🔐 Current User UID: \(currentUid ?? "nil"), Email: \(currentEmail ?? "nil")")
         
         var users: [DiscoverUser] = []
         
         for doc in snapshot.documents {
             let userId = doc.documentID
-            
-            // Skip self
-            if let currentUid = currentUid, userId == currentUid { continue }
-            
             let data = doc.data()
+            let userEmail = data["email"] as? String ?? ""
+            let displayName = data["display_name"] as? String ?? ""
             
-            // Map Firestore Data to DiscoverUser
-            let displayName = data["displayName"] as? String ?? "VibeU User"
+            // Skip self - check both UID and email
+            if let currentUid = currentUid, userId == currentUid {
+                print("⛔️ Skipping self by UID: \(userId)")
+                continue
+            }
+            
+            if let currentEmail = currentEmail, !currentEmail.isEmpty, !userEmail.isEmpty, userEmail.lowercased() == currentEmail.lowercased() {
+                print("⛔️ Skipping self by Email: \(userEmail)")
+                continue
+            }
+            
+            print("👤 Processing user: \(userId)")
+            print("   Raw data keys: \(data.keys.joined(separator: ", "))")
+            print("   displayName: '\(displayName)'")
+            
+            // Skip users without name
+            if displayName.isEmpty {
+                print("   ❌ Skipped: Empty displayName")
+                continue
+            }
+            
             let age = data["age"] as? Int ?? 18
             let city = data["city"] as? String ?? ""
-            let profilePhotoURL = data["profilePhotoURL"] as? String ?? ""
-            let photosData = data["photos"] as? [String] ?? []
+            let profilePhotoURL = data["profile_photo_url"] as? String ?? ""
+            let photosData = data["photos"] as? [[String: Any]] ?? []
             let tags = data["tags"] as? [String] ?? []
             let activityScore = data["activity_score"] as? Int ?? Int.random(in: 30...80)
-            // let bio = data["bio"] as? String ?? ""
+            
+            print("   photos count: \(photosData.count), profile_photo_url: '\(profilePhotoURL)'")
             
             // Social Links Logic
-            let socialLinks = data["socialLinks"] as? [String: Any]
+            let socialLinks = data["social_links"] as? [String: Any]
             let tiktok = socialLinks?["tiktok"] as? [String: String]
             let instagram = socialLinks?["instagram"] as? [String: String]
             let snapchat = socialLinks?["snapchat"] as? [String: String]
@@ -67,29 +92,60 @@ actor DiscoverService {
             let instagramUsername = instagram?["username"]
             let snapchatUsername = snapchat?["username"]
             
-            // Photos Mapping
+            // Photos Mapping from Firebase Storage URLs
             var userPhotos: [UserPhoto] = []
             if !photosData.isEmpty {
-                 userPhotos = photosData.enumerated().map { index, url in
-                     UserPhoto(
-                         id: UUID().uuidString,
-                         url: url,
-                         thumbnailURL: nil,
-                         orderIndex: index,
-                         isPrimary: index == 0
-                     )
-                 }
+                userPhotos = photosData.enumerated().compactMap { index, photoDict in
+                    guard let url = photoDict["url"] as? String, !url.isEmpty else { return nil }
+                    return UserPhoto(
+                        id: photoDict["id"] as? String ?? UUID().uuidString,
+                        url: url,
+                        thumbnailURL: photoDict["thumbnailURL"] as? String,
+                        orderIndex: photoDict["orderIndex"] as? Int ?? index,
+                        isPrimary: photoDict["isPrimary"] as? Bool ?? (index == 0)
+                    )
+                }
             } else if !profilePhotoURL.isEmpty {
-                 userPhotos = [
-                     UserPhoto(
-                         id: UUID().uuidString,
-                         url: profilePhotoURL,
-                         thumbnailURL: nil,
-                         orderIndex: 0,
-                         isPrimary: true
-                     )
-                 ]
+                userPhotos = [
+                    UserPhoto(
+                        id: UUID().uuidString,
+                        url: profilePhotoURL,
+                        thumbnailURL: nil,
+                        orderIndex: 0,
+                        isPrimary: true
+                    )
+                ]
             }
+            
+            print("   userPhotos count after mapping: \(userPhotos.count)")
+            
+            // Skip users without photos
+            if userPhotos.isEmpty {
+                print("   ❌ Skipped: No photos")
+                continue
+            }
+            
+            print("   ✅ User added: \(displayName)")
+            
+            // Calculate real distance if location data available
+            let latitude = data["latitude"] as? Double
+            let longitude = data["longitude"] as? Double
+            var calculatedDistance: Double?
+            
+            if let lat = latitude, let lon = longitude {
+                // Get distance from LocationManager
+                calculatedDistance = await MainActor.run {
+                    LocationManager.shared.calculateDistanceFromUser(
+                        to: CLLocationCoordinate2D(latitude: lat, longitude: lon)
+                    )
+                }
+            }
+            
+            // Use calculated distance or fallback to random
+            let finalDistance = calculatedDistance ?? Double.random(in: 1...20)
+            
+            // Get bio
+            let bio = data["bio"] as? String
             
             // Construct User
             let user = DiscoverUser(
@@ -99,7 +155,7 @@ actor DiscoverService {
                 city: city,
                 country: nil,
                 countryFlag: nil,
-                distanceKm: Double.random(in: 1...20), // Placeholder
+                distanceKm: finalDistance,
                 profilePhotoURL: profilePhotoURL,
                 photos: userPhotos,
                 tags: tags,
@@ -109,10 +165,13 @@ actor DiscoverService {
                 tiktokUsername: tiktokUsername,
                 instagramUsername: instagramUsername,
                 snapchatUsername: snapchatUsername,
-                isFriend: false
+                isFriend: false,
+                bio: bio
             )
             users.append(user)
         }
+        
+        print("✅ DiscoverService: Mapped \(users.count) valid users")
         
         // Apply age filter in-memory (Firestore doesn't support range queries well with other filters)
         var filteredUsers = users
@@ -125,6 +184,8 @@ actor DiscoverService {
         
         // Limit to requested count
         let limitedUsers = Array(filteredUsers.prefix(limit))
+        
+        print("🎯 DiscoverService: Returning \(limitedUsers.count) users")
         
         return DiscoverResponse(
             users: limitedUsers,

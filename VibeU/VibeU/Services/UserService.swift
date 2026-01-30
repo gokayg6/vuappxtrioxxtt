@@ -26,36 +26,84 @@ actor UserService {
     
     /// Fetches a user by their UID
     func fetchUser(uid: String) async throws -> User? {
+        print("🔍 [UserService] Fetching user: \(uid)")
+        
         do {
             // Try to fetch from server first
             let document = try await usersRef.document(uid).getDocument(source: .server)
-            if document.exists, let user = try? document.data(as: User.self) {
-                // Return user directly - photos are now embedded in the main document
-                // This is the SINGLE SOURCE OF TRUTH.
-                return user
+            print("📄 [UserService] Document exists: \(document.exists)")
+            
+            if document.exists {
+                guard let data = document.data() else {
+                    print("⚠️ [UserService] Document has no data")
+                    return nil
+                }
+                
+                print("📋 [UserService] Raw document data:")
+                for (key, value) in data {
+                    print("   \(key): \(type(of: value)) = \(value)")
+                }
+                
+                do {
+                    // Use Firestore decoder - it automatically handles Timestamp -> Date conversion
+                    let user = try document.data(as: User.self)
+                    print("✅ [UserService] User decoded successfully: \(user.displayName)")
+                    return user
+                } catch let decodingError as DecodingError {
+                    print("❌ [UserService] DecodingError details:")
+                    switch decodingError {
+                    case .typeMismatch(let type, let context):
+                        print("   Type mismatch: expected \(type)")
+                        print("   Context: \(context.debugDescription)")
+                        print("   Coding path: \(context.codingPath.map { $0.stringValue }.joined(separator: " -> "))")
+                    case .valueNotFound(let type, let context):
+                        print("   Value not found: \(type)")
+                        print("   Context: \(context.debugDescription)")
+                        print("   Coding path: \(context.codingPath.map { $0.stringValue }.joined(separator: " -> "))")
+                    case .keyNotFound(let key, let context):
+                        print("   Key not found: \(key.stringValue)")
+                        print("   Context: \(context.debugDescription)")
+                    case .dataCorrupted(let context):
+                        print("   Data corrupted")
+                        print("   Context: \(context.debugDescription)")
+                        print("   Coding path: \(context.codingPath.map { $0.stringValue }.joined(separator: " -> "))")
+                    @unknown default:
+                        print("   Unknown decoding error: \(decodingError)")
+                    }
+                    throw decodingError
+                } catch {
+                    print("❌ [UserService] Failed to decode user: \(error)")
+                    throw error
+                }
             }
+            
+            print("⚠️ [UserService] Document does not exist for uid: \(uid)")
             return nil
         } catch let error as NSError {
+            print("❌ [UserService] Error fetching user: \(error.localizedDescription)")
+            print("🔍 [UserService] Error domain: \(error.domain), code: \(error.code)")
+            
             // If offline or unavailable, try cache
             if error.domain == "FIRFirestoreErrorDomain" && (error.code == 14 || error.code == 7) {
                 print("⚠️ Server unavailable, trying cache for user \(uid)")
                 let document = try await usersRef.document(uid).getDocument(source: .cache)
-                if document.exists, var user = try? document.data(as: User.self) {
-                    // Try to fetch photos from cache (ProfileService defaults to default source, likely automagically cached)
-                    // Just attempt same fetch, Firestore handles cache if offline
-                    let photoModels = try? await ProfileService.shared.fetchPhotos(userId: uid)
-                    if let models = photoModels {
-                         user.photos = models.map { model in
-                            UserPhoto(
-                                id: model.id,
-                                url: model.url,
-                                thumbnailURL: model.url,
-                                orderIndex: model.orderIndex,
-                                isPrimary: model.isPrimary
-                            )
+                if document.exists {
+                    if var user = try? document.data(as: User.self) {
+                        // Try to fetch photos from cache
+                        let photoModels = try? await ProfileService.shared.fetchPhotos(userId: uid)
+                        if let models = photoModels {
+                             user.photos = models.map { model in
+                                UserPhoto(
+                                    id: model.id,
+                                    url: model.url,
+                                    thumbnailURL: model.url,
+                                    orderIndex: model.orderIndex,
+                                    isPrimary: model.isPrimary
+                                )
+                            }
                         }
+                        return user
                     }
-                    return user
                 }
                 return nil
             }

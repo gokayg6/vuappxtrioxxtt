@@ -3,9 +3,9 @@
 <plist version="1.0">
 <dict>
 	<key>CLIENT_ID</key>
-	<string>901614024126-0qk6l2ko6hj90n50tj9j1iv1jdmphmev.apps.googleusercontent.com</string>
+	<string>901614024126-jk45khdkb2gegbuk8o9u7h5ngmhso765.apps.googleusercontent.com</string>
 	<key>REVERSED_CLIENT_ID</key>
-	<string>com.googleusercontent.apps.901614024126-0qk6l2ko6hj90n50tj9j1iv1jdmphmev</string>
+	<string>com.googleusercontent.apps.901614024126-jk45khdkb2gegbuk8o9u7h5ngmhso765</string>
 	<key>API_KEY</key>
 	<string>AIzaSyDq7FnW8Rt5CXWKyciV9HpU_x7YoeIynZE</string>
 	<key>GCM_SENDER_ID</key>
@@ -13,7 +13,7 @@
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>Vibeu</string>
+	<string>com.vibeu.app</string>
 	<key>PROJECT_ID</key>
 	<string>vibeu-d55ea</string>
 	<key>STORAGE_BUCKET</key>
@@ -29,6 +29,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:901614024126:ios:74dbe0379b21e9a055f5ef</string>
+	<string>1:901614024126:ios:72e999513745bd6655f5ef</string>
 </dict>
 </plist>

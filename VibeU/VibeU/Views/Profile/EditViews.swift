@@ -18,8 +18,7 @@ struct ProfileKeys {
     static let boosts = "user_boosts"
     static let isPremium = "user_isPremium"
     // New comprehensive fields
-    static let university = "user_university"
-    static let department = "user_department"
+    static let country = "user_country"
     static let company = "user_company"
     static let height = "user_height"
     static let zodiac = "user_zodiac"
@@ -41,8 +40,8 @@ struct EditProfileView: View {
     
     // Location & Career
     @State private var city = ""
-    @State private var university = ""
-    @State private var department = ""
+    @State private var country = "TR"
+    @State private var showCountryPicker = false
     @State private var jobTitle = ""
     @State private var company = ""
     
@@ -159,6 +158,9 @@ struct EditProfileView: View {
         .onChange(of: photoItem) { _, item in
             Task { await loadPhoto(item) }
         }
+        .sheet(isPresented: $showCountryPicker) {
+            ProfileCountryPickerSheet(selectedCountry: $country)
+        }
         .onAppear { loadProfile() }
         .alert("Kaydedildi ✓", isPresented: $showSavedAlert) {
             Button("Tamam") { dismiss() }
@@ -176,8 +178,7 @@ struct EditProfileView: View {
         
         // Extended fields - appState first, UserDefaults fallback
         jobTitle = user?.jobTitle ?? UserDefaults.standard.string(forKey: ProfileKeys.jobTitle) ?? ""
-        university = user?.university ?? UserDefaults.standard.string(forKey: ProfileKeys.university) ?? ""
-        department = user?.department ?? UserDefaults.standard.string(forKey: ProfileKeys.department) ?? ""
+        country = user?.country ?? UserDefaults.standard.string(forKey: ProfileKeys.country) ?? "TR"
         company = user?.company ?? UserDefaults.standard.string(forKey: ProfileKeys.company) ?? ""
         height = user?.height ?? UserDefaults.standard.string(forKey: ProfileKeys.height) ?? ""
         zodiac = user?.zodiac ?? UserDefaults.standard.string(forKey: ProfileKeys.zodiac) ?? ""
@@ -220,8 +221,7 @@ struct EditProfileView: View {
         UserDefaults.standard.set(bio, forKey: ProfileKeys.bio)
         UserDefaults.standard.set(city, forKey: ProfileKeys.city)
         UserDefaults.standard.set(jobTitle, forKey: ProfileKeys.jobTitle)
-        UserDefaults.standard.set(university, forKey: ProfileKeys.university)
-        UserDefaults.standard.set(department, forKey: ProfileKeys.department)
+        UserDefaults.standard.set(country, forKey: ProfileKeys.country)
         UserDefaults.standard.set(company, forKey: ProfileKeys.company)
         UserDefaults.standard.set(height, forKey: ProfileKeys.height)
         UserDefaults.standard.set(zodiac, forKey: ProfileKeys.zodiac)
@@ -240,8 +240,7 @@ struct EditProfileView: View {
             "bio": bio,
             "city": city,
             "job_title": jobTitle,
-            "university": university,
-            "department": department,
+            "country": country,
             "company": company,
             "height": height,
             "zodiac": zodiac,
@@ -265,8 +264,7 @@ struct EditProfileView: View {
                     appState.currentUser?.bio = bio
                     appState.currentUser?.city = city
                     appState.currentUser?.jobTitle = jobTitle
-                    appState.currentUser?.university = university
-                    appState.currentUser?.department = department
+                    appState.currentUser?.country = country
                     appState.currentUser?.company = company
                     appState.currentUser?.height = height
                     appState.currentUser?.zodiac = zodiac
@@ -302,38 +300,23 @@ struct EditProfileView: View {
             savedPhoto = image
         }
         
-        // Upload to Firebase
+        // Upload PROFILE PHOTO (separate from gallery photos)
         do {
-            let photoModel = try await PhotoUploadService.shared.uploadPhoto(
+            let downloadURL = try await PhotoUploadService.shared.uploadProfilePhoto(
                 image: image,
-                userId: userId,
-                orderIndex: 0 // Primary photo
+                userId: userId
             )
             
-            // Update appState.currentUser with new photo URL
+            // Update appState.currentUser with new profile photo URL
             await MainActor.run {
-                appState.currentUser?.profilePhotoURL = photoModel.url
-                
-                // Also update photos array
-                let newUserPhoto = UserPhoto(
-                    id: photoModel.id,
-                    url: photoModel.url,
-                    thumbnailURL: photoModel.url,
-                    orderIndex: photoModel.orderIndex,
-                    isPrimary: photoModel.isPrimary
-                )
-                
-                // Replace first photo or insert at beginning
-                if appState.currentUser?.photos.isEmpty == true {
-                    appState.currentUser?.photos = [newUserPhoto]
-                } else {
-                    appState.currentUser?.photos.insert(newUserPhoto, at: 0)
-                }
+                appState.currentUser?.profilePhotoURL = downloadURL
+                print("✅ Profile photo updated: \(downloadURL)")
             }
             
-            await LogService.shared.info("Profil fotoğrafı güncellendi", category: "Profile")
+            await LogService.shared.info("Profile photo updated", category: "Profile")
         } catch {
-            print("Profile photo upload failed: \(error)")
+            print("❌ Failed to upload profile photo: \(error)")
+            await LogService.shared.error("Profile photo upload failed: \(error)", category: "Profile")
         }
     }
     
@@ -418,9 +401,37 @@ struct EditProfileView: View {
             VStack(spacing: 0) {
                 ThemedEditRow(icon: "location", title: "Şehir", text: $city, colors: colors)
                 ThemedEditDivider(colors: colors)
-                ThemedEditRow(icon: "building.columns", title: "Üniversite", text: $university, colors: colors)
-                ThemedEditDivider(colors: colors)
-                ThemedEditRow(icon: "book", title: "Bölüm", text: $department, colors: colors)
+                
+                // Country Picker Button
+                Button {
+                    showCountryPicker = true
+                } label: {
+                    HStack(spacing: 14) {
+                        RoundedRectangle(cornerRadius: 8)
+                            .fill(colors.secondaryBackground)
+                            .frame(width: 36, height: 36)
+                            .overlay(Image(systemName: "flag").font(.system(size: 15)).foregroundStyle(colors.secondaryText))
+                        
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("Ülke")
+                                .font(.system(size: 12))
+                                .foregroundStyle(colors.tertiaryText)
+                            
+                            Text(countryName(for: country))
+                                .font(.system(size: 16, weight: .medium))
+                                .foregroundStyle(colors.primaryText)
+                        }
+                        
+                        Spacer()
+                        
+                        Image(systemName: "chevron.down")
+                            .font(.system(size: 12, weight: .medium))
+                            .foregroundStyle(colors.tertiaryText)
+                    }
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 12)
+                }
+                
                 ThemedEditDivider(colors: colors)
                 ThemedEditRow(icon: "briefcase", title: "Meslek", text: $jobTitle, colors: colors)
                 ThemedEditDivider(colors: colors)
@@ -920,18 +931,13 @@ struct PhotosEditView: View {
                 self.loadedImages = []
             }
             
-            // 2. Download from URLs in PARALLEL
+            // 2. Download from URLs in PARALLEL using ImageCacheService
             let downloadedImages = await withTaskGroup(of: (Int, UIImage?).self) { group in
                 for (index, photo) in photos.enumerated() {
                     group.addTask {
-                        guard let url = URL(string: photo.url) else { return (index, nil) }
-                        do {
-                            let (data, _) = try await URLSession.shared.data(from: url)
-                            if let image = UIImage(data: data) {
-                                return (index, image)
-                            }
-                        } catch {
-                            print("Error downloading photo \(index): \(error)")
+                        // Use ImageCacheService for instant loading
+                        if let image = await ImageCacheService.shared.getImage(url: photo.url) {
+                            return (index, image)
                         }
                         return (index, nil)
                     }
@@ -985,6 +991,7 @@ struct PhotosEditView: View {
                         self.photoModels.append(photoModel)
                         
                         // SYNC APPSTATE (Single Source of Truth)
+                        // NOTE: Gallery photos do NOT update profile photo
                         if var user = appState.currentUser {
                             let userPhoto = UserPhoto(
                                 id: photoModel.id,
@@ -994,9 +1001,7 @@ struct PhotosEditView: View {
                                 isPrimary: photoModel.isPrimary
                             )
                             user.photos.append(userPhoto)
-                            if photoModel.isPrimary {
-                                user.profilePhotoURL = photoModel.url
-                            }
+                            // DO NOT update profilePhotoURL - it's managed separately
                             appState.currentUser = user
                             print("PhotosEditView: Synced appState with new photo. Total: \(user.photos.count)")
                         }
@@ -1494,18 +1499,55 @@ struct InterestsEditView: View {
     private func saveInterests() {
         guard let uid = Auth.auth().currentUser?.uid else { return }
         
+        print("💾 [InterestsEditView] Saving interests: \(selectedInterests)")
+        
         // Save to local UserDefaults for cache
         UserDefaults.standard.set(Array(selectedInterests), forKey: ProfileKeys.interests)
+        
+        // Convert selected interest names to Interest objects
+        var interestObjects: [[String: Any]] = []
+        var interestModels: [Interest] = []
+        
+        for (category, interests) in allInterests {
+            for (emoji, name) in interests {
+                if selectedInterests.contains(name) {
+                    let code = name.lowercased().replacingOccurrences(of: " ", with: "_")
+                    let interestId = UUID().uuidString
+                    
+                    interestObjects.append([
+                        "id": interestId,
+                        "code": code,
+                        "name": name,
+                        "emoji": emoji,
+                        "category": category
+                    ])
+                    
+                    interestModels.append(Interest(
+                        id: interestId,
+                        code: code,
+                        name: name,
+                        emoji: emoji,
+                        category: category
+                    ))
+                }
+            }
+        }
+        
+        print("💾 [InterestsEditView] Converted to \(interestObjects.count) interest objects")
         
         // Save to Firebase
         Task {
             do {
                 try await UserService.shared.updateUserFields(uid: uid, data: [
-                    "interests": Array(selectedInterests)
+                    "interests": interestObjects
                 ])
                 
+                print("✅ [InterestsEditView] Interests saved to Firebase successfully")
+                
                 await MainActor.run {
-                    // Note: appState.currentUser?.interests is [Interest], skip direct assignment
+                    // Update appState with Interest objects
+                    appState.currentUser?.interests = interestModels
+                    
                     let impact = UIImpactFeedbackGenerator(style: .medium)
                     impact.impactOccurred()
                     showSavedAlert = true
@@ -1513,7 +1555,7 @@ struct InterestsEditView: View {
                 
                 await LogService.shared.info("İlgi alanları Firebase'e kaydedildi", category: "Profile", metadata: ["count": "\(selectedInterests.count)"])
             } catch {
-                print("Error saving interests to Firebase: \(error)")
+                print("❌ [InterestsEditView] Error saving interests to Firebase: \(error)")
                 await MainActor.run { showSavedAlert = true } // Still show success for local save
             }
         }
@@ -2184,5 +2226,113 @@ struct ThemeSettingsView: View {
         }
         .navigationTitle("Tema")
         .toolbarColorScheme(.dark, for: .navigationBar)
+    }
+}
+
+
+// MARK: - Country Picker Sheet
+struct ProfileCountryPickerSheet: View {
+    @Binding var selectedCountry: String
+    @Environment(\.dismiss) private var dismiss
+    @Environment(\.colorScheme) private var colorScheme
+    @State private var searchText = ""
+    
+    private var isDark: Bool { colorScheme == .dark }
+    private var colors: ThemeColors { isDark ? .dark : .light }
+    
+    private let countries = [
+        ("TR", "Türkiye"), ("US", "Amerika Birleşik Devletleri"), ("GB", "Birleşik Krallık"),
+        ("DE", "Almanya"), ("FR", "Fransa"), ("IT", "İtalya"), ("ES", "İspanya"),
+        ("NL", "Hollanda"), ("BE", "Belçika"), ("AT", "Avusturya"), ("CH", "İsviçre"),
+        ("SE", "İsveç"), ("NO", "Norveç"), ("DK", "Danimarka"), ("FI", "Finlandiya"),
+        ("PL", "Polonya"), ("CZ", "Çek Cumhuriyeti"), ("GR", "Yunanistan"), ("PT", "Portekiz"),
+        ("RU", "Rusya"), ("UA", "Ukrayna"), ("RO", "Romanya"), ("BG", "Bulgarya"),
+        ("CA", "Kanada"), ("MX", "Meksika"), ("BR", "Brezilya"), ("AR", "Arjantin"),
+        ("CL", "Şili"), ("CO", "Kolombiya"), ("PE", "Peru"), ("VE", "Venezuela"),
+        ("JP", "Japonya"), ("CN", "Çin"), ("KR", "Güney Kore"), ("IN", "Hindistan"),
+        ("TH", "Tayland"), ("VN", "Vietnam"), ("ID", "Endonezya"), ("MY", "Malezya"),
+        ("SG", "Singapur"), ("PH", "Filipinler"), ("AU", "Avustralya"), ("NZ", "Yeni Zelanda"),
+        ("ZA", "Güney Afrika"), ("EG", "Mısır"), ("MA", "Fas"), ("DZ", "Cezayir"),
+        ("TN", "Tunus"), ("KE", "Kenya"), ("NG", "Nijerya"), ("SA", "Suudi Arabistan"),
+        ("AE", "Birleşik Arap Emirlikleri"), ("IL", "İsrail"), ("IQ", "Irak"), ("IR", "İran"),
+        ("PK", "Pakistan"), ("BD", "Bangladeş"), ("LK", "Sri Lanka"), ("AF", "Afganistan")
+    ]
+    
+    private var filteredCountries: [(String, String)] {
+        if searchText.isEmpty {
+            return countries
+        }
+        return countries.filter { $0.1.localizedCaseInsensitiveContains(searchText) }
+    }
+    
+    var body: some View {
+        NavigationStack {
+            ZStack {
+                colors.background.ignoresSafeArea()
+                
+                VStack(spacing: 0) {
+                    // Search Bar
+                    HStack(spacing: 12) {
+                        Image(systemName: "magnifyingglass")
+                            .foregroundStyle(colors.secondaryText)
+                        
+                        TextField("Ülke Ara", text: $searchText)
+                            .textFieldStyle(.plain)
+                            .foregroundStyle(colors.primaryText)
+                    }
+                    .padding(14)
+                    .background(colors.cardBackground, in: RoundedRectangle(cornerRadius: 14))
+                    .overlay(RoundedRectangle(cornerRadius: 14).stroke(colors.border, lineWidth: 0.5))
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 12)
+                    
+                    // Countries List
+                    ScrollView {
+                        LazyVStack(spacing: 0) {
+                            ForEach(filteredCountries, id: \.0) { code, name in
+                                Button {
+                                    selectedCountry = code
+                                    dismiss()
+                                } label: {
+                                    HStack(spacing: 12) {
+                                        Text(countryFlag(for: code))
+                                            .font(.system(size: 28))
+                                        
+                                        Text(name)
+                                            .font(.system(size: 16))
+                                            .foregroundStyle(colors.primaryText)
+                                        
+                                        Spacer()
+                                        
+                                        if selectedCountry == code {
+                                            Image(systemName: "checkmark")
+                                                .foregroundStyle(colors.accent)
+                                        }
+                                    }
+                                    .padding(.horizontal, 16)
+                                    .padding(.vertical, 14)
+                                    .background(selectedCountry == code ? colors.secondaryBackground : Color.clear)
+                                }
+                                
+                                if code != filteredCountries.last?.0 {
+                                    Divider()
+                                        .background(colors.border)
+                                        .padding(.leading, 60)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            .navigationTitle("Ülke Seç")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbarColorScheme(isDark ? .dark : .light, for: .navigationBar)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Kapat") { dismiss() }
+                        .foregroundStyle(colors.accent)
+                }
+            }
+        }
     }
 }

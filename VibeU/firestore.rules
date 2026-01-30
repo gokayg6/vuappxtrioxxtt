@@ -1,0 +1,166 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // ============================================
+    // HELPER FUNCTIONS
+    // ============================================
+    
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    // ============================================
+    // USERS COLLECTION - RELAXED FOR MOCK DATA
+    // ============================================
+    
+    match /users/{userId} {
+      // Herkes okuyabilir
+      allow read: if isAuthenticated();
+      
+      // Herkes oluşturabilir (mock data için)
+      allow create: if isAuthenticated();
+      
+      // Sadece kendi profilini güncelleyebilir
+      allow update: if isOwner(userId);
+      
+      // Sadece kendi hesabını silebilir
+      allow delete: if isOwner(userId);
+      
+      // Subcollections
+      match /{subcollection}/{document=**} {
+        allow read: if isAuthenticated();
+        allow write: if isAuthenticated();
+      }
+    }
+    
+    // ============================================
+    // FRIEND REQUESTS - RELAXED
+    // ============================================
+    
+    match /friend_requests/{requestId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
+      allow update: if isAuthenticated();
+      allow delete: if isAuthenticated();
+    }
+    
+    // ============================================
+    // DIAMOND TRANSACTIONS
+    // ============================================
+    
+    match /diamond_transactions/{transactionId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
+      allow update, delete: if false;
+    }
+    
+    // ============================================
+    // MESSAGES
+    // ============================================
+    
+    match /messages/{messageId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
+      allow update: if false;
+      allow delete: if isAuthenticated();
+    }
+    
+    // ============================================
+    // MATCHES
+    // ============================================
+    
+    match /matches/{matchId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
+      allow delete: if isAuthenticated();
+      allow update: if false;
+    }
+    
+    // ============================================
+    // DOUBLE DATE
+    // ============================================
+    
+    match /double_date_teams/{teamId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
+      allow update: if isAuthenticated();
+      allow delete: if isAuthenticated();
+    }
+    
+    match /double_date_invites/{inviteId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
+      allow update: if isAuthenticated();
+      allow delete: if isAuthenticated();
+    }
+    
+    match /double_date_matches/{matchId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
+      allow delete: if isAuthenticated();
+      allow update: if false;
+    }
+    
+    // ============================================
+    // REPORTS & BLOCKS
+    // ============================================
+    
+    match /reports/{reportId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
+      allow update, delete: if false;
+    }
+    
+    match /blocks/{blockId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
+      allow delete: if isAuthenticated();
+      allow update: if false;
+    }
+    
+    // ============================================
+    // NOTIFICATIONS
+    // ============================================
+    
+    match /notifications/{notificationId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
+      allow update: if isAuthenticated();
+      allow delete: if isAuthenticated();
+    }
+    
+    // ============================================
+    // LIVE EVENTS
+    // ============================================
+    
+    match /live_events/{eventId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
+      allow update: if isAuthenticated();
+      allow delete: if isAuthenticated();
+    }
+    
+    // ============================================
+    // LOGS
+    // ============================================
+    
+    match /logs/{logId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
+      allow update, delete: if false;
+    }
+    
+    // ============================================
+    // ADMIN - NO ACCESS
+    // ============================================
+    
+    match /admin/{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

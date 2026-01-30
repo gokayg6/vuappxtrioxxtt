@@ -21,25 +21,25 @@ struct OnboardingView: View {
             icon: "person.2.fill",
             title: "Yeni İnsanlarla Tanış",
             subtitle: "Etrafındaki harika insanları keşfet ve anlamlı bağlantılar kur",
-            gradient: [Color(hex: "667eea"), Color(hex: "764ba2")]
+            gradient: [Color(red: 0.4, green: 0.49, blue: 0.92), Color(red: 0.46, green: 0.29, blue: 0.64)]
         ),
         OnboardingPage(
             icon: "sparkles",
             title: "Ortak İlgi Alanları",
             subtitle: "Seninle aynı tutkuları paylaşan insanları bul",
-            gradient: [Color(hex: "f093fb"), Color(hex: "f5576c")]
+            gradient: [Color(red: 0.94, green: 0.58, blue: 0.98), Color(red: 0.96, green: 0.34, blue: 0.42)]
         ),
         OnboardingPage(
             icon: "message.fill",
             title: "Gerçek Bağlantılar",
             subtitle: "Sadece yüzeysel değil, gerçek ve derin arkadaşlıklar edin",
-            gradient: [Color(hex: "4facfe"), Color(hex: "00f2fe")]
+            gradient: [Color(red: 0.31, green: 0.67, blue: 1.0), Color(red: 0.0, green: 0.95, blue: 1.0)]
         ),
         OnboardingPage(
             icon: "shield.checkered",
             title: "Güvenli Ortam",
             subtitle: "Gizliliğin ve güvenliğin bizim önceliğimiz",
-            gradient: [Color(hex: "43e97b"), Color(hex: "38f9d7")]
+            gradient: [Color(red: 0.26, green: 0.91, blue: 0.48), Color(red: 0.22, green: 0.98, blue: 0.84)]
         )
     ]
     
@@ -49,9 +49,9 @@ struct OnboardingView: View {
             if colorScheme == .dark {
                 LinearGradient(
                     colors: [
-                        Color(hex: "0a0118"),
-                        Color(hex: "1a0a2e"),
-                        Color(hex: "0d0d1a")
+                        Color(red: 0.04, green: 0.0, blue: 0.09),
+                        Color(red: 0.1, green: 0.04, blue: 0.18),
+                        Color(red: 0.05, green: 0.05, blue: 0.1)
                     ],
                     startPoint: .top,
                     endPoint: .bottom
@@ -225,7 +225,7 @@ struct OnboardingOrbs: View {
                 Circle()
                     .fill(
                         RadialGradient(
-                            colors: [Color(hex: "667eea").opacity(0.4), .clear],
+                            colors: [Color(red: 0.4, green: 0.49, blue: 0.92).opacity(0.4), .clear],
                             center: .center,
                             startRadius: 0,
                             endRadius: 200
@@ -240,7 +240,7 @@ struct OnboardingOrbs: View {
                 Circle()
                     .fill(
                         RadialGradient(
-                            colors: [Color(hex: "f093fb").opacity(0.3), .clear],
+                            colors: [Color(red: 0.94, green: 0.58, blue: 0.98).opacity(0.3), .clear],
                             center: .center,
                             startRadius: 0,
                             endRadius: 150
@@ -255,7 +255,7 @@ struct OnboardingOrbs: View {
                 Circle()
                     .fill(
                         RadialGradient(
-                            colors: [Color(hex: "4facfe").opacity(0.25), .clear],
+                            colors: [Color(red: 0.31, green: 0.67, blue: 1.0).opacity(0.25), .clear],
                             center: .center,
                             startRadius: 0,
                             endRadius: 120

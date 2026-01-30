@@ -40,46 +40,25 @@ struct GlassAsyncImage: View {
                 Image(uiImage: image)
                     .resizable()
                     .aspectRatio(contentMode: contentMode)
-            } else if isLoading {
-                GlassSkeletonCard()
             } else {
                 placeholderView
-                    .onAppear {
-                        loadImage()
-                    }
+            }
+        }
+        .task(id: url) {
+            await loadImage()
+        }
+        .onChange(of: url) { _, newUrl in
+            Task {
+                image = nil
+                await loadImage()
             }
         }
     }
     
-    private func loadImage() {
-        guard let urlString = url, let imageURL = URL(string: urlString) else { return }
+    private func loadImage() async {
+        guard let urlString = url, !urlString.isEmpty else { return }
         
-        // Check cache first
-        if let cached = ImageCacheManager.shared.image(for: urlString) {
-            self.image = cached
-            return
-        }
-        
-        isLoading = true
-        
-        Task {
-            do {
-                let (data, _) = try await URLSession.shared.data(from: imageURL)
-                if let uiImage = UIImage(data: data) {
-                    // Save to cache
-                    ImageCacheManager.shared.setImage(uiImage, for: urlString)
-                    
-                    await MainActor.run {
-                        self.image = uiImage
-                        self.isLoading = false
-                    }
-                }
-            } catch {
-                await MainActor.run {
-                    self.isLoading = false
-                }
-            }
-        }
+        image = await ImageCacheService.shared.getImage(url: urlString)
     }
     
     private var placeholderView: some View {

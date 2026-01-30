@@ -19,6 +19,34 @@ enum Gender: String, Codable, CaseIterable {
         case .preferNotToSay: return "gender_prefer_not"
         }
     }
+    
+    // Custom decoder to handle Turkish values from old data
+    init(from decoder: Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        let rawValue = try container.decode(String.self)
+        
+        // Try to map Turkish values to English enum
+        switch rawValue.lowercased() {
+        case "male":
+            self = .male
+        case "female":
+            self = .female
+        case "non_binary", "nonbinary":
+            self = .nonBinary
+        case "prefer_not_to_say", "prefernottosay":
+            self = .preferNotToSay
+        // Turkish mappings
+        case "erkek":
+            self = .male
+        case "kadın", "kadin":
+            self = .female
+        case "diğer", "diger", "other":
+            self = .nonBinary
+        default:
+            print("⚠️ [Gender] Unknown gender value '\(rawValue)', defaulting to prefer_not_to_say")
+            self = .preferNotToSay
+        }
+    }
 }
 
 struct User: Identifiable, Codable, Equatable, Hashable {
@@ -58,6 +86,12 @@ struct User: Identifiable, Codable, Equatable, Hashable {
     var wantKids: String?
     var hobbies: [String]?
     
+    // Currency
+    var diamondBalance: Int?
+    
+    // Onboarding completion
+    var profileCompletedAt: Date?
+    
     enum CodingKeys: String, CodingKey {
         case id, username, age, gender, country, city, bio, tags, interests
         case displayName = "display_name"
@@ -86,6 +120,8 @@ struct User: Identifiable, Codable, Equatable, Hashable {
         case lookingFor = "looking_for"
         case wantKids = "want_kids"
         case hobbies
+        case diamondBalance = "diamond_balance"
+        case profileCompletedAt = "profile_completed_at"
     }
     
     init(from decoder: Decoder) throws {
@@ -94,7 +130,16 @@ struct User: Identifiable, Codable, Equatable, Hashable {
         id = try container.decode(String.self, forKey: .id)
         username = try container.decode(String.self, forKey: .username)
         displayName = try container.decode(String.self, forKey: .displayName)
-        dateOfBirth = try container.decode(Date.self, forKey: .dateOfBirth)
+        
+        // Handle date_of_birth - might be missing or invalid
+        if let dob = try? container.decode(Date.self, forKey: .dateOfBirth) {
+            dateOfBirth = dob
+        } else {
+            // Default to 18 years ago if missing
+            dateOfBirth = Calendar.current.date(byAdding: .year, value: -18, to: Date()) ?? Date()
+            print("⚠️ [User] Using default date of birth for user \(id)")
+        }
+        
         age = try container.decode(Int.self, forKey: .age)
         ageGroup = try container.decode(AgeGroup.self, forKey: .ageGroup)
         gender = try container.decode(Gender.self, forKey: .gender)
@@ -107,13 +152,35 @@ struct User: Identifiable, Codable, Equatable, Hashable {
         photos = try container.decodeIfPresent([UserPhoto].self, forKey: .photos) ?? []
         
         tags = try container.decodeIfPresent([String].self, forKey: .tags) ?? []
-        interests = try container.decodeIfPresent([Interest].self, forKey: .interests) ?? []
+        
+        // Interests - support both string array (legacy) and Interest object array
+        if let interestObjects = try? container.decodeIfPresent([Interest].self, forKey: .interests) {
+            interests = interestObjects
+        } else if let interestStrings = try? container.decodeIfPresent([String].self, forKey: .interests) {
+            // Convert string array to Interest objects
+            interests = interestStrings.map { name in
+                let code = name.lowercased().replacingOccurrences(of: " ", with: "_")
+                return Interest(
+                    id: UUID().uuidString,
+                    code: code,
+                    name: name,
+                    emoji: nil,
+                    category: "General"
+                )
+            }
+        } else {
+            interests = []
+        }
+        
         isPremium = try container.decodeIfPresent(Bool.self, forKey: .isPremium) ?? false
         premiumExpiresAt = try container.decodeIfPresent(Date.self, forKey: .premiumExpiresAt)
         isVerified = try container.decodeIfPresent(Bool.self, forKey: .isVerified) ?? false
         socialLinks = try container.decodeIfPresent(SocialLinks.self, forKey: .socialLinks)
         lastActiveAt = try container.decodeIfPresent(Date.self, forKey: .lastActiveAt) ?? Date()
         createdAt = try container.decodeIfPresent(Date.self, forKey: .createdAt) ?? Date()
+        
+        // Currency
+        diamondBalance = try container.decodeIfPresent(Int.self, forKey: .diamondBalance)
         
         // Extended fields
         jobTitle = try container.decodeIfPresent(String.self, forKey: .jobTitle)
@@ -129,10 +196,11 @@ struct User: Identifiable, Codable, Equatable, Hashable {
         lookingFor = try container.decodeIfPresent(String.self, forKey: .lookingFor)
         wantKids = try container.decodeIfPresent(String.self, forKey: .wantKids)
         hobbies = try container.decodeIfPresent([String].self, forKey: .hobbies) ?? []
+        profileCompletedAt = try container.decodeIfPresent(Date.self, forKey: .profileCompletedAt)
     }
     
     // Explicit init for mock/creation
-    init(id: String, username: String, displayName: String, dateOfBirth: Date, age: Int, ageGroup: AgeGroup, gender: Gender, country: String, city: String, bio: String?, profilePhotoURL: String, photos: [UserPhoto], tags: [String], interests: [Interest], isPremium: Bool, premiumExpiresAt: Date?, isVerified: Bool, socialLinks: SocialLinks?, lastActiveAt: Date, createdAt: Date, jobTitle: String? = nil, company: String? = nil, university: String? = nil, department: String? = nil, height: String? = nil, zodiac: String? = nil, smoking: String? = nil, drinking: String? = nil, exercise: String? = nil, pets: String? = nil, lookingFor: String? = nil, wantKids: String? = nil, hobbies: [String]? = nil) {
+    init(id: String, username: String, displayName: String, dateOfBirth: Date, age: Int, ageGroup: AgeGroup, gender: Gender, country: String, city: String, bio: String?, profilePhotoURL: String, photos: [UserPhoto], tags: [String], interests: [Interest], isPremium: Bool, premiumExpiresAt: Date?, isVerified: Bool, socialLinks: SocialLinks?, lastActiveAt: Date, createdAt: Date, jobTitle: String? = nil, company: String? = nil, university: String? = nil, department: String? = nil, height: String? = nil, zodiac: String? = nil, smoking: String? = nil, drinking: String? = nil, exercise: String? = nil, pets: String? = nil, lookingFor: String? = nil, wantKids: String? = nil, hobbies: [String]? = nil, diamondBalance: Int? = nil, profileCompletedAt: Date? = nil) {
         self.id = id
         self.username = username
         self.displayName = displayName
@@ -166,6 +234,8 @@ struct User: Identifiable, Codable, Equatable, Hashable {
         self.lookingFor = lookingFor
         self.wantKids = wantKids
         self.hobbies = hobbies
+        self.diamondBalance = diamondBalance
+        self.profileCompletedAt = profileCompletedAt
     }
     
     func hash(into hasher: inout Hasher) {

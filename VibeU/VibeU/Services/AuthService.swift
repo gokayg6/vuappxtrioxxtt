@@ -32,15 +32,20 @@ class AuthService: @unchecked Sendable {
     
     func getCurrentUser() async throws -> User {
         guard let uid = Auth.auth().currentUser?.uid else {
+            print("❌ [AuthService] No Firebase user found")
             throw AuthError.notAuthenticated
         }
         
+        print("🔍 [AuthService] Getting current user: \(uid)")
+        
         // Use UserService to fetch user
         if let user = try await UserService.shared.fetchUser(uid: uid) {
+            print("✅ [AuthService] User fetched successfully: \(user.displayName)")
             return user
         }
         
         // Fallback or error
+        print("❌ [AuthService] User not found in Firestore")
         throw AuthError.serverError("Kullanıcı verisi alınamadı")
     }
     
@@ -170,12 +175,17 @@ class AuthService: @unchecked Sendable {
     }
     
     private func handleSocialLoginSuccess(uid: String, email: String, name: String, photoURL: String?) async throws -> SocialAuthResponse {
-        // Check via UserService
+        print("🔍 [AuthService] Checking if user exists: \(uid)")
+        
+        // Check via UserService - DON'T CREATE DUPLICATE
         if let existingUser = try await UserService.shared.fetchUser(uid: uid) {
+            print("✅ [AuthService] Existing user found: \(existingUser.displayName)")
             self.currentUser = mapUserToAuthUser(user: existingUser)
             return SocialAuthResponse(user: existingUser, accessToken: uid, refreshToken: uid)
         } else {
-            // New User
+            print("📝 [AuthService] Creating new user: \(name)")
+            
+            // New User - Create with minimal data
             let newUser = User(
                 id: uid,
                 username: email.components(separatedBy: "@").first ?? "user_\(uid.prefix(5))",
@@ -187,7 +197,7 @@ class AuthService: @unchecked Sendable {
                 country: "Turkey",
                 city: "Istanbul",
                 bio: "VibeU'ya yeni katıldım!",
-                profilePhotoURL: photoURL ?? "https://ui-avatars.com/api/?name=\(name)&background=random",
+                profilePhotoURL: photoURL ?? "https://ui-avatars.com/api/?name=\(name.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? "User")&background=random",
                 photos: [],
                 tags: [],
                 interests: [],
@@ -196,10 +206,14 @@ class AuthService: @unchecked Sendable {
                 isVerified: false,
                 socialLinks: nil,
                 lastActiveAt: Date(),
-                createdAt: Date()
+                createdAt: Date(),
+                diamondBalance: 100, // Initial diamonds
+                profileCompletedAt: nil // Not completed yet - will trigger onboarding
             )
             
             try await UserService.shared.saveUser(newUser)
+            print("✅ [AuthService] New user created successfully")
+            
             self.currentUser = mapUserToAuthUser(user: newUser)
             return SocialAuthResponse(user: newUser, accessToken: uid, refreshToken: uid)
         }

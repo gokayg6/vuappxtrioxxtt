@@ -25,9 +25,10 @@ struct DiscoverUser: Identifiable, Codable, Equatable, Hashable {
     let instagramUsername: String?
     let snapchatUsername: String?
     let isFriend: Bool?
+    let bio: String? // Bio eklendi
     
     enum CodingKeys: String, CodingKey {
-        case id, age, city, country, tags, score, photos
+        case id, age, city, country, tags, score, photos, bio
         case displayName = "display_name"
         case countryFlag = "country_flag"
         case distanceKm = "distance_km"
@@ -68,7 +69,8 @@ struct DiscoverUser: Identifiable, Codable, Equatable, Hashable {
         tiktokUsername: String? = nil,
         instagramUsername: String?,
         snapchatUsername: String?,
-        isFriend: Bool? = false
+        isFriend: Bool? = false,
+        bio: String? = nil
     ) {
         self.id = id
         self.displayName = displayName
@@ -87,6 +89,7 @@ struct DiscoverUser: Identifiable, Codable, Equatable, Hashable {
         self.instagramUsername = instagramUsername
         self.snapchatUsername = snapchatUsername
         self.isFriend = isFriend
+        self.bio = bio
     }
 }
 
@@ -129,7 +132,49 @@ extension DiscoverUser {
         self.instagramUsername = user.socialLinks?.instagram?.username
         self.snapchatUsername = user.socialLinks?.snapchat?.username
         self.isFriend = false
+        self.bio = user.bio
     }
 }
     
 
+
+
+// MARK: - Mock Data (For Previews & Fallback Only)
+extension DiscoverUser {
+    static var mockUsers: [DiscoverUser] {
+        let names = ["Elif", "Zeynep", "Ayşe", "Selin", "Melis"]
+        let cities = ["Istanbul", "Ankara", "Izmir"]
+        
+        return (0..<5).map { i in
+            DiscoverUser(
+                id: "mock_\(i)",
+                displayName: names[i],
+                age: Int.random(in: 20...28),
+                city: cities.randomElement()!,
+                country: "Turkey",
+                countryFlag: "🇹🇷",
+                distanceKm: Double.random(in: 1...20),
+                profilePhotoURL: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=800",
+                photos: [
+                    UserPhoto(id: "p\(i)", url: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=800", thumbnailURL: nil, orderIndex: 0, isPrimary: true)
+                ],
+                tags: ["Müzik", "Spor", "Seyahat"],
+                commonInterests: ["Müzik"],
+                score: Double.random(in: 70...95),
+                isBoosted: false,
+                tiktokUsername: nil,
+                instagramUsername: "user\(i)",
+                snapchatUsername: nil,
+                isFriend: false
+            )
+        }
+    }
+    
+    static var likedYouUsers: [DiscoverUser] {
+        Array(mockUsers.prefix(3))
+    }
+    
+    static var newUsers: [DiscoverUser] {
+        Array(mockUsers.suffix(3))
+    }
+}

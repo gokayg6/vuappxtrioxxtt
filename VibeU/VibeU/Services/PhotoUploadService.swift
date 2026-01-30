@@ -195,6 +195,58 @@ final class PhotoUploadService: ObservableObject {
         return photo
     }
     
+    /// Upload profile photo (separate from gallery photos)
+    /// - Parameters:
+    ///   - image: The UIImage to upload
+    ///   - userId: The user's ID
+    /// - Returns: The download URL
+    func uploadProfilePhoto(
+        image: UIImage,
+        userId: String
+    ) async throws -> String {
+        isUploading = true
+        uploadProgress = 0
+        lastError = nil
+        
+        defer {
+            isUploading = false
+        }
+        
+        // Step 1: Resize image
+        uploadProgress = 0.1
+        let resizedImage = resizeImage(image, maxDimension: maxDimension)
+        uploadProgress = 0.2
+        
+        // Step 2: Compress to JPEG
+        guard let imageData = compressImage(resizedImage, quality: compressionQuality) else {
+            let error = PhotoUploadError.compressionFailed
+            lastError = error
+            throw error
+        }
+        uploadProgress = 0.4
+        
+        // Step 3: Upload to Firebase Storage (separate path for profile photos)
+        let downloadURL = try await StorageService.shared.uploadImage(
+            image: resizedImage,
+            path: "users/\(userId)/profile/profile_photo.jpg",
+            compressionQuality: compressionQuality
+        ) { [weak self] progress in
+             Task { @MainActor in
+                 self?.uploadProgress = 0.4 + (progress * 0.5)
+             }
+        }
+        
+        uploadProgress = 0.9
+        
+        // Step 4: Update profile_photo_url in Firestore
+        try await db.collection("users").document(userId).updateData([
+            "profile_photo_url": downloadURL
+        ])
+        
+        uploadProgress = 1.0
+        return downloadURL
+    }
+    
     /// Process image without uploading (for local preview/validation)
     /// - Parameter image: The UIImage to process
     /// - Returns: Processed image data
@@ -292,7 +344,7 @@ final class PhotoUploadService: ObservableObject {
             "url": url,
             "thumbnailUrl": url,
             "orderIndex": orderIndex,
-            "isPrimary": orderIndex == 0,
+            "isPrimary": false, // Gallery photos are never primary
             "moderationStatus": "pending",
             "createdAt": now
         ]
@@ -303,7 +355,7 @@ final class PhotoUploadService: ObservableObject {
             "url": url,
             "thumbnail_url": url,
             "order_index": orderIndex,
-            "is_primary": orderIndex == 0
+            "is_primary": false // Gallery photos are never primary
         ]
         
         do {
@@ -320,12 +372,8 @@ final class PhotoUploadService: ObservableObject {
                 "photos": FieldValue.arrayUnion([userPhotoData])
             ])
             
-            // 3. Update profile photo URL if primary
-            if orderIndex == 0 {
-                try await db.collection("users").document(userId).updateData([
-                    "profile_photo_url": url
-                ])
-            }
+            // NOTE: Profile photo (profile_photo_url) is managed separately
+            // Gallery photos do NOT automatically update profile photo
             
             return PhotoModel(
                 id: photoId,
@@ -333,7 +381,7 @@ final class PhotoUploadService: ObservableObject {
                 url: url,
                 thumbnailUrl: url,
                 orderIndex: orderIndex,
-                isPrimary: orderIndex == 0,
+                isPrimary: false, // Gallery photos are never primary
                 moderationStatus: "pending",
                 createdAt: now
             )

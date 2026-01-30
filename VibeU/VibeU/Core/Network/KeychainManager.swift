@@ -2,7 +2,7 @@ import Foundation
 import Security
 
 final class KeychainManager: @unchecked Sendable {
-    nonisolated(unsafe) static let shared = KeychainManager()
+    static let shared = KeychainManager()
     
     private let accessTokenKey = "com.vibeu.accessToken"
     private let refreshTokenKey = "com.vibeu.refreshToken"

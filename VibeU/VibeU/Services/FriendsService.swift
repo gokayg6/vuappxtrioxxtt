@@ -203,6 +203,14 @@ actor FriendsService {
             return [] 
         }
         
+        // EXTRA DEBUG: Print current user info
+        if let currentUser = Auth.auth().currentUser {
+            print("🔍 [FriendsService] Current Auth User:")
+            print("   UID: \(currentUser.uid)")
+            print("   Email: \(currentUser.email ?? "none")")
+            print("   Provider: \(currentUser.providerData.map { $0.providerID })")
+        }
+        
         print("🔍 [FriendsService] Fetching requests for uid: \(currentUid)")
         
         // Simplified query without order (to avoid composite index requirement)
@@ -212,6 +220,14 @@ actor FriendsService {
             .getDocuments()
         
         print("📦 [FriendsService] Found \(snapshot.documents.count) pending requests")
+        
+        // EXTRA DEBUG: Print all requests in collection for this user
+        let allRequests = try await requestsRef.whereField("toId", isEqualTo: currentUid).getDocuments()
+        print("📊 [FriendsService] Total requests (all statuses): \(allRequests.documents.count)")
+        for doc in allRequests.documents {
+            let data = doc.data()
+            print("   - Doc \(doc.documentID): status=\(data["status"] ?? "nil"), fromId=\(data["fromId"] ?? "nil")")
+        }
             
         var requests: [SocialRequest] = []
         
@@ -300,23 +316,66 @@ actor FriendsService {
     }
     
     func acceptRequest(requestId: String) async throws {
-        guard let currentUid = Auth.auth().currentUser?.uid else { return }
+        guard let currentUid = Auth.auth().currentUser?.uid else {
+            print("❌ [FriendsService] acceptRequest: No current user!")
+            return
+        }
+        
+        print("✅ [FriendsService] acceptRequest called")
+        print("   RequestID: \(requestId)")
+        print("   Current UID: \(currentUid)")
         
         let docRef = requestsRef.document(requestId)
         let doc = try await docRef.getDocument()
         
-        guard let data = doc.data(),
-              let fromId = data["fromId"] as? String, // Sender
-              let toId = data["toId"] as? String, // Should be me
-              toId == currentUid else { return }
+        guard doc.exists else {
+            print("❌ [FriendsService] Request document does not exist!")
+            return
+        }
+        
+        guard let data = doc.data() else {
+            print("❌ [FriendsService] Request document has no data!")
+            return
+        }
+        
+        print("📄 [FriendsService] Request data: \(data)")
+        
+        guard let fromId = data["fromId"] as? String else {
+            print("❌ [FriendsService] No fromId in request!")
+            return
+        }
+        
+        guard let toId = data["toId"] as? String else {
+            print("❌ [FriendsService] No toId in request!")
+            return
+        }
+        
+        print("   FromID: \(fromId)")
+        print("   ToID: \(toId)")
+        
+        guard toId == currentUid else {
+            print("❌ [FriendsService] toId (\(toId)) != currentUid (\(currentUid))")
+            return
+        }
               
         // 1. Update request status
-        try await docRef.updateData(["status": "accepted"])
+        print("📝 [FriendsService] Updating request status to accepted...")
+        try await docRef.updateData(["status": "accepted", "respondedAt": FieldValue.serverTimestamp()])
+        print("✅ [FriendsService] Request status updated")
         
         // 2. Add to Friends Collections (Bidirectional)
+        print("👥 [FriendsService] Adding to friends collections...")
         let timestamp = FieldValue.serverTimestamp()
+        
+        // Add fromId to my friends
+        print("   Adding \(fromId) to \(currentUid)'s friends")
         try await userFriendsRef(userId: currentUid).document(fromId).setData(["createdAt": timestamp])
+        
+        // Add me to fromId's friends
+        print("   Adding \(currentUid) to \(fromId)'s friends")
         try await userFriendsRef(userId: fromId).document(currentUid).setData(["createdAt": timestamp])
+        
+        print("✅ [FriendsService] Friends added successfully!")
     }
     
     func rejectRequest(requestId: String) async throws {

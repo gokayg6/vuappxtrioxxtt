@@ -9,10 +9,9 @@ class AppDelegate: NSObject, UIApplicationDelegate {
                      didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
         FirebaseApp.configure()
         
-        // Configure Firestore settings
+        // Configure Firestore settings with new API
         let settings = FirestoreSettings()
-        settings.isPersistenceEnabled = true
-        settings.cacheSizeBytes = FirestoreCacheSizeUnlimited
+        settings.cacheSettings = PersistentCacheSettings(sizeBytes: FirestoreCacheSizeUnlimited as NSNumber)
         Firestore.firestore().settings = settings
         
         return true

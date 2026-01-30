@@ -31,10 +31,20 @@ struct RootView: View {
                     AuthView()
                         .blur(radius: hasTransitioned ? 0 : transitionBlur)
                         .opacity(hasTransitioned ? 1 : transitionOpacity)
+                case .needsProfileSetup:
+                    OnboardingFlowView()
+                        .blur(radius: hasTransitioned ? 0 : transitionBlur)
+                        .opacity(hasTransitioned ? 1 : transitionOpacity)
                 case .authenticated:
                     MainTabView()
                         .blur(radius: hasTransitioned ? 0 : transitionBlur)
                         .opacity(hasTransitioned ? 1 : transitionOpacity)
+                        .onAppear {
+                            // Prefetch discover users on app launch
+                            if appState.cachedDiscoverUsers.isEmpty || appState.shouldRefreshDiscoverCache() {
+                                appState.prefetchDiscoverUsers()
+                            }
+                        }
                 }
             }
         }

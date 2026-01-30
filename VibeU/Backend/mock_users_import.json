@@ -1,0 +1,16 @@
+[
+  {
+    "email": "ayse.yilmaz@vibeumock.com",
+    "password": "VibeU2024!",
+    "displayName": "Ayşe Yılmaz",
+    "photoURL": "https://picsum.photos/id/101/1080/1920",
+    "customClaims": {
+      "name": "Ayşe",
+      "surname": "Yılmaz",
+      "age": 24,
+      "gender": "female",
+      "city": "İstanbul",
+      "country": "Türkiye"
+    }
+  }
+]

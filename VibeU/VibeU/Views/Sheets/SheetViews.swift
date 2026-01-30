@@ -243,7 +243,7 @@ struct BoostSheet: View {
                         ForEach(boostProducts) { product in
                             BoostOptionRow(product: product, colors: colors) {
                                 Task {
-                                    try? await PremiumService.shared.activateBoost(type: .thirtyMin)
+                                    _ = try? await PremiumService.shared.activateBoost(type: .thirtyMin)
                                     dismiss()
                                 }
                             }
@@ -557,14 +557,17 @@ struct DiamondScreen: View {
                 if isLoading {
                     ProgressView()
                 } else {
-                    VStack(spacing: 32) {
-                        balanceCard
-                        dailyRewardSection
-                        infoSection
-                        Spacer()
+                    ScrollView {
+                        VStack(spacing: 24) {
+                            balanceCard
+                            dailyRewardSection
+                            purchaseSection
+                            infoSection
+                        }
+                        .padding(.horizontal, 20)
+                        .padding(.top, 20)
+                        .padding(.bottom, 40)
                     }
-                    .padding(.horizontal, 20)
-                    .padding(.top, 24)
                 }
             }
             .navigationTitle("Elmaslarım")
@@ -582,39 +585,53 @@ struct DiamondScreen: View {
                 }
             }
         }
-        .presentationDetents([.medium, .large])
+        .presentationDetents([.large])
         .presentationDragIndicator(.visible)
         .task { await loadData() }
     }
     
     private var balanceCard: some View {
-        VStack(spacing: 16) {
+        VStack(spacing: 20) {
             ZStack {
                 Circle()
-                    .fill(RadialGradient(colors: [.cyan.opacity(0.4), .clear], center: .center, startRadius: 20, endRadius: 80))
-                    .frame(width: 120, height: 120)
-                    .blur(radius: 20)
+                    .fill(RadialGradient(colors: [.cyan.opacity(0.2), .clear], center: .center, startRadius: 20, endRadius: 80))
+                    .frame(width: 140, height: 140)
+                    .blur(radius: 15)
                 
-                Image(systemName: "diamond.fill")
-                    .font(.system(size: 60))
-                    .foregroundStyle(LinearGradient(colors: [.cyan, .blue], startPoint: .topLeading, endPoint: .bottomTrailing))
-                    .shadow(color: .cyan.opacity(0.5), radius: 10)
+                Image("diamond-icon")
+                    .resizable()
+                    .renderingMode(.original)
+                    .scaledToFit()
+                    .frame(width: 100, height: 100)
+                    .shadow(color: .cyan.opacity(0.3), radius: 10)
             }
             
-            VStack(spacing: 4) {
+            VStack(spacing: 6) {
                 Text("\(balance)")
-                    .font(.system(size: 48, weight: .bold, design: .rounded))
+                    .font(.system(size: 56, weight: .bold, design: .rounded))
                     .foregroundStyle(colors.primaryText)
                 
                 Text("Elmas")
-                    .font(.subheadline)
+                    .font(.title3.weight(.medium))
                     .foregroundStyle(colors.secondaryText)
             }
         }
         .frame(maxWidth: .infinity)
-        .padding(.vertical, 32)
+        .padding(.vertical, 40)
         .background(colors.cardBackground, in: RoundedRectangle(cornerRadius: 24))
-        .overlay(RoundedRectangle(cornerRadius: 24).stroke(LinearGradient(colors: [.cyan.opacity(0.3), .blue.opacity(0.3)], startPoint: .topLeading, endPoint: .bottomTrailing), lineWidth: 1))
+        .overlay(
+            RoundedRectangle(cornerRadius: 24)
+                .stroke(
+                    LinearGradient(
+                        colors: isDark ? 
+                            [Color.white.opacity(0.3), Color.white.opacity(0.1)] :
+                            [Color.gray.opacity(0.3), Color.gray.opacity(0.1)],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ),
+                    lineWidth: 1
+                )
+        )
     }
     
     private var dailyRewardSection: some View {
@@ -623,8 +640,12 @@ struct DiamondScreen: View {
                 Image(systemName: "gift.fill").foregroundStyle(.orange)
                 Text("Günlük Ödül").font(.headline).foregroundStyle(colors.primaryText)
                 Spacer()
-                Text("+100").font(.headline.weight(.bold)).foregroundStyle(.cyan)
-                Image(systemName: "diamond.fill").foregroundStyle(.cyan)
+                Text("+100").font(.headline.weight(.bold)).foregroundStyle(colors.primaryText)
+                Image("diamond-icon")
+                    .resizable()
+                    .renderingMode(.original)
+                    .scaledToFit()
+                    .frame(width: 20, height: 20)
             }
             
             if canClaimReward {
@@ -653,6 +674,21 @@ struct DiamondScreen: View {
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 16)
                 .background(colors.secondaryBackground, in: RoundedRectangle(cornerRadius: 16))
+            }
+        }
+        .padding(20)
+        .background(colors.cardBackground, in: RoundedRectangle(cornerRadius: 20))
+        .overlay(RoundedRectangle(cornerRadius: 20).stroke(colors.border, lineWidth: 0.5))
+    }
+    
+    private var purchaseSection: some View {
+        VStack(spacing: 16) {
+            Text("Elmas Satın Al").font(.headline).foregroundStyle(colors.primaryText)
+            
+            VStack(spacing: 12) {
+                DiamondPurchaseOption(amount: 100, price: "₺9,99", colors: colors)
+                DiamondPurchaseOption(amount: 500, price: "₺39,99", colors: colors, badge: "Popüler")
+                DiamondPurchaseOption(amount: 1000, price: "₺69,99", colors: colors, badge: "En İyi Değer")
             }
         }
         .padding(20)
@@ -732,7 +768,7 @@ struct DiamondScreen: View {
                 }
             }
             
-            try await db.runTransaction { (transaction, errorPointer) -> Any? in
+            _ = try await db.runTransaction { (transaction, errorPointer) -> Any? in
                 let snapshot: DocumentSnapshot
                 do { snapshot = try transaction.getDocument(docRef) }
                 catch let e as NSError { errorPointer?.pointee = e; return nil }
@@ -750,6 +786,15 @@ struct DiamondScreen: View {
             ])
             
             balance += 100
+            
+            // Update timeUntilNextReward for next day
+            let istanbul = TimeZone(identifier: "Europe/Istanbul")!
+            var calendar = Calendar.current
+            calendar.timeZone = istanbul
+            let today = calendar.startOfDay(for: Date())
+            let tomorrow = calendar.date(byAdding: .day, value: 1, to: today)!
+            timeUntilNextReward = tomorrow.timeIntervalSince(Date())
+            
             UINotificationFeedbackGenerator().notificationOccurred(.success)
         } catch {
             print("❌ [DiamondScreen] Claim error: \(error)")
@@ -763,5 +808,58 @@ struct DiamondScreen: View {
         let hours = Int(interval) / 3600
         let minutes = (Int(interval) % 3600) / 60
         return hours > 0 ? "\(hours) saat \(minutes) dakika" : "\(minutes) dakika"
+    }
+}
+
+
+// MARK: - Diamond Purchase Option
+struct DiamondPurchaseOption: View {
+    let amount: Int
+    let price: String
+    var colors: ThemeColors = .dark
+    var badge: String? = nil
+    
+    var body: some View {
+        Button {
+            // TODO: Implement purchase
+        } label: {
+            HStack {
+                Image("diamond-icon")
+                    .resizable()
+                    .renderingMode(.original)
+                    .scaledToFit()
+                    .frame(width: 32, height: 32)
+                
+                VStack(alignment: .leading, spacing: 2) {
+                    HStack(spacing: 6) {
+                        Text("\(amount) Elmas")
+                            .font(.headline)
+                            .foregroundStyle(colors.primaryText)
+                        
+                        if let badge = badge {
+                            Text(badge)
+                                .font(.caption2.weight(.semibold))
+                                .foregroundStyle(.white)
+                                .padding(.horizontal, 6)
+                                .padding(.vertical, 2)
+                                .background(Capsule().fill(LinearGradient(colors: [.orange, .pink], startPoint: .leading, endPoint: .trailing)))
+                        }
+                    }
+                    Text("En iyi değer")
+                        .font(.caption)
+                        .foregroundStyle(colors.secondaryText)
+                }
+                
+                Spacer()
+                
+                Text(price)
+                    .font(.headline.weight(.bold))
+                    .foregroundStyle(.cyan)
+            }
+            .padding(16)
+            .background(colors.secondaryBackground, in: RoundedRectangle(cornerRadius: 16))
+            .overlay(RoundedRectangle(cornerRadius: 16).stroke(colors.border, lineWidth: 0.5))
+        }
+        .buttonStyle(.plain)
     }
 }
