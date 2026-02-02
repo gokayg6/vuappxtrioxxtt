@@ -1,4 +1,6 @@
 import SwiftUI
+import FirebaseFirestore
+import FirebaseAuth
 
 struct MainTabView: View {
     @State private var selectedTab: MainTab = .home
@@ -11,6 +13,10 @@ struct MainTabView: View {
     @State private var starScale: CGFloat = 1.0
     @State private var starRotation: Double = 0
     
+    // First Launch Diamond Popup
+    @State private var showFirstLaunchPopup = false
+    @State private var isClaimingFirstReward = false
+    
     private var isDark: Bool {
         switch appState.currentTheme {
         case .dark: return true
@@ -22,56 +28,58 @@ struct MainTabView: View {
     private var colors: ThemeColors { isDark ? .dark : .light }
     
     init() {
-        // Revert hidden tab bar
         UITabBar.appearance().isHidden = false
     }
     
     var body: some View {
-        TabView(selection: $selectedTab) {
-            // Keşfet (Tinder Style Swipe)
-            DiscoverView()
-                .tabItem {
-                    TabIcon(name: "sparkles", isSelected: selectedTab == .home, isDark: isDark)
-                    Text("Keşfet")
-                }
-                .tag(MainTab.home)
+        ZStack {
+            TabView(selection: $selectedTab) {
+                DiscoverView()
+                    .tabItem {
+                        TabIcon(name: "sparkles", isSelected: selectedTab == .home, isDark: isDark)
+                        Text("Keşfet")
+                    }
+                    .tag(MainTab.home)
+                
+                ExploreViewNew()
+                    .tabItem {
+                        TabIcon(name: "safari", isSelected: selectedTab == .explore, isDark: isDark)
+                        Text("Göz At")
+                    }
+                    .tag(MainTab.explore)
+                
+                FavoritesView()
+                    .tabItem {
+                        TabIcon(name: "heart", isSelected: selectedTab == .likes, isDark: isDark)
+                        Text("Beğenenler")
+                    }
+                    .tag(MainTab.likes)
+                    .badge(likesCount > 0 ? likesCount : 0)
+                
+                FriendsView()
+                    .tabItem {
+                        TabIcon(name: "person.2", isSelected: selectedTab == .friends, isDark: isDark)
+                        Text("Arkadaşlar")
+                    }
+                    .tag(MainTab.friends)
+                
+                ProfileView()
+                    .tabItem {
+                        TabIcon(name: "person", isSelected: selectedTab == .profile, isDark: isDark)
+                        Text("Profil")
+                    }
+                    .tag(MainTab.profile)
+            }
+            .tint(isDark ? .white : .black)
             
-            // Göz At (Grid View) - Pusula ikonu
-            ExploreViewNew()
-                .tabItem {
-                    TabIcon(name: "safari", isSelected: selectedTab == .explore, isDark: isDark)
-                    Text("Göz At")
-                }
-                .tag(MainTab.explore)
-            
-            // Beğenenler - Kalp ikonu
-            FavoritesView()
-                .tabItem {
-                    TabIcon(name: "heart", isSelected: selectedTab == .likes, isDark: isDark)
-                    Text("Beğenenler")
-                }
-                .tag(MainTab.likes)
-                .badge(likesCount > 0 ? likesCount : 0)
-            
-            // Arkadaşlar - İki kişi ikonu
-            FriendsView()
-                .tabItem {
-                    TabIcon(name: "person.2", isSelected: selectedTab == .friends, isDark: isDark)
-                    Text("Arkadaşlar")
-                }
-                .tag(MainTab.friends)
-            
-            // Profil
-            ProfileView()
-                .tabItem {
-                    TabIcon(name: "person", isSelected: selectedTab == .profile, isDark: isDark)
-                    Text("Profil")
-                }
-                .tag(MainTab.profile)
+            // FIRST LAUNCH 50 DIAMOND POPUP
+            if showFirstLaunchPopup {
+                firstLaunchPopupOverlay
+            }
         }
-        .tint(isDark ? .white : .black)
         .onAppear {
             configureTabBarAppearance()
+            checkFirstLaunch()
         }
         .onChange(of: appState.currentTheme) { _, _ in
             configureTabBarAppearance()
@@ -83,6 +91,145 @@ struct MainTabView: View {
         }
         .task {
             await loadCounts()
+        }
+    }
+    
+    // MARK: - First Launch Popup View
+    private var firstLaunchPopupOverlay: some View {
+        ZStack {
+            Color.black.opacity(0.7)
+                .ignoresSafeArea()
+                .transition(.opacity)
+            
+            VStack(spacing: 24) {
+                VStack(spacing: 12) {
+                    Text("🎁")
+                        .font(.system(size: 60))
+                    
+                    Text("Hoş Geldin!")
+                        .font(.system(size: 24, weight: .bold))
+                        .foregroundStyle(.white)
+                    
+                    Text("Ücretsiz 50 Elmas Kazan")
+                        .font(.system(size: 18, weight: .semibold))
+                        .foregroundStyle(Color(red: 1.0, green: 0.84, blue: 0.0))
+                }
+                
+                VStack(spacing: 8) {
+                    HStack(spacing: 8) {
+                        Image("diamond-icon")
+                            .resizable()
+                            .renderingMode(.template)
+                            .scaledToFit()
+                            .frame(width: 32, height: 32)
+                            .foregroundStyle(Color(red: 1.0, green: 0.84, blue: 0.0))
+                        
+                        Text("+50")
+                            .font(.system(size: 40, weight: .bold))
+                            .foregroundStyle(Color(red: 1.0, green: 0.84, blue: 0.0))
+                    }
+                    
+                    Text("Reklam izleyerek ücretsiz elmas kazanabilirsin!")
+                        .font(.system(size: 14))
+                        .foregroundStyle(.white.opacity(0.7))
+                        .multilineTextAlignment(.center)
+                }
+                
+                Button {
+                    claimFirstLaunchReward()
+                } label: {
+                    HStack {
+                        if isClaimingFirstReward {
+                            ProgressView()
+                                .tint(.black)
+                        } else {
+                            Image(systemName: "play.rectangle.fill")
+                            Text("Reklam İzle & Kazan")
+                        }
+                    }
+                    .font(.system(size: 17, weight: .bold))
+                    .foregroundStyle(.black)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 16)
+                    .background(
+                        LinearGradient(
+                            colors: [Color(red: 1.0, green: 0.85, blue: 0.4), Color(red: 1.0, green: 0.7, blue: 0.3)],
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        ),
+                        in: RoundedRectangle(cornerRadius: 16)
+                    )
+                }
+                .disabled(isClaimingFirstReward)
+                
+                Button {
+                    withAnimation(.easeOut(duration: 0.3)) {
+                        showFirstLaunchPopup = false
+                    }
+                    UserDefaults.standard.set(true, forKey: "hasSeenFirstLaunchPopup")
+                } label: {
+                    Text("Daha sonra")
+                        .font(.system(size: 14))
+                        .foregroundStyle(.white.opacity(0.5))
+                }
+            }
+            .padding(32)
+            .background(
+                RoundedRectangle(cornerRadius: 28)
+                    .fill(Color(red: 0.1, green: 0.08, blue: 0.15))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 28)
+                            .stroke(
+                                LinearGradient(
+                                    colors: [Color(red: 1.0, green: 0.84, blue: 0.0).opacity(0.5), .clear],
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                ),
+                                lineWidth: 1
+                            )
+                    )
+            )
+            .padding(24)
+            .transition(.scale.combined(with: .opacity))
+        }
+    }
+    
+    private func checkFirstLaunch() {
+        let hasSeenPopup = UserDefaults.standard.bool(forKey: "hasSeenFirstLaunchPopup")
+        if !hasSeenPopup {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                withAnimation(.spring(response: 0.5)) {
+                    showFirstLaunchPopup = true
+                }
+            }
+        }
+    }
+    
+    private func claimFirstLaunchReward() {
+        isClaimingFirstReward = true
+        
+        // Simulate ad watching (in real app, integrate AdMob)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+            // Grant diamonds via Firestore directly
+            Task {
+                if let uid = Auth.auth().currentUser?.uid {
+                    let db = Firestore.firestore()
+                    try? await db.collection("users").document(uid).updateData([
+                        "diamond_balance": FieldValue.increment(Int64(50))
+                    ])
+                }
+            }
+            
+            // Haptic
+            let generator = UINotificationFeedbackGenerator()
+            generator.notificationOccurred(.success)
+            
+            isClaimingFirstReward = false
+            UserDefaults.standard.set(true, forKey: "hasSeenFirstLaunchPopup")
+            
+            withAnimation(.spring(response: 0.5)) {
+                showFirstLaunchPopup = false
+            }
         }
     }
     

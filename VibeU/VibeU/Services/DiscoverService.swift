@@ -11,15 +11,28 @@ actor DiscoverService {
     
     // MARK: - Discover Feed
     
+    /// Age Group enum for safety filtering
+    enum AgeGroup: String {
+        case minor = "minor"   // 15-17 years old
+        case adult = "adult"   // 18+ years old
+        
+        static func from(age: Int) -> AgeGroup {
+            return age >= 18 ? .adult : .minor
+        }
+    }
+    
     func getDiscoverFeed(
         mode: DiscoverMode,
         cursor: String? = nil,
         limit: Int = 20,
-        countryFilter: String? = nil, // nil = global, "Turkey" = my country
+        countryFilter: String? = nil, // nil = no filter, "Turkey" = my country only
+        excludeCountry: String? = nil, // "Turkey" = exclude Turkey (for global mode)
         ageRange: ClosedRange<Int>? = nil,
-        genderFilter: String? = nil
+        genderFilter: String? = nil,
+        currentUserAge: Int = 18 // Current user's age for pool separation
     ) async throws -> DiscoverResponse {
-        print("🔍 DiscoverService: Fetching users with countryFilter=\(countryFilter ?? "nil"), limit=\(limit)")
+        let currentUserAgeGroup = AgeGroup.from(age: currentUserAge)
+        print("🔍 DiscoverService: Fetching users with countryFilter=\(countryFilter ?? "nil"), excludeCountry=\(excludeCountry ?? "nil"), limit=\(limit), ageGroup=\(currentUserAgeGroup.rawValue)")
         
         // Build query with filters
         var query: Query = db.collection("users")
@@ -73,8 +86,37 @@ actor DiscoverService {
                 continue
             }
             
+            // GLOBAL MODE: Skip users from excluded country (Turkey)
+            if let excluded = excludeCountry, !excluded.isEmpty {
+                let userCountry = data["country"] as? String ?? ""
+                if userCountry.lowercased() == excluded.lowercased() || 
+                   userCountry.lowercased() == "türkiye" ||
+                   userCountry.lowercased() == "turkey" {
+                    print("   ⛔️ Skipped: User from excluded country '\(userCountry)'")
+                    continue
+                }
+            }
+            
             let age = data["age"] as? Int ?? 18
+            
+            // 🔒 CRITICAL SAFETY: Age Pool Separation
+            // - Users under 15 are not allowed (minimum age)
+            // - Minors (15-17) can ONLY see other minors
+            // - Adults (18+) can ONLY see other adults
+            if age < 15 {
+                print("   ⛔️ Skipped: User under minimum age (15)")
+                continue
+            }
+            
+            let userAgeGroup = AgeGroup.from(age: age)
+            if userAgeGroup != currentUserAgeGroup {
+                print("   ⛔️ Skipped: User in different age pool (\(userAgeGroup.rawValue) vs \(currentUserAgeGroup.rawValue))")
+                continue
+            }
+            
             let city = data["city"] as? String ?? ""
+            let country = data["country"] as? String
+            let countryFlag = getCountryFlag(for: country)
             let profilePhotoURL = data["profile_photo_url"] as? String ?? ""
             let photosData = data["photos"] as? [[String: Any]] ?? []
             let tags = data["tags"] as? [String] ?? []
@@ -153,8 +195,8 @@ actor DiscoverService {
                 displayName: displayName,
                 age: age,
                 city: city,
-                country: nil,
-                countryFlag: nil,
+                country: country,
+                countryFlag: countryFlag,
                 distanceKm: finalDistance,
                 profilePhotoURL: profilePhotoURL,
                 photos: userPhotos,
@@ -242,5 +284,53 @@ actor DiscoverService {
     
     func getReceivedLikes() async throws -> [Like] {
         return []
+    }
+    
+    // MARK: - Helper Functions
+    
+    /// Convert country name to flag emoji
+    private func getCountryFlag(for country: String?) -> String? {
+        guard let country = country?.lowercased() else { return nil }
+        
+        let flagMap: [String: String] = [
+            "türkiye": "🇹🇷",
+            "turkey": "🇹🇷",
+            "almanya": "🇩🇪",
+            "germany": "🇩🇪",
+            "amerika": "🇺🇸",
+            "abd": "🇺🇸",
+            "usa": "🇺🇸",
+            "united states": "🇺🇸",
+            "ingiltere": "🇬🇧",
+            "england": "🇬🇧",
+            "united kingdom": "🇬🇧",
+            "uk": "🇬🇧",
+            "fransa": "🇫🇷",
+            "france": "🇫🇷",
+            "italya": "🇮🇹",
+            "italy": "🇮🇹",
+            "ispanya": "🇪🇸",
+            "spain": "🇪🇸",
+            "hollanda": "🇳🇱",
+            "netherlands": "🇳🇱",
+            "belçika": "🇧🇪",
+            "belgium": "🇧🇪",
+            "avusturya": "🇦🇹",
+            "austria": "🇦🇹",
+            "isviçre": "🇨🇭",
+            "switzerland": "🇨🇭",
+            "yunanistan": "🇬🇷",
+            "greece": "🇬🇷",
+            "rusya": "🇷🇺",
+            "russia": "🇷🇺",
+            "kanada": "🇨🇦",
+            "canada": "🇨🇦",
+            "avustralya": "🇦🇺",
+            "australia": "🇦🇺",
+            "japonya": "🇯🇵",
+            "japan": "🇯🇵"
+        ]
+        
+        return flagMap[country] ?? "🌍"
     }
 }

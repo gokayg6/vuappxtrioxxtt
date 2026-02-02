@@ -58,11 +58,20 @@
 		<true/>
 	</dict>
 	<key>NSCameraUsageDescription</key>
-	<string>VibeU needs camera access to take profile photos</string>
+	<string>VibeU needs camera access to take profile photos and scan QR codes</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>VibeU uses your location to show people near you</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>VibeU needs photo library access to select profile photos</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>VibeU needs permission to save your QR card to photos</string>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>VibeU uses local network to find nearby friends</string>
+	<key>NSBonjourServices</key>
+	<array>
+		<string>_vibeu-nearby._tcp</string>
+		<string>_vibeu-nearby._udp</string>
+	</array>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

@@ -139,42 +139,170 @@ extension DiscoverUser {
 
 
 
-// MARK: - Mock Data (For Previews & Fallback Only)
+// MARK: - Mock Data (For Previews & Debug Only)
 extension DiscoverUser {
-    static var mockUsers: [DiscoverUser] {
-        let names = ["Elif", "Zeynep", "Ayşe", "Selin", "Melis"]
-        let cities = ["Istanbul", "Ankara", "Izmir"]
+    
+    // MARK: - Turkish Users (40 total: 35 female, 5 male)
+    static var turkishUsers: [DiscoverUser] {
+        let femaleNames = ["Elif", "Zeynep", "Ayşe", "Selin", "Melis", "Deniz", "İrem", "Ceren", "Gizem", "Burcu",
+                           "Damla", "Esra", "Gamze", "Hazal", "Iclal", "Jale", "Kübra", "Leman", "Merve", "Nazlı",
+                           "Özge", "Pınar", "Rüya", "Sude", "Tuğba", "Ülkü", "Vildan", "Yaren", "Zara", "Ayla",
+                           "Beste", "Cansu", "Defne", "Ecrin", "Fulya"]
+        let maleNames = ["Ahmet", "Burak", "Can", "Deniz", "Emre"]
+        let cities = ["İstanbul", "Ankara", "İzmir", "Antalya", "Bursa", "Trabzon"]
         
-        return (0..<5).map { i in
-            DiscoverUser(
-                id: "mock_\(i)",
-                displayName: names[i],
-                age: Int.random(in: 20...28),
+        let femalePhotos = [
+            "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=800",
+            "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=800",
+            "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=800",
+            "https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?w=800",
+            "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=800",
+            "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=800",
+            "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=800",
+            "https://images.unsplash.com/photo-1502767089025-6572583495b9?w=800"
+        ]
+        
+        let malePhotos = [
+            "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=800",
+            "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=800"
+        ]
+        
+        var users: [DiscoverUser] = []
+        
+        // Female users (35)
+        for i in 0..<35 {
+            users.append(DiscoverUser(
+                id: "tr_f_\(i)",
+                displayName: femaleNames[i % femaleNames.count],
+                age: Int.random(in: 19...28),
                 city: cities.randomElement()!,
-                country: "Turkey",
+                country: "Türkiye",
                 countryFlag: "🇹🇷",
-                distanceKm: Double.random(in: 1...20),
-                profilePhotoURL: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=800",
-                photos: [
-                    UserPhoto(id: "p\(i)", url: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=800", thumbnailURL: nil, orderIndex: 0, isPrimary: true)
-                ],
-                tags: ["Müzik", "Spor", "Seyahat"],
+                distanceKm: Double.random(in: 1...30),
+                profilePhotoURL: femalePhotos[i % femalePhotos.count],
+                photos: [UserPhoto(id: "p_tr_f_\(i)", url: femalePhotos[i % femalePhotos.count], thumbnailURL: nil, orderIndex: 0, isPrimary: true)],
+                tags: ["Müzik", "Seyahat", "Spor"].shuffled().prefix(2).map { $0 },
                 commonInterests: ["Müzik"],
                 score: Double.random(in: 70...95),
+                isBoosted: i < 3,
+                tiktokUsername: i % 3 == 0 ? "user\(i)" : nil,
+                instagramUsername: "insta\(i)",
+                snapchatUsername: i % 2 == 0 ? "snap\(i)" : nil,
+                isFriend: false,
+                bio: "Merhaba! 🌟"
+            ))
+        }
+        
+        // Male users (5)
+        for i in 0..<5 {
+            users.append(DiscoverUser(
+                id: "tr_m_\(i)",
+                displayName: maleNames[i],
+                age: Int.random(in: 20...30),
+                city: cities.randomElement()!,
+                country: "Türkiye",
+                countryFlag: "🇹🇷",
+                distanceKm: Double.random(in: 1...30),
+                profilePhotoURL: malePhotos[i % malePhotos.count],
+                photos: [UserPhoto(id: "p_tr_m_\(i)", url: malePhotos[i % malePhotos.count], thumbnailURL: nil, orderIndex: 0, isPrimary: true)],
+                tags: ["Spor", "Oyun", "Müzik"].shuffled().prefix(2).map { $0 },
+                commonInterests: ["Spor"],
+                score: Double.random(in: 60...85),
                 isBoosted: false,
                 tiktokUsername: nil,
-                instagramUsername: "user\(i)",
+                instagramUsername: "insta_m\(i)",
                 snapchatUsername: nil,
-                isFriend: false
-            )
+                isFriend: false,
+                bio: "Selam! 👋"
+            ))
         }
+        
+        return users.shuffled()
+    }
+    
+    // MARK: - Global Users (20 total: 17 female, 3 male)
+    static var globalUsers: [DiscoverUser] {
+        let globalData: [(name: String, country: String, flag: String, city: String)] = [
+            ("Emma", "United States", "🇺🇸", "New York"),
+            ("Sophie", "United Kingdom", "🇬🇧", "London"),
+            ("Marie", "France", "🇫🇷", "Paris"),
+            ("Giulia", "Italy", "🇮🇹", "Rome"),
+            ("Anna", "Germany", "🇩🇪", "Berlin"),
+            ("Isabella", "Spain", "🇪🇸", "Madrid"),
+            ("Olivia", "Australia", "🇦🇺", "Sydney"),
+            ("Yuki", "Japan", "🇯🇵", "Tokyo"),
+            ("Elena", "Russia", "🇷🇺", "Moscow"),
+            ("Kim", "South Korea", "🇰🇷", "Seoul"),
+            ("Sarah", "Canada", "🇨🇦", "Toronto"),
+            ("Eva", "Netherlands", "🇳🇱", "Amsterdam"),
+            ("Ingrid", "Sweden", "🇸🇪", "Stockholm"),
+            ("Katrine", "Denmark", "🇩🇰", "Copenhagen"),
+            ("Bianca", "Brazil", "🇧🇷", "São Paulo"),
+            ("Priya", "India", "🇮🇳", "Mumbai"),
+            ("Valentina", "Mexico", "🇲🇽", "Mexico City"),
+            // Males
+            ("James", "United States", "🇺🇸", "Los Angeles"),
+            ("Oliver", "United Kingdom", "🇬🇧", "Manchester"),
+            ("Lucas", "Germany", "🇩🇪", "Munich")
+        ]
+        
+        let femalePhotos = [
+            "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=800",
+            "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=800",
+            "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=800",
+            "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=800",
+            "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=800"
+        ]
+        
+        let malePhotos = [
+            "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=800"
+        ]
+        
+        var users: [DiscoverUser] = []
+        
+        for (i, data) in globalData.enumerated() {
+            let isMale = i >= 17
+            let photo = isMale ? malePhotos[0] : femalePhotos[i % femalePhotos.count]
+            
+            users.append(DiscoverUser(
+                id: "global_\(i)",
+                displayName: data.name,
+                age: Int.random(in: 19...28),
+                city: data.city,
+                country: data.country,
+                countryFlag: data.flag,
+                distanceKm: Double.random(in: 100...5000),
+                profilePhotoURL: photo,
+                photos: [UserPhoto(id: "p_g_\(i)", url: photo, thumbnailURL: nil, orderIndex: 0, isPrimary: true)],
+                tags: ["Travel", "Music", "Art"].shuffled().prefix(2).map { $0 },
+                commonInterests: ["Travel"],
+                score: Double.random(in: 65...90),
+                isBoosted: i < 2,
+                tiktokUsername: i % 4 == 0 ? "global\(i)" : nil,
+                instagramUsername: "insta_\(data.name.lowercased())",
+                snapchatUsername: nil,
+                isFriend: false,
+                bio: "Hello from \(data.city)! 🌍"
+            ))
+        }
+        
+        return users.shuffled()
+    }
+    
+    // MARK: - Combined Mock Data
+    static var mockUsers: [DiscoverUser] {
+        return turkishUsers
+    }
+    
+    static var allMockUsers: [DiscoverUser] {
+        return turkishUsers + globalUsers
     }
     
     static var likedYouUsers: [DiscoverUser] {
-        Array(mockUsers.prefix(3))
+        Array(turkishUsers.prefix(5))
     }
     
     static var newUsers: [DiscoverUser] {
-        Array(mockUsers.suffix(3))
+        Array(turkishUsers.suffix(5))
     }
 }

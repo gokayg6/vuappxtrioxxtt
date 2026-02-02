@@ -205,8 +205,8 @@ final class AppState {
     
     var isPremium: Bool {
         get { 
-            // Test için devre dışı - false döndür
-            return false
+            // Read from UserDefaults
+            return UserDefaults.standard.bool(forKey: "isPremium")
         }
         set { 
             UserDefaults.standard.set(newValue, forKey: "isPremium")

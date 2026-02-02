@@ -2,7 +2,7 @@ import SwiftUI
 
 // MARK: - Glass Effect Modifier
 extension View {
-    func glassEffect(isDark: Bool = true) -> some View {
+    func vibeGlassEffect(isDark: Bool = true) -> some View {
         self
             .background(
                 RoundedRectangle(cornerRadius: 16)

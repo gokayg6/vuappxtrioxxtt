@@ -13,6 +13,10 @@ struct DiamondScreen: View {
     @State private var showSuccessAnimation = false
     @State private var timeUntilNextReward: TimeInterval?
     
+    // Watch Ad for Diamonds
+    @State private var canWatchAd = true
+    @State private var isWatchingAd = false
+    
     private var isDark: Bool {
         switch appState.currentTheme {
         case .dark: return true
@@ -39,20 +43,17 @@ struct DiamondScreen: View {
                 if isLoading {
                     ProgressView()
                 } else {
-                    VStack(spacing: 32) {
-                        // Diamond Balance Card
-                        balanceCard
-                        
-                        // Daily Reward Section
-                        dailyRewardSection
-                        
-                        // Info Section
-                        infoSection
-                        
-                        Spacer()
+                    ScrollView(showsIndicators: false) {
+                        VStack(spacing: 24) {
+                            balanceCard
+                            dailyRewardSection
+                            watchAdSection
+                            infoSection
+                            Spacer(minLength: 50)
+                        }
+                        .padding(.horizontal, 20)
+                        .padding(.top, 24)
                     }
-                    .padding(.horizontal, 20)
-                    .padding(.top, 24)
                 }
             }
             .navigationTitle("Elmaslarım")
@@ -77,12 +78,14 @@ struct DiamondScreen: View {
         .task {
             await loadData()
         }
+        .onAppear {
+            checkAdWatchedToday()
+        }
     }
     
     // MARK: - Balance Card
     private var balanceCard: some View {
         VStack(spacing: 16) {
-            // Diamond Icon with Glow
             ZStack {
                 Circle()
                     .fill(RadialGradient(
@@ -103,7 +106,6 @@ struct DiamondScreen: View {
                     .shadow(color: Color(red: 1.0, green: 0.84, blue: 0.0).opacity(0.5), radius: 10)
             }
             
-            // Balance
             VStack(spacing: 4) {
                 Text("\(balance)")
                     .font(.system(size: 48, weight: .bold, design: .rounded))
@@ -214,6 +216,90 @@ struct DiamondScreen: View {
         )
     }
     
+    // MARK: - Watch Ad Section (NEW - 25 Diamonds)
+    private var watchAdSection: some View {
+        VStack(spacing: 16) {
+            HStack {
+                Image(systemName: "play.rectangle.fill")
+                    .foregroundStyle(.purple)
+                
+                Text("Reklam İzle")
+                    .font(.headline)
+                    .foregroundStyle(colors.primaryText)
+                
+                Spacer()
+                
+                Text("+25")
+                    .font(.headline.weight(.bold))
+                    .foregroundStyle(Color(red: 1.0, green: 0.84, blue: 0.0))
+                
+                Image("diamond-icon")
+                    .resizable()
+                    .renderingMode(.template)
+                    .scaledToFit()
+                    .frame(width: 16, height: 16)
+                    .foregroundStyle(Color(red: 1.0, green: 0.84, blue: 0.0))
+            }
+            
+            if canWatchAd {
+                Button {
+                    watchAdForDiamonds()
+                } label: {
+                    HStack {
+                        if isWatchingAd {
+                            ProgressView()
+                                .tint(.white)
+                        } else {
+                            Image(systemName: "play.circle.fill")
+                            Text("Reklam İzle & 25 Elmas Kazan")
+                        }
+                    }
+                    .font(.headline)
+                    .foregroundStyle(.white)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 16)
+                    .background(
+                        LinearGradient(
+                            colors: [.purple, .indigo],
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        ),
+                        in: RoundedRectangle(cornerRadius: 16)
+                    )
+                }
+                .disabled(isWatchingAd)
+                
+                Text("Günde 1 kez kullanılabilir")
+                    .font(.caption)
+                    .foregroundStyle(colors.tertiaryText)
+            } else {
+                VStack(spacing: 8) {
+                    HStack {
+                        Image(systemName: "checkmark.circle.fill")
+                            .foregroundStyle(.green)
+                        
+                        Text("Bugün reklamı izledin!")
+                            .font(.subheadline)
+                            .foregroundStyle(colors.secondaryText)
+                    }
+                    
+                    Text("Yarın tekrar izleyebilirsin")
+                        .font(.caption)
+                        .foregroundStyle(colors.tertiaryText)
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 16)
+                .background(colors.secondaryBackground, in: RoundedRectangle(cornerRadius: 16))
+            }
+        }
+        .padding(20)
+        .background(colors.cardBackground, in: RoundedRectangle(cornerRadius: 20))
+        .overlay(
+            RoundedRectangle(cornerRadius: 20)
+                .stroke(colors.border, lineWidth: 0.5)
+        )
+    }
+    
     // MARK: - Info Section
     private var infoSection: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -223,6 +309,7 @@ struct DiamondScreen: View {
             
             infoRow(icon: "heart.fill", color: .pink, text: "Eşleşme isteği göndermek: 10 elmas")
             infoRow(icon: "gift.fill", color: .orange, text: "Her gün ücretsiz 100 elmas al")
+            infoRow(icon: "play.rectangle.fill", color: .purple, text: "Reklam izle, 25 elmas kazan")
         }
         .padding(20)
         .background(colors.cardBackground, in: RoundedRectangle(cornerRadius: 20))
@@ -265,7 +352,6 @@ struct DiamondScreen: View {
             canClaimReward = false
             showSuccessAnimation = true
             
-            // Haptic feedback
             let generator = UINotificationFeedbackGenerator()
             generator.notificationOccurred(.success)
             
@@ -274,6 +360,39 @@ struct DiamondScreen: View {
         }
         
         isClaiming = false
+    }
+    
+    private func checkAdWatchedToday() {
+        let lastWatchDate = UserDefaults.standard.object(forKey: "lastAdWatchDate") as? Date
+        if let lastDate = lastWatchDate {
+            canWatchAd = !Calendar.current.isDateInToday(lastDate)
+        } else {
+            canWatchAd = true
+        }
+    }
+    
+    private func watchAdForDiamonds() {
+        isWatchingAd = true
+        
+        // Simulate ad watching (in real app, integrate AdMob/Unity Ads)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+            // Grant diamonds
+            balance += 25
+            canWatchAd = false
+            isWatchingAd = false
+            
+            // Save watch date
+            UserDefaults.standard.set(Date(), forKey: "lastAdWatchDate")
+            
+            // Update Firestore
+            Task {
+                try? await DiamondService.shared.addDiamonds(amount: 25, type: .adReward)
+            }
+            
+            // Haptic
+            let generator = UINotificationFeedbackGenerator()
+            generator.notificationOccurred(.success)
+        }
     }
     
     private func formatTime(_ interval: TimeInterval) -> String {

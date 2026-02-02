@@ -36,7 +36,7 @@ struct ExploreViewNew: View {
     @State private var showVibeQuiz = false
     @State private var showAstroMatch = false
     @State private var showSpeedDate = false
-    @State private var showBlindDate = false
+    // BlindDate removed - user request
     @State private var showVoiceMatch = false
     
     @Environment(AppState.self) private var appState
@@ -71,10 +71,9 @@ struct ExploreViewNew: View {
                         .padding(.horizontal, 16)
                         .padding(.top, 8)
                         
-                        // QUICK ACTIONS
+                        // QUICK ACTIONS (Blind Date removed)
                         QuickActionPills(
                             onSpeedDate: { showSpeedDate = true },
-                            onBlindDate: { showBlindDate = true },
                             onVoiceMatch: { showVoiceMatch = true },
                             onAstroMatch: { showAstroMatch = true }
                         )
@@ -120,7 +119,7 @@ struct ExploreViewNew: View {
             .task { await loadData() }
             .refreshable { await loadData() }
             .fullScreenCover(isPresented: $showVibeQuiz) { VibeQuizGlassView() }
-            .fullScreenCover(isPresented: $showBlindDate) { BlindDateGlassView() }
+            // BlindDate removed
             .fullScreenCover(isPresented: $showVoiceMatch) { VoiceMatchGlassView() }
             .fullScreenCover(isPresented: $showGameMatch) { GameMatchDetailView() }
             .fullScreenCover(isPresented: $showMusicMatch) { MusicMatchDetailView() }
@@ -470,7 +469,6 @@ struct LiquidGlassHero: View {
 // MARK: - QUICK ACTION PILLS
 struct QuickActionPills: View {
     let onSpeedDate: () -> Void
-    let onBlindDate: () -> Void
     let onVoiceMatch: () -> Void
     let onAstroMatch: () -> Void
     
@@ -478,7 +476,6 @@ struct QuickActionPills: View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 10) {
                 QuickPill(icon: "bolt.fill", title: "Hızlı Tanış", subtitle: "3 dk", accentColor: .orange, action: onSpeedDate)
-                QuickPill(icon: "theatermasks.fill", title: "Kör Randevu", subtitle: "Fotoğrafsız", accentColor: .purple, action: onBlindDate)
                 QuickPill(icon: "mic.fill", title: "Ses Tanış", subtitle: "30 sn", accentColor: .cyan, action: onVoiceMatch)
                 QuickPill(icon: "moon.stars.fill", title: "Burç Eşleş", subtitle: "Astroloji", accentColor: .pink, action: onAstroMatch)
             }
@@ -538,7 +535,7 @@ struct QuickPill: View {
     }
 }
 
-// MARK: - GLASS MOOD CAROUSEL
+// MARK: - GLASS MOOD CAROUSEL - REDESIGNED
 struct GlassMoodCarousel: View {
     @Binding var selectedMood: String?
     @Environment(AppState.self) private var appState
@@ -554,26 +551,54 @@ struct GlassMoodCarousel: View {
     
     private var colors: ThemeColors { isDark ? .dark : .light }
     
-    let moods = [
-        ("adventure", "figure.hiking", "Macera", Color.orange),
-        ("romantic", "heart.fill", "Romantik", Color.pink),
-        ("chill", "moon.fill", "Sakin", Color.cyan),
-        ("party", "party.popper.fill", "Parti", Color.purple),
-        ("deep", "water.waves", "Derin", Color.blue)
+    // Modern mood data with gradient colors - shortened subtitles for better fit
+    let moods: [(id: String, icon: String, title: String, subtitle: String, gradient: [Color])] = [
+        ("adventure", "figure.hiking", "Macera", "Heyecan", [Color.orange, Color.red]),
+        ("romantic", "heart.fill", "Romantik", "Aşk", [Color.pink, Color.red.opacity(0.8)]),
+        ("chill", "leaf.fill", "Sakin", "Dinlenme", [Color.cyan, Color.teal]),
+        ("party", "party.popper.fill", "Parti", "Eğlence", [Color.purple, Color.pink]),
+        ("deep", "brain.head.profile", "Derin", "Sohbet", [Color.indigo, Color.blue]),
+        ("creative", "paintbrush.fill", "Yaratıcı", "Sanat", [Color.yellow, Color.orange])
     ]
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text("Bugün Nasıl Hissediyorsun?")
-                .font(.system(size: 17, weight: .bold))
-                .foregroundStyle(colors.primaryText)
-                .padding(.horizontal, 16)
+        VStack(alignment: .leading, spacing: 14) {
+            HStack {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Bugün Nasıl Hissediyorsun?")
+                        .font(.system(size: 18, weight: .bold))
+                        .foregroundStyle(colors.primaryText)
+                    
+                    Text("Ruh haline göre eşleş")
+                        .font(.system(size: 12))
+                        .foregroundStyle(colors.secondaryText)
+                }
+                
+                Spacer()
+                
+                Image(systemName: "sparkles")
+                    .font(.system(size: 18))
+                    .foregroundStyle(
+                        LinearGradient(
+                            colors: [.purple, .pink],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+            }
+            .padding(.horizontal, 16)
             
             ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 10) {
-                    ForEach(moods, id: \.0) { mood in
-                        MoodCard(id: mood.0, icon: mood.1, title: mood.2, accentColor: mood.3) {
-                            selectedMood = mood.0
+                HStack(spacing: 12) {
+                    ForEach(moods, id: \.id) { mood in
+                        ModernMoodCard(
+                            id: mood.id,
+                            icon: mood.icon,
+                            title: mood.title,
+                            subtitle: mood.subtitle,
+                            gradient: mood.gradient
+                        ) {
+                            selectedMood = mood.id
                         }
                     }
                 }
@@ -583,14 +608,17 @@ struct GlassMoodCarousel: View {
     }
 }
 
-struct MoodCard: View {
+struct ModernMoodCard: View {
     let id: String
     let icon: String
     let title: String
-    let accentColor: Color
+    let subtitle: String
+    let gradient: [Color]
     let action: () -> Void
+    
     @Environment(AppState.self) private var appState
     @Environment(\.colorScheme) private var systemColorScheme
+    @State private var isPressed = false
     
     private var isDark: Bool {
         switch appState.currentTheme {
@@ -600,39 +628,46 @@ struct MoodCard: View {
         }
     }
     
-    private var colors: ThemeColors { isDark ? .dark : .light }
-    private let cardShape = RoundedRectangle(cornerRadius: 18, style: .continuous)
+    private let cardShape = RoundedRectangle(cornerRadius: 20, style: .continuous)
     
     var body: some View {
         Button(action: action) {
-            VStack(spacing: 10) {
-                Spacer()
-                
+            VStack(spacing: 12) {
+                // Icon with gradient background
                 ZStack {
                     Circle()
-                        .fill(accentColor.opacity(0.15))
-                        .frame(width: 50, height: 50)
+                        .fill(
+                            LinearGradient(
+                                colors: gradient,
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                        )
+                        .frame(width: 56, height: 56)
+                        .shadow(color: gradient[0].opacity(0.4), radius: 8, y: 4)
                     
                     Image(systemName: icon)
-                        .font(.system(size: 24, weight: .medium))
-                        .foregroundStyle(accentColor)
+                        .font(.system(size: 26, weight: .medium))
+                        .foregroundStyle(.white)
                 }
                 
-                Text(title)
-                    .font(.system(size: 13, weight: .semibold))
-                    .foregroundStyle(colors.primaryText)
-                
-                Spacer()
-                
-                Rectangle()
-                    .fill(accentColor)
-                    .frame(height: 3)
-                    .padding(.horizontal, 16)
+                VStack(spacing: 4) {
+                    Text(title)
+                        .font(.system(size: 14, weight: .bold))
+                        .foregroundStyle(isDark ? .white : .black)
+                    
+                    Text(subtitle)
+                        .font(.system(size: 10))
+                        .foregroundStyle(isDark ? .white.opacity(0.6) : .black.opacity(0.6))
+                        .lineLimit(1)
+                }
             }
-            .frame(width: 100, height: 120)
-            .background(.ultraThinMaterial, in: cardShape)
+            .frame(width: 110, height: 140)
+            .glassEffect()
         }
         .buttonStyle(.plain)
+        .scaleEffect(isPressed ? 0.95 : 1.0)
+        .animation(.spring(response: 0.3), value: isPressed)
     }
 }
 
@@ -3117,6 +3152,12 @@ struct MoodExploreGlassView: View {
     @Environment(AppState.self) private var appState
     @Environment(\.colorScheme) private var systemColorScheme
     
+    enum MoodMode: String, CaseIterable {
+        case kisi = "Kişi Bul"
+        case tavsiye = "Tavsiye Al"
+    }
+    
+    @State private var selectedMode: MoodMode? = nil
     @State private var users: [MoodUser] = []
     @State private var currentIndex = 0
     @State private var offset: CGSize = .zero
@@ -3137,7 +3178,13 @@ struct MoodExploreGlassView: View {
             ZStack {
                 colors.background.ignoresSafeArea()
                 
-                if isLoading {
+                if selectedMode == nil {
+                    // Mode Selection Screen
+                    modeSelectionView
+                } else if selectedMode == .tavsiye {
+                    // Tavsiye (Advice) View
+                    adviceView
+                } else if isLoading {
                     ProgressView()
                 } else if currentIndex < users.count {
                     moodSwipeView
@@ -3256,18 +3303,28 @@ struct MoodExploreGlassView: View {
         do {
             let db = Firestore.firestore()
             let snapshot = try await db.collection("users")
-                .limit(to: 20)
+                .limit(to: 30)
                 .getDocuments()
             
             let loadedUsers = snapshot.documents.compactMap { doc -> MoodUser? in
-                guard doc.documentID != currentUserId,
-                      let name = doc.data()["name"] as? String,
-                      let age = doc.data()["age"] as? Int,
-                      let photoURL = doc.data()["photo_url"] as? String else {
-                    return nil
-                }
+                let data = doc.data()
+                guard doc.documentID != currentUserId else { return nil }
                 
-                let bio = doc.data()["bio"] as? String ?? ""
+                // Get name from display_name or name field
+                let name = data["display_name"] as? String ?? data["name"] as? String ?? "Kullanıcı"
+                
+                // Calculate age from date_of_birth or use age field
+                var age = data["age"] as? Int ?? 0
+                if age == 0, let dobTimestamp = data["date_of_birth"] as? Timestamp {
+                    let calendar = Calendar.current
+                    age = calendar.dateComponents([.year], from: dobTimestamp.dateValue(), to: Date()).year ?? 18
+                }
+                if age < 15 { return nil } // Skip invalid ages
+                
+                // Get photo URL
+                let photoURL = data["profile_photo_url"] as? String ?? data["photo_url"] as? String ?? ""
+                
+                let bio = data["bio"] as? String ?? "Merhaba! 👋"
                 return MoodUser(id: doc.documentID, name: name, age: age, photoURL: photoURL, bio: bio, mood: mood)
             }
             
@@ -3395,6 +3452,197 @@ struct MoodExploreGlassView: View {
         }
     }
     
+    // MARK: - Mode Selection View
+    private var modeSelectionView: some View {
+        VStack(spacing: 30) {
+            // Header
+            VStack(spacing: 12) {
+                Text(moodEmoji)
+                    .font(.system(size: 60))
+                
+                Text("\(mood.capitalized) Ruh Hali")
+                    .font(.system(size: 28, weight: .bold))
+                    .foregroundStyle(colors.primaryText)
+                
+                Text("Ne yapmak istersin?")
+                    .font(.system(size: 16))
+                    .foregroundStyle(colors.secondaryText)
+            }
+            .padding(.bottom, 20)
+            
+            // Selection Cards
+            VStack(spacing: 16) {
+                // Kişi Bul
+                Button {
+                    withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
+                        selectedMode = .kisi
+                    }
+                    Task { await loadMoodUsers() }
+                } label: {
+                    HStack(spacing: 16) {
+                        ZStack {
+                            Circle()
+                                .fill(moodColor.opacity(0.2))
+                                .frame(width: 56, height: 56)
+                            Image(systemName: "person.2.fill")
+                                .font(.system(size: 24))
+                                .foregroundStyle(moodColor)
+                        }
+                        
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("Kişi Bul")
+                                .font(.system(size: 18, weight: .bold))
+                                .foregroundStyle(colors.primaryText)
+                            Text("Aynı ruh halindeki insanlarla tanış")
+                                .font(.system(size: 13))
+                                .foregroundStyle(colors.secondaryText)
+                        }
+                        
+                        Spacer()
+                        
+                        Image(systemName: "chevron.right")
+                            .font(.system(size: 16, weight: .semibold))
+                            .foregroundStyle(colors.tertiaryText)
+                    }
+                    .padding(20)
+                    .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 20))
+                    .glassEffect(.regular.interactive(), in: RoundedRectangle(cornerRadius: 20))
+                }
+                .buttonStyle(.plain)
+                
+                // Tavsiye Al
+                Button {
+                    withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
+                        selectedMode = .tavsiye
+                    }
+                } label: {
+                    HStack(spacing: 16) {
+                        ZStack {
+                            Circle()
+                                .fill(moodColor.opacity(0.2))
+                                .frame(width: 56, height: 56)
+                            Image(systemName: "lightbulb.fill")
+                                .font(.system(size: 24))
+                                .foregroundStyle(moodColor)
+                        }
+                        
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("Tavsiye Al")
+                                .font(.system(size: 18, weight: .bold))
+                                .foregroundStyle(colors.primaryText)
+                            Text("Ruh haline göre öneriler al")
+                                .font(.system(size: 13))
+                                .foregroundStyle(colors.secondaryText)
+                        }
+                        
+                        Spacer()
+                        
+                        Image(systemName: "chevron.right")
+                            .font(.system(size: 16, weight: .semibold))
+                            .foregroundStyle(colors.tertiaryText)
+                    }
+                    .padding(20)
+                    .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 20))
+                    .glassEffect(.regular.interactive(), in: RoundedRectangle(cornerRadius: 20))
+                }
+                .buttonStyle(.plain)
+            }
+            .padding(.horizontal, 24)
+            
+            Spacer()
+        }
+        .padding(.top, 60)
+    }
+    
+    // MARK: - Advice View
+    private var adviceView: some View {
+        ScrollView {
+            VStack(spacing: 24) {
+                // Header
+                VStack(spacing: 12) {
+                    Text(moodEmoji)
+                        .font(.system(size: 50))
+                    Text("\(mood.capitalized) İçin Öneriler")
+                        .font(.system(size: 24, weight: .bold))
+                        .foregroundStyle(colors.primaryText)
+                }
+                .padding(.top, 20)
+                
+                // Advice Cards based on mood
+                VStack(spacing: 16) {
+                    ForEach(advicesForMood, id: \.title) { advice in
+                        AdviceCard(advice: advice, moodColor: moodColor, colors: colors)
+                    }
+                }
+                .padding(.horizontal, 16)
+                
+                // Back to Kişi button
+                Button {
+                    withAnimation {
+                        selectedMode = .kisi
+                    }
+                    Task { await loadMoodUsers() }
+                } label: {
+                    Text("Kişi Bul'a Geç")
+                        .font(.system(size: 16, weight: .semibold))
+                        .foregroundStyle(.white)
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 50)
+                        .background(moodColor, in: RoundedRectangle(cornerRadius: 14))
+                }
+                .padding(.horizontal, 24)
+                .padding(.bottom, 30)
+            }
+        }
+    }
+    
+    private var advicesForMood: [MoodAdvice] {
+        switch mood {
+        case "adventure":
+            return [
+                MoodAdvice(icon: "figure.hiking", title: "Doğa Yürüyüşü", desc: "Şehirden kaç, ormanda kaybol!"),
+                MoodAdvice(icon: "airplane", title: "Hafta Sonu Kaçamağı", desc: "Yakın bir şehre git, keşfet"),
+                MoodAdvice(icon: "camera.fill", title: "Fotoğraf Gezisi", desc: "Yeni yerler keşfet, anıları yakala")
+            ]
+        case "romantic":
+            return [
+                MoodAdvice(icon: "heart.fill", title: "Romantik Akşam", desc: "Mum ışığında yemek, şarap"),
+                MoodAdvice(icon: "moon.stars.fill", title: "Gece Yürüyüşü", desc: "Sahilde el ele yürü"),
+                MoodAdvice(icon: "gift.fill", title: "Sürpriz Hediye", desc: "Küçük ama anlamlı bir şey al")
+            ]
+        case "chill":
+            return [
+                MoodAdvice(icon: "cup.and.saucer.fill", title: "Kahve Molası", desc: "Favori kahve dükkanında dinlen"),
+                MoodAdvice(icon: "book.fill", title: "Kitap Keyfi", desc: "Rahat bir köşede kitabına dal"),
+                MoodAdvice(icon: "figure.yoga", title: "Yoga Seansı", desc: "Bedenini ve zihnini dinlendir")
+            ]
+        case "party":
+            return [
+                MoodAdvice(icon: "music.note", title: "Konser", desc: "Canlı müzik enerjisi yakala"),
+                MoodAdvice(icon: "figure.dance", title: "Dans Gecesi", desc: "Kulüpte sabaha kadar eğlen"),
+                MoodAdvice(icon: "person.3.fill", title: "Ev Partisi", desc: "Arkadaşlarını topla, parti kur")
+            ]
+        case "deep":
+            return [
+                MoodAdvice(icon: "brain.head.profile", title: "Derin Sohbet", desc: "Hayatın anlamını tartış"),
+                MoodAdvice(icon: "paintbrush.fill", title: "Sanat Galerisi", desc: "Eserleri yorumla, düşün"),
+                MoodAdvice(icon: "doc.text.fill", title: "Günlük Tut", desc: "Düşüncelerini yazıya dök")
+            ]
+        case "creative":
+            return [
+                MoodAdvice(icon: "paintpalette.fill", title: "Resim Yap", desc: "Tuval al, hayal gücünü çalıştır"),
+                MoodAdvice(icon: "music.quarternote.3", title: "Müzik Yap", desc: "Enstrüman çal veya beat yap"),
+                MoodAdvice(icon: "camera.aperture", title: "Fotoğrafçılık", desc: "Farklı açılardan dünyayı yakala")
+            ]
+        default:
+            return [
+                MoodAdvice(icon: "sparkles", title: "Yeni Bir Şey Dene", desc: "Konfor alanından çık"),
+                MoodAdvice(icon: "person.2.fill", title: "Arkadaşlarla Buluş", desc: "Sosyalleş, eğlen"),
+                MoodAdvice(icon: "star.fill", title: "Kendine Zaman Ayır", desc: "Sevdiğin bir aktivite yap")
+            ]
+        }
+    }
+    
     private var moodColor: Color {
         switch mood {
         case "adventure": return .orange
@@ -3471,6 +3719,47 @@ struct MoodUserCard: View {
         }
         .clipShape(RoundedRectangle(cornerRadius: 24))
         .shadow(radius: 10)
+    }
+}
+
+// MARK: - Mood Advice Model
+struct MoodAdvice {
+    let icon: String
+    let title: String
+    let desc: String
+}
+
+// MARK: - Advice Card View
+struct AdviceCard: View {
+    let advice: MoodAdvice
+    let moodColor: Color
+    let colors: ThemeColors
+    
+    var body: some View {
+        HStack(spacing: 16) {
+            ZStack {
+                Circle()
+                    .fill(moodColor.opacity(0.15))
+                    .frame(width: 50, height: 50)
+                Image(systemName: advice.icon)
+                    .font(.system(size: 22))
+                    .foregroundStyle(moodColor)
+            }
+            
+            VStack(alignment: .leading, spacing: 4) {
+                Text(advice.title)
+                    .font(.system(size: 16, weight: .semibold))
+                    .foregroundStyle(colors.primaryText)
+                Text(advice.desc)
+                    .font(.system(size: 13))
+                    .foregroundStyle(colors.secondaryText)
+            }
+            
+            Spacer()
+        }
+        .padding(16)
+        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
+        .glassEffect(.regular.interactive(), in: RoundedRectangle(cornerRadius: 16))
     }
 }
 
@@ -3672,25 +3961,43 @@ struct GameMatchDetailView: View {
         
         do {
             let db = Firestore.firestore()
+            // Get all users instead of filtering by gaming_preferences
             let snapshot = try await db.collection("users")
-                .whereField("gaming_preferences.is_gamer", isEqualTo: true)
                 .limit(to: 50)
                 .getDocuments()
             
+            let allGames = ["Valorant", "League of Legends", "CS2", "Apex Legends", "Fortnite", "PUBG", "Overwatch 2", "Rocket League", "Minecraft", "FIFA"]
+            let ranks = ["Bronze", "Silver", "Gold", "Platinum", "Diamond", "Master"]
+            let roles = ["Support", "DPS", "Tank", "Flex", "Carry"]
+            
             let loadedGamers = snapshot.documents.compactMap { doc -> Gamer? in
                 let data = doc.data()
-                guard doc.documentID != currentUserId,
-                      let name = data["name"] as? String,
-                      let age = data["age"] as? Int,
-                      let photoURL = data["photo_url"] as? String else {
-                    return nil
-                }
+                guard doc.documentID != currentUserId else { return nil }
                 
+                // Get name from display_name or name field
+                let name = data["display_name"] as? String ?? data["name"] as? String ?? "Oyuncu"
+                
+                // Calculate age from date_of_birth or use age field
+                var age = data["age"] as? Int ?? 0
+                if age == 0, let dobTimestamp = data["date_of_birth"] as? Timestamp {
+                    let calendar = Calendar.current
+                    age = calendar.dateComponents([.year], from: dobTimestamp.dateValue(), to: Date()).year ?? 18
+                }
+                if age < 15 { return nil } // Skip invalid ages
+                
+                // Get photo URL
+                let photoURL = data["profile_photo_url"] as? String ?? data["photo_url"] as? String ?? ""
+                
+                // Get gaming preferences if exists, otherwise generate random
                 let gamingPrefs = data["gaming_preferences"] as? [String: Any] ?? [:]
-                let games = gamingPrefs["games"] as? [String] ?? []
-                let rank = gamingPrefs["rank"] as? String ?? "Unranked"
-                let role = gamingPrefs["role"] as? String ?? "Flex"
-                let bio = data["bio"] as? String ?? ""
+                var games = gamingPrefs["games"] as? [String] ?? []
+                if games.isEmpty {
+                    // Assign random 2-4 games
+                    games = Array(allGames.shuffled().prefix(Int.random(in: 2...4)))
+                }
+                let rank = gamingPrefs["rank"] as? String ?? ranks.randomElement() ?? "Gold"
+                let role = gamingPrefs["role"] as? String ?? roles.randomElement() ?? "Flex"
+                let bio = data["bio"] as? String ?? "Beraber oyun oynamak ister misin? 🎮"
                 
                 return Gamer(
                     id: doc.documentID,
@@ -4110,24 +4417,45 @@ struct MusicMatchDetailView: View {
         
         do {
             let db = Firestore.firestore()
+            // Get all users instead of filtering by music_preferences
             let snapshot = try await db.collection("users")
-                .whereField("music_preferences.favorite_genres", isNotEqualTo: [])
                 .limit(to: 50)
                 .getDocuments()
             
+            let allGenres = ["Pop", "Rock", "Hip-Hop", "Rap", "Jazz", "Elektronik", "EDM", "Klasik", "R&B", "Indie", "Türkçe Pop", "K-Pop"]
+            let allArtists = ["Tarkan", "Sezen Aksu", "Duman", "maNga", "Mor ve Ötesi", "The Weeknd", "Drake", "Billie Eilish", "Taylor Swift", "BTS"]
+            
             let loaded = snapshot.documents.compactMap { doc -> MusicLover? in
                 let data = doc.data()
-                guard doc.documentID != currentUserId,
-                      let name = data["name"] as? String,
-                      let age = data["age"] as? Int,
-                      let photoURL = data["photo_url"] as? String else {
-                    return nil
-                }
+                guard doc.documentID != currentUserId else { return nil }
                 
+                // Get name from display_name or name field
+                let name = data["display_name"] as? String ?? data["name"] as? String ?? "Müzik Sever"
+                
+                // Calculate age from date_of_birth or use age field
+                var age = data["age"] as? Int ?? 0
+                if age == 0, let dobTimestamp = data["date_of_birth"] as? Timestamp {
+                    let calendar = Calendar.current
+                    age = calendar.dateComponents([.year], from: dobTimestamp.dateValue(), to: Date()).year ?? 18
+                }
+                if age < 15 { return nil } // Skip invalid ages
+                
+                // Get photo URL
+                let photoURL = data["profile_photo_url"] as? String ?? data["photo_url"] as? String ?? ""
+                
+                // Get music preferences if exists, otherwise generate random
                 let musicPrefs = data["music_preferences"] as? [String: Any] ?? [:]
-                let genres = musicPrefs["favorite_genres"] as? [String] ?? []
-                let artists = musicPrefs["favorite_artists"] as? [String] ?? []
-                let bio = data["bio"] as? String ?? ""
+                var genres = musicPrefs["favorite_genres"] as? [String] ?? []
+                var artists = musicPrefs["favorite_artists"] as? [String] ?? []
+                if genres.isEmpty {
+                    // Assign random 2-4 genres
+                    genres = Array(allGenres.shuffled().prefix(Int.random(in: 2...4)))
+                }
+                if artists.isEmpty {
+                    // Assign random 2-3 artists
+                    artists = Array(allArtists.shuffled().prefix(Int.random(in: 2...3)))
+                }
+                let bio = data["bio"] as? String ?? "Müzik hakkında konuşmayı seviyorum 🎵"
                 
                 return MusicLover(
                     id: doc.documentID,

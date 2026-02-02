@@ -4,6 +4,11 @@ import FirebaseFirestore
 
 // MARK: - Main Discover View (Tinder Style)
 
+// Swipe Direction Locking
+enum SwipeDirection {
+    case none, left, right, up
+}
+
 struct DiscoverView: View {
     @State private var currentIndex = 0
     @State private var cardOffset: CGSize = .zero
@@ -16,6 +21,7 @@ struct DiscoverView: View {
     @State private var showDoubleDateSheet = false
     @State private var showPremiumSheet = false
     @State private var showProfileSummary = false
+    @State private var showShareSheet = false // NEW: Share screen
     @State private var isGlobalMode = false // false = Kendi Ülkem, true = Global
     @State private var showingFullProfile = false // Track if full profile detail is shown
     
@@ -23,6 +29,8 @@ struct DiscoverView: View {
     @State private var cardScale: CGFloat = 1.0
     @State private var cardBlur: CGFloat = 0
     @State private var cardOpacity: Double = 1.0
+    
+    @State private var lockedDirection: SwipeDirection = .none
     
     // Real data from Firestore
     @State private var users: [DiscoverUser] = []
@@ -38,6 +46,12 @@ struct DiscoverView: View {
     @State private var showDiamondFloat = false
     @State private var diamondFloatOffset: CGFloat = 0
     @State private var diamondFloatOpacity: Double = 0
+    
+    // Profile view counter for ad trigger (every 5 profiles)
+    @State private var profileViewCount = 0
+    @State private var showAdOverlay = false
+    @State private var isWatchingAd = false
+    @State private var showSoftPremiumPopup = false
     
     @Environment(AppState.self) private var appState
     @Environment(\.colorScheme) private var colorScheme
@@ -69,7 +83,8 @@ struct DiscoverView: View {
                                 onLike: likeCurrentUser,
                                 onSkip: skipCurrentUser,
                                 onTap: { selectedUser = user },
-                                onOpenProfile: { selectedUser = user }
+                                onOpenProfile: { selectedUser = user },
+                                lockedDirection: lockedDirection
                             )
                             .id("\(user.id)-\(currentIndex)") // Unique ID to force refresh
                             .frame(width: geo.size.width - 24, height: geo.size.height + 30)
@@ -81,10 +96,32 @@ struct DiscoverView: View {
                             .gesture(
                                 DragGesture()
                                     .onChanged { value in
+                                        // Update offset
                                         cardOffset = value.translation
                                         cardRotation = Double(value.translation.width / 20)
+                                        
+                                        // Locking Logic
+                                        if lockedDirection == .none {
+                                            // Determine direction if threshold crossed
+                                            if value.translation.width > 50 {
+                                                lockedDirection = .right
+                                            } else if value.translation.width < -50 {
+                                                lockedDirection = .left
+                                            } else if value.translation.height < -50 {
+                                                lockedDirection = .up
+                                            }
+                                        } else {
+                                            // Reset lock if returned to near center
+                                            // Use a smaller threshold to unlock to avoid flickering
+                                            if abs(value.translation.width) < 20 && abs(value.translation.height) < 20 {
+                                                lockedDirection = .none
+                                            }
+                                        }
                                     }
                                     .onEnded { value in
+                                        // Reset lock
+                                        lockedDirection = .none
+                                        
                                         if value.translation.width > 100 {
                                             likeCurrentUser()
                                         } else if value.translation.width < -100 {
@@ -116,7 +153,8 @@ struct DiscoverView: View {
                         onSuperLike: { superLikeUser() },
                         onLike: likeCurrentUser,
                         onAddFriend: { showProfileSummary = true },
-                        cardOffset: cardOffset
+                        cardOffset: cardOffset,
+                        lockedDirection: lockedDirection
                     )
                     .padding(.bottom, 8)
                     .padding(.top, -35)
@@ -130,13 +168,16 @@ struct DiscoverView: View {
             DiamondScreen()
         }
         .sheet(isPresented: $showFilters) {
-            FilterSheet(isGlobalMode: $isGlobalMode)
+            FilterSheet(isGlobalMode: $isGlobalMode, currentUserAge: appState.currentUser?.age ?? 18)
         }
         .sheet(isPresented: $showDoubleDateSheet) {
             DoubleDateSheet()
         }
         .sheet(isPresented: $showPremiumSheet) {
             SubscriptionSheet()
+        }
+        .sheet(isPresented: $showShareSheet) {
+            ShareView()
         }
         .sheet(isPresented: $showProfileSummary) {
             if let user = currentUser {
@@ -187,45 +228,81 @@ struct DiscoverView: View {
         }
         .onAppear {
             loadUsers()
+            
+            // Show soft premium popup every time screen opens (for non-premium users)
+            if appState.currentUser?.isPremium != true {
+                let sessionCount = UserDefaults.standard.integer(forKey: "discoverSessionCount") + 1
+                UserDefaults.standard.set(sessionCount, forKey: "discoverSessionCount")
+                
+                // Show premium popup every 3rd session
+                if sessionCount % 3 == 0 {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                        showSoftPremiumPopup = true
+                    }
+                }
+            }
         }
-        .onChange(of: isGlobalMode) { _, _ in
-            loadUsers()
+        .overlay {
+            // Ad Overlay (shown after every 5 profiles)
+            if showAdOverlay {
+                adOverlayView
+                    .transition(.opacity)
+            }
+            
+            // Soft Premium Popup
+            if showSoftPremiumPopup {
+                softPremiumPopupView
+                    .transition(.scale.combined(with: .opacity))
+            }
+        }
+        .onChange(of: isGlobalMode) { _, newValue in
+            print("🌍 Global mode changed to: \(newValue)")
+            currentIndex = 0 // Reset to first card
+            loadUsers(forceRefresh: true)
         }
         .onChange(of: selectedMode) { _, _ in
-            loadUsers()
+            currentIndex = 0 // Reset to first card
+            loadUsers(forceRefresh: true)
         }
         .overlay(alignment: .topTrailing) {
             // Floating Diamond Animation (-10 💎) - Sağ üstte
             if showDiamondFloat {
-                HStack(spacing: 6) {
-                    Text("-10")
-                        .font(.system(size: 24, weight: .bold))
-                        .foregroundStyle(.white)
+                VStack(spacing: 4) {
+                    HStack(spacing: 6) {
+                        Text("-10")
+                            .font(.system(size: 24, weight: .bold))
+                            .foregroundStyle(.white)
+                        
+                        Image("diamond-icon")
+                            .resizable()
+                            .renderingMode(.original)
+                            .scaledToFit()
+                            .frame(width: 20, height: 20)
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 10)
+                    .background(
+                        Capsule()
+                            .fill(Color.black.opacity(0.85))
+                            .overlay(
+                                Capsule()
+                                    .stroke(
+                                        LinearGradient(
+                                            colors: [Color(red: 1.0, green: 0.84, blue: 0.0), Color(red: 1.0, green: 0.65, blue: 0.0)],
+                                            startPoint: .leading,
+                                            endPoint: .trailing
+                                        ),
+                                        lineWidth: 2
+                                    )
+                            )
+                    )
+                    .shadow(color: Color(red: 1.0, green: 0.84, blue: 0.0).opacity(0.5), radius: 15, y: 8)
                     
-                    Image("diamond-icon")
-                        .resizable()
-                        .renderingMode(.original)
-                        .scaledToFit()
-                        .frame(width: 20, height: 20)
+                    // Current balance text
+                    Text("Bakiye: \(appState.currentUser?.diamondBalance ?? 0) 💎")
+                        .font(.system(size: 12, weight: .medium))
+                        .foregroundStyle(.white.opacity(0.7))
                 }
-                .padding(.horizontal, 16)
-                .padding(.vertical, 10)
-                .background(
-                    Capsule()
-                        .fill(Color.black.opacity(0.85))
-                        .overlay(
-                            Capsule()
-                                .stroke(
-                                    LinearGradient(
-                                        colors: [Color(red: 1.0, green: 0.84, blue: 0.0), Color(red: 1.0, green: 0.65, blue: 0.0)],
-                                        startPoint: .leading,
-                                        endPoint: .trailing
-                                    ),
-                                    lineWidth: 2
-                                )
-                        )
-                )
-                .shadow(color: Color(red: 1.0, green: 0.84, blue: 0.0).opacity(0.5), radius: 15, y: 8)
                 .offset(x: -20, y: diamondFloatOffset)
                 .opacity(diamondFloatOpacity)
             }
@@ -263,20 +340,20 @@ struct DiscoverView: View {
     
     // MARK: - Top Bar
     private var topBar: some View {
-        HStack(spacing: 16) {
+        HStack(spacing: 8) {
             // Filter Button
             Button {
                 showFilters = true
             } label: {
                 Image(systemName: "slider.horizontal.3")
-                    .font(.system(size: 22, weight: .medium))
+                    .font(.system(size: 20, weight: .medium))
                     .foregroundStyle(colorScheme == .dark ? .white.opacity(0.8) : .black.opacity(0.8))
             }
             
             Spacer()
             
-            // Mode Selector (Sana Özel | Çifte Randevu) - Blob animasyonlu
-            ModeSelectorView(selectedMode: $selectedMode, showDoubleDateSheet: $showDoubleDateSheet)
+            // Mode Selector (Sana Özel | Paylaş | Çift Randevu) - Blob animasyonlu
+            ModeSelectorView(selectedMode: $selectedMode, showDoubleDateSheet: $showDoubleDateSheet, showShareSheet: $showShareSheet)
             
             Spacer()
             
@@ -305,25 +382,31 @@ struct DiscoverView: View {
                     .resizable()
                     .renderingMode(.original)
                     .scaledToFit()
-                    .frame(width: 28, height: 28)
-                    .frame(width: 40, height: 40)
+                    .frame(width: 26, height: 26)
+                    .frame(width: 36, height: 36)
                     .background(Circle().fill(colorScheme == .dark ? Color(red: 0.04, green: 0.02, blue: 0.08) : Color.white))
             }
         }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 12)
+        .padding(.horizontal, 8)
+        .padding(.vertical, 10)
     }
     
     // MARK: - Actions
     
-    private func loadUsers() {
-        // First, use cached data if available
-        if !appState.cachedDiscoverUsers.isEmpty && !appState.shouldRefreshDiscoverCache() {
+    private func loadUsers(forceRefresh: Bool = false) {
+        // First, use cached data if available (but NOT if forceRefresh is true)
+        if !forceRefresh && !appState.cachedDiscoverUsers.isEmpty && !appState.shouldRefreshDiscoverCache() {
             self.users = appState.cachedDiscoverUsers
             self.isLoading = false
             print("✅ Using cached discover users: \(users.count)")
             prefetchNextImages()
             return
+        }
+        
+        // Clear cache when forceRefresh
+        if forceRefresh {
+            appState.cachedDiscoverUsers = []
+            print("🔄 Force refresh - cache cleared for new filter")
         }
         
         Task {
@@ -334,11 +417,19 @@ struct DiscoverView: View {
             loadError = nil
             
             do {
+                // Global mode = exclude Turkey, Local mode = only Turkey
                 let countryFilter = isGlobalMode ? nil : "Türkiye"
+                let excludeCountry = isGlobalMode ? "Türkiye" : nil
+                
+                // Get current user's age for age pool filtering (default to 18 if not set)
+                let currentUserAge = appState.currentUser?.age ?? 18
+                
                 let response = try await DiscoverService.shared.getDiscoverFeed(
                     mode: selectedMode,
                     limit: 50,
-                    countryFilter: countryFilter
+                    countryFilter: countryFilter,
+                    excludeCountry: excludeCountry,
+                    currentUserAge: currentUserAge
                 )
                 
                 await MainActor.run {
@@ -471,14 +562,93 @@ struct DiscoverView: View {
         }
     }
     
+    // MARK: - Friend Request (Sağa kaydırma - Arkadaşlık isteği gönderir)
     private func likeCurrentUser() {
+        // 🚨 CRITICAL: Pre-validate diamond balance BEFORE proceeding
+        let currentDiamonds = appState.currentUser?.diamondBalance ?? 0
+        guard currentDiamonds >= 10 else {
+            // Show error and reset card position - DO NOT proceed
+            withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                cardOffset = .zero
+                cardRotation = 0
+            }
+            
+            requestSuccess = false
+            requestMessage = "Yetersiz elmas! Arkadaşlık isteği göndermek için 10 elmas gerekli."
+            showRequestToast = true
+            
+            DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
+                showRequestToast = false
+            }
+            
+            print("❌ Insufficient diamonds (\(currentDiamonds)) - blocking friend request")
+            return // DO NOT move to next user
+        }
+        
         withAnimation(.easeOut(duration: 0.3)) {
             cardOffset = CGSize(width: 500, height: 0)
             cardRotation = 15
         }
         if let user = currentUser {
             Task {
-                try? await ChatService.shared.likeUser(userId: user.id)
+                do {
+                    // FriendsService.sendFriendRequest already handles diamond deduction (10 diamonds)
+                    try await FriendsService.shared.sendFriendRequest(userId: user.id)
+                    
+                    // Refresh diamond balance in AppState
+                    await MainActor.run {
+                        if var currentUser = appState.currentUser {
+                            currentUser.diamondBalance = max(0, (currentUser.diamondBalance ?? 0) - 10)
+                            // Update local state - the actual update is in Firestore
+                        }
+                    }
+                    
+                    await MainActor.run {
+                        requestSuccess = true
+                        requestMessage = "Arkadaşlık isteği gönderildi!"
+                        showRequestToast = true
+                        
+                        // 💎 Trigger floating diamond animation
+                        showDiamondFloat = true
+                        diamondFloatOffset = 100
+                        diamondFloatOpacity = 0
+                        
+                        withAnimation(.spring(response: 0.6, dampingFraction: 0.7)) {
+                            diamondFloatOffset = 120
+                            diamondFloatOpacity = 1.0
+                        }
+                        
+                        // Fade out diamond float after 1.5s
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                            withAnimation(.easeOut(duration: 0.5)) {
+                                diamondFloatOffset = 80
+                                diamondFloatOpacity = 0
+                            }
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                                showDiamondFloat = false
+                            }
+                        }
+                        
+                        // Fade out toast after 2 seconds
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+                            withAnimation(.easeOut(duration: 0.5)) {
+                                showRequestToast = false
+                            }
+                        }
+                    }
+                    print("✅ Friend request sent to \(user.displayName)")
+                } catch {
+                    await MainActor.run {
+                        requestSuccess = false
+                        requestMessage = error.localizedDescription
+                        showRequestToast = true
+                        
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
+                            showRequestToast = false
+                        }
+                    }
+                    print("❌ Friend request failed: \(error)")
+                }
             }
         }
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
@@ -496,7 +666,14 @@ struct DiscoverView: View {
         }
     }
     
+    // MARK: - Super Like (Premium Only + Friend Request)
     private func superLikeUser() {
+        // PREMIUM CHECK: Super Like is premium-only
+        guard appState.currentUser?.isPremium == true else {
+            showPremiumSheet = true
+            return
+        }
+        
         // Deduct 100 diamonds for Super Like
         Task {
             guard let uid = Auth.auth().currentUser?.uid else { return }
@@ -505,15 +682,28 @@ struct DiscoverView: View {
                 let db = Firestore.firestore()
                 let userRef = db.collection("users").document(uid)
                 
-                // Get current diamond balance
+                // Get current diamond balance using safe extraction
                 let doc = try await userRef.getDocument()
-                let currentBalance = doc.data()?["diamond_balance"] as? Int ?? 0
+                let currentBalance: Int
+                if let balance = doc.data()?["diamond_balance"] as? Int {
+                    currentBalance = balance
+                } else if let balance64 = doc.data()?["diamond_balance"] as? Int64 {
+                    currentBalance = Int(balance64)
+                } else if let balanceNSNumber = doc.data()?["diamond_balance"] as? NSNumber {
+                    currentBalance = balanceNSNumber.intValue
+                } else {
+                    currentBalance = 100
+                }
                 
                 // Check if user has enough diamonds
                 guard currentBalance >= 100 else {
                     await MainActor.run {
-                        // Show error - not enough diamonds
-                        print("❌ Not enough diamonds for Super Like")
+                        requestSuccess = false
+                        requestMessage = "Yetersiz elmas (100 gerekli)"
+                        showRequestToast = true
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
+                            showRequestToast = false
+                        }
                     }
                     return
                 }
@@ -541,16 +731,28 @@ struct DiscoverView: View {
                     "created_at": FieldValue.serverTimestamp()
                 ])
                 
-                // Log super like action
+                // Log super like action AND send friend request
                 if let user = currentUser {
                     try? await db.collection("super_likes").addDocument(data: [
                         "from_user_id": uid,
                         "to_user_id": user.id,
                         "created_at": FieldValue.serverTimestamp()
                     ])
+                    
+                    // Super Like also sends a friend request automatically (without extra charge)
+                    try await FriendsService.shared.sendFriendRequestWithoutCharge(userId: user.id)
+                    
+                    await MainActor.run {
+                        requestSuccess = true
+                        requestMessage = "Super Like + Arkadaşlık isteği gönderildi!"
+                        showRequestToast = true
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
+                            showRequestToast = false
+                        }
+                    }
                 }
             } catch {
-                print("❌ Error deducting diamonds: \(error)")
+                print("❌ Error in super like: \(error)")
             }
         }
         
@@ -562,7 +764,14 @@ struct DiscoverView: View {
         }
     }
     
+    // MARK: - Rewind (Premium Only)
     private func rewindUser() {
+        // PREMIUM CHECK: Rewind is premium-only
+        guard appState.currentUser?.isPremium == true else {
+            showPremiumSheet = true
+            return
+        }
+        
         guard currentIndex > 0 else { return }
         cardScale = 1.15
         cardBlur = 10
@@ -587,6 +796,17 @@ struct DiscoverView: View {
         cardRotation = 0
         currentPhotoIndex = 0
         
+        // Increment profile view counter for ad trigger
+        profileViewCount += 1
+        
+        // Show ad every 5 profiles (for non-premium users)
+        if profileViewCount >= 5 && appState.currentUser?.isPremium != true {
+            profileViewCount = 0
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                showAdOverlay = true
+            }
+        }
+        
         // Prefetch next images
         prefetchNextImages()
         
@@ -598,14 +818,207 @@ struct DiscoverView: View {
             }
         }
     }
+    
+    // MARK: - Ad Overlay View
+    private var adOverlayView: some View {
+        ZStack {
+            Color.black.opacity(0.8)
+                .ignoresSafeArea()
+            
+            VStack(spacing: 24) {
+                Image(systemName: "play.rectangle.fill")
+                    .font(.system(size: 50))
+                    .foregroundStyle(.white)
+                
+                Text("Reklam Süresi")
+                    .font(.system(size: 22, weight: .bold))
+                    .foregroundStyle(.white)
+                
+                if isWatchingAd {
+                    ProgressView()
+                        .tint(.white)
+                        .scaleEffect(1.5)
+                    
+                    Text("Reklam izleniyor...")
+                        .font(.system(size: 14))
+                        .foregroundStyle(.white.opacity(0.7))
+                } else {
+                    Button {
+                        watchAdAndContinue()
+                    } label: {
+                        Text("İzle ve Devam Et")
+                            .font(.system(size: 17, weight: .bold))
+                            .foregroundStyle(.black)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 16)
+                            .background(Color.white, in: RoundedRectangle(cornerRadius: 16))
+                    }
+                    .padding(.horizontal, 40)
+                }
+                
+                // Premium option
+                Button {
+                    showAdOverlay = false
+                    showPremiumSheet = true
+                } label: {
+                    HStack {
+                        Image(systemName: "crown.fill")
+                        Text("Premium ile reklamsız kullan")
+                    }
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundStyle(Color(red: 1.0, green: 0.84, blue: 0.0))
+                }
+            }
+            .padding(32)
+        }
+    }
+    
+    private func watchAdAndContinue() {
+        isWatchingAd = true
+        
+        // Simulate ad (in real app, integrate AdMob/Unity Ads)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+            isWatchingAd = false
+            showAdOverlay = false
+        }
+    }
+    
+    // MARK: - Soft Premium Popup (Dismissible)
+    private var softPremiumPopupView: some View {
+        ZStack {
+            Color.black.opacity(0.6)
+                .ignoresSafeArea()
+                .onTapGesture {
+                    withAnimation(.spring(response: 0.4)) {
+                        showSoftPremiumPopup = false
+                    }
+                }
+            
+            VStack(spacing: 20) {
+                // Close button
+                HStack {
+                    Spacer()
+                    Button {
+                        withAnimation(.spring(response: 0.4)) {
+                            showSoftPremiumPopup = false
+                        }
+                    } label: {
+                        Image(systemName: "xmark")
+                            .font(.system(size: 14, weight: .bold))
+                            .foregroundStyle(.white.opacity(0.6))
+                            .frame(width: 28, height: 28)
+                            .background(Color.white.opacity(0.1), in: Circle())
+                    }
+                }
+                
+                // Crown icon
+                Image(systemName: "crown.fill")
+                    .font(.system(size: 50))
+                    .foregroundStyle(
+                        LinearGradient(
+                            colors: [Color(red: 1.0, green: 0.85, blue: 0.4), Color(red: 1.0, green: 0.7, blue: 0.3)],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+                    .shadow(color: Color.orange.opacity(0.4), radius: 15)
+                
+                VStack(spacing: 8) {
+                    Text("Premium'a Geç")
+                        .font(.system(size: 22, weight: .bold))
+                        .foregroundStyle(.white)
+                    
+                    Text("Sınırsız beğeni, reklamsız kullanım, özel özellikler")
+                        .font(.system(size: 14))
+                        .foregroundStyle(.white.opacity(0.7))
+                        .multilineTextAlignment(.center)
+                }
+                
+                // Features
+                VStack(alignment: .leading, spacing: 10) {
+                    premiumFeatureRow(icon: "heart.fill", text: "Sınırsız beğeni gönder")
+                    premiumFeatureRow(icon: "eye.slash.fill", text: "Gizli profil görüntüleme")
+                    premiumFeatureRow(icon: "bolt.fill", text: "Öncelikli eşleşme")
+                    premiumFeatureRow(icon: "xmark.circle.fill", text: "Reklamsız deneyim")
+                }
+                
+                // CTA Button
+                Button {
+                    showSoftPremiumPopup = false
+                    showPremiumSheet = true
+                } label: {
+                    Text("Premium'u Keşfet")
+                        .font(.system(size: 17, weight: .bold))
+                        .foregroundStyle(.black)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 16)
+                        .background(
+                            LinearGradient(
+                                colors: [Color(red: 1.0, green: 0.85, blue: 0.4), Color(red: 1.0, green: 0.7, blue: 0.3)],
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            ),
+                            in: RoundedRectangle(cornerRadius: 16)
+                        )
+                }
+                
+                Button {
+                    withAnimation(.spring(response: 0.4)) {
+                        showSoftPremiumPopup = false
+                    }
+                } label: {
+                    Text("Daha sonra")
+                        .font(.system(size: 14))
+                        .foregroundStyle(.white.opacity(0.5))
+                }
+            }
+            .padding(24)
+            .background(
+                RoundedRectangle(cornerRadius: 28)
+                    .fill(Color(red: 0.1, green: 0.08, blue: 0.15))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 28)
+                            .stroke(
+                                LinearGradient(
+                                    colors: [Color(red: 1.0, green: 0.84, blue: 0.0).opacity(0.3), .clear],
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                ),
+                                lineWidth: 1
+                            )
+                    )
+            )
+            .padding(20)
+        }
+    }
+    
+    private func premiumFeatureRow(icon: String, text: String) -> some View {
+        HStack(spacing: 12) {
+            Image(systemName: icon)
+                .font(.system(size: 14))
+                .foregroundStyle(Color(red: 1.0, green: 0.85, blue: 0.4))
+                .frame(width: 20)
+            
+            Text(text)
+                .font(.system(size: 14))
+                .foregroundStyle(.white.opacity(0.9))
+        }
+    }
 }
 
 // MARK: - Mode Selector (Simple Working Version)
 struct ModeSelectorView: View {
     @Binding var selectedMode: DiscoverMode
     @Binding var showDoubleDateSheet: Bool
+    @Binding var showShareSheet: Bool
     @Namespace private var namespace
     @Environment(\.colorScheme) private var colorScheme
+    
+    // Track which button is "active" for the blob animation
+    enum ActiveButton: String {
+        case sanaOzel, paylas, ciftRandevu
+    }
+    @State private var activeButton: ActiveButton = .sanaOzel
     
     // Light modda siyah hover, dark modda beyaz hover
     private var hoverColor: Color {
@@ -617,22 +1030,56 @@ struct ModeSelectorView: View {
         colorScheme == .dark ? .black : .white
     }
     
+    private var unselectedTextColor: Color {
+        colorScheme == .dark ? .white.opacity(0.6) : .black.opacity(0.6)
+    }
+    
     var body: some View {
         HStack(spacing: 0) {
             // Sana Özel
             Button {
                 withAnimation(.spring(response: 0.35, dampingFraction: 0.7)) {
                     selectedMode = .forYou
+                    activeButton = .sanaOzel
                 }
             } label: {
                 Text("Sana Özel")
-                    .font(.system(size: 13, weight: .semibold))
-                    .foregroundStyle(selectedMode == .forYou ? selectedTextColor : (colorScheme == .dark ? .white.opacity(0.6) : .black.opacity(0.6)))
+                    .font(.system(size: 11, weight: .semibold))
+                    .foregroundStyle(activeButton == .sanaOzel ? selectedTextColor : unselectedTextColor)
                     .fixedSize()
-                    .padding(.horizontal, 14)
-                    .padding(.vertical, 8)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 6)
                     .background {
-                        if selectedMode == .forYou {
+                        if activeButton == .sanaOzel {
+                            Capsule()
+                                .fill(hoverColor)
+                                .matchedGeometryEffect(id: "blob", in: namespace)
+                        }
+                    }
+            }
+            .buttonStyle(.plain)
+            
+            // Paylaş
+            Button {
+                withAnimation(.spring(response: 0.35, dampingFraction: 0.7)) {
+                    activeButton = .paylas
+                }
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                    showShareSheet = true
+                }
+            } label: {
+                HStack(spacing: 4) {
+                    Image(systemName: "qrcode")
+                        .font(.system(size: 10, weight: .semibold))
+                    Text("Paylaş")
+                }
+                    .font(.system(size: 11, weight: .semibold))
+                    .foregroundStyle(activeButton == .paylas ? selectedTextColor : unselectedTextColor)
+                    .fixedSize()
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 6)
+                    .background {
+                        if activeButton == .paylas {
                             Capsule()
                                 .fill(hoverColor)
                                 .matchedGeometryEffect(id: "blob", in: namespace)
@@ -646,20 +1093,21 @@ struct ModeSelectorView: View {
                 // Önce hover geçsin
                 withAnimation(.spring(response: 0.35, dampingFraction: 0.7)) {
                     selectedMode = .doubleDate
+                    activeButton = .ciftRandevu
                 }
                 // 0.3 saniye sonra sheet açılsın, hover yerinde kalsın
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                     showDoubleDateSheet = true
                 }
             } label: {
-                Text("Çifte Randevu")
-                    .font(.system(size: 13, weight: .semibold))
-                    .foregroundStyle(selectedMode == .doubleDate ? selectedTextColor : (colorScheme == .dark ? .white.opacity(0.6) : .black.opacity(0.6)))
+                Text("Çift Randevu")
+                    .font(.system(size: 11, weight: .semibold))
+                    .foregroundStyle(activeButton == .ciftRandevu ? selectedTextColor : unselectedTextColor)
                     .fixedSize()
-                    .padding(.horizontal, 14)
-                    .padding(.vertical, 8)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 6)
                     .background {
-                        if selectedMode == .doubleDate {
+                        if activeButton == .ciftRandevu {
                             Capsule()
                                 .fill(hoverColor)
                                 .matchedGeometryEffect(id: "blob", in: namespace)
@@ -675,6 +1123,14 @@ struct ModeSelectorView: View {
             if oldValue == true && newValue == false {
                 withAnimation(.spring(response: 0.35, dampingFraction: 0.7)) {
                     selectedMode = .forYou
+                    activeButton = .sanaOzel
+                }
+            }
+        }
+        .onChange(of: showShareSheet) { oldValue, newValue in
+            if oldValue == true && newValue == false {
+                withAnimation(.spring(response: 0.35, dampingFraction: 0.7)) {
+                    activeButton = .sanaOzel
                 }
             }
         }
@@ -731,6 +1187,7 @@ struct TinderStyleCard: View {
     let onSkip: () -> Void
     let onTap: () -> Void
     let onOpenProfile: () -> Void
+    let lockedDirection: SwipeDirection
     
     @State private var isInfoExpanded = false
     
@@ -914,15 +1371,22 @@ struct TinderStyleCard: View {
                     .transition(.move(edge: .bottom).combined(with: .opacity))
                 }
                 
-                // Like/Nope/SuperLike Indicators with enhanced styling
-                if cardOffset.width > 50 {
+                // Like/Nope/SuperLike Indicators with enhanced styling (LOCKED)
+                if lockedDirection == .right {
                     likeIndicator
-                }
-                if cardOffset.width < -50 {
+                } else if lockedDirection == .left {
                     nopeIndicator
-                }
-                if cardOffset.height < -50 {
+                } else if lockedDirection == .up {
                     superLikeIndicator
+                } else {
+                    // Fallback for initial drag before lock or fast swipes
+                    if cardOffset.width > 50 {
+                        likeIndicator
+                    } else if cardOffset.width < -50 {
+                        nopeIndicator
+                    } else if cardOffset.height < -50 {
+                        superLikeIndicator
+                    }
                 }
             }
             .clipShape(RoundedRectangle(cornerRadius: 16))
@@ -935,24 +1399,24 @@ struct TinderStyleCard: View {
         let swipeStrength = max(abs(cardOffset.width), abs(cardOffset.height))
         let opacity = min(swipeStrength / 120, 0.5) // Max 50% opacity - daha hafif
         
-        if cardOffset.width > 20 {
-            // Sağa kaydırma - Yeşil gradient (Like) - İkonun renklerini kullan
+        if lockedDirection == .right || (lockedDirection == .none && cardOffset.width > 20) {
+            // Sağa kaydırma - Mor/Cyan gradient (Friend Request) - Arkadaş Ekleme
             ZStack {
                 LinearGradient(
                     colors: [
-                        Color(red: 0.5, green: 1.0, blue: 0.3).opacity(opacity * 0.6),
-                        Color(red: 0.2, green: 0.9, blue: 0.4).opacity(opacity * 0.4),
-                        Color(red: 0.2, green: 0.9, blue: 0.4).opacity(opacity * 0.2),
+                        Color(red: 0.6, green: 0.3, blue: 1.0).opacity(opacity * 0.6),
+                        Color(red: 0.4, green: 0.6, blue: 1.0).opacity(opacity * 0.4),
+                        Color(red: 0.3, green: 0.7, blue: 0.9).opacity(opacity * 0.2),
                         Color.clear
                     ],
                     startPoint: .topLeading,
                     endPoint: .bottomTrailing
                 )
                 
-                // Ekstra glow effect - daha subtle
+                // Ekstra glow effect - mor/cyan
                 RadialGradient(
                     colors: [
-                        Color(red: 0.3, green: 0.9, blue: 0.3).opacity(opacity * 0.4),
+                        Color(red: 0.5, green: 0.4, blue: 1.0).opacity(opacity * 0.4),
                         Color.clear
                     ],
                     center: .topLeading,
@@ -962,8 +1426,8 @@ struct TinderStyleCard: View {
             }
             .allowsHitTesting(false)
             
-        } else if cardOffset.width < -20 {
-            // Sola kaydırma - Kırmızı/Pembe gradient (Skip) - İkonun renklerini kullan
+        } else if lockedDirection == .left || (lockedDirection == .none && cardOffset.width < -20) {
+            // Sola kaydırma - Kırmızı/Pembe gradient (Skip)
             ZStack {
                 LinearGradient(
                     colors: [
@@ -976,7 +1440,6 @@ struct TinderStyleCard: View {
                     endPoint: .bottomLeading
                 )
                 
-                // Ekstra glow effect - daha subtle
                 RadialGradient(
                     colors: [
                         Color(red: 1.0, green: 0.3, blue: 0.5).opacity(opacity * 0.4),
@@ -989,8 +1452,8 @@ struct TinderStyleCard: View {
             }
             .allowsHitTesting(false)
             
-        } else if cardOffset.height < -20 {
-            // Yukarı kaydırma - Mavi gradient (Super Like) - İkonun renklerini kullan
+        } else if lockedDirection == .up || (lockedDirection == .none && cardOffset.height < -20) {
+            // Yukarı kaydırma - Mavi gradient (Super Like)
             ZStack {
                 LinearGradient(
                     colors: [
@@ -1003,7 +1466,6 @@ struct TinderStyleCard: View {
                     endPoint: .bottom
                 )
                 
-                // Ekstra glow effect - daha subtle
                 RadialGradient(
                     colors: [
                         Color(red: 0.2, green: 0.7, blue: 1.0).opacity(opacity * 0.4),
@@ -1018,6 +1480,7 @@ struct TinderStyleCard: View {
         }
     }
     
+    // MARK: - Friend Request Indicator (Sağa kaydırma)
     private var likeIndicator: some View {
         VStack {
             HStack {
@@ -1025,7 +1488,7 @@ struct TinderStyleCard: View {
                     Circle()
                         .fill(
                             LinearGradient(
-                                colors: [Color(red: 0.5, green: 1.0, blue: 0.3), Color(red: 0.2, green: 0.9, blue: 0.4)],
+                                colors: [Color(red: 0.6, green: 0.3, blue: 1.0), Color(red: 0.4, green: 0.6, blue: 1.0)],
                                 startPoint: .top,
                                 endPoint: .bottom
                             )
@@ -1036,11 +1499,11 @@ struct TinderStyleCard: View {
                         }
                         .frame(width: 70, height: 70)
                     
-                    Image(systemName: "heart.fill")
-                        .font(.system(size: 35, weight: .bold))
+                    Image(systemName: "person.badge.plus")
+                        .font(.system(size: 32, weight: .bold))
                         .foregroundStyle(Color(white: 0.12))
                 }
-                .shadow(color: Color(red: 0.3, green: 0.9, blue: 0.3).opacity(0.5), radius: 12, y: 0)
+                .shadow(color: Color(red: 0.5, green: 0.4, blue: 1.0).opacity(0.5), radius: 12, y: 0)
                 .rotationEffect(.degrees(-15))
                 .padding(.leading, 30)
                 .padding(.top, 60)
@@ -1494,23 +1957,91 @@ struct TinderActionBar: View {
     let onLike: () -> Void
     let onAddFriend: () -> Void
     var cardOffset: CGSize = .zero // Kart kaydırma durumu
+    var lockedDirection: SwipeDirection // Kilitli yön
     
-    // Hangi buton highlight olacak
-    private var highlightSkip: Bool {
-        cardOffset.width < -50
+    // Animasyon Parametreleri
+    private let threshold: CGFloat = 20.0
+    private let limit: CGFloat = 150.0 // Tam aktivasyon mesafesi
+    
+    // Helper to calculate state for each button
+    private func getButtonState(for action: ActionType) -> (scale: CGFloat, opacity: Double, isHighlighted: Bool) {
+        // 1. Kilitli yön varsa direkt ona göre karar ver
+        if lockedDirection != .none {
+            var isLockedActive = false
+            
+            switch lockedDirection {
+            case .right:
+                isLockedActive = (action == .like)
+            case .left:
+                isLockedActive = (action == .skip)
+            case .up:
+                isLockedActive = (action == .superLike)
+            case .none:
+                break
+            }
+            
+            // Eğer aksiyon Rewind ise her zaman pasif
+            if action == .rewind { isLockedActive = false }
+            
+            if isLockedActive {
+                return (1.3, 1.0, true) // Kilitliyken tam aktif
+            } else {
+                return (0.7, 0.3, false) // Kilitliyken diğerleri sönük
+            }
+        }
+        
+        // 2. Kilit yoksa offset'e göre dinamik hesapla (eski mantık)
+        let x = cardOffset.width
+        let y = cardOffset.height
+        
+        // Hiç hareket yoksa veya threshold altındaysa default hal
+        if abs(x) < threshold && abs(y) < threshold {
+            return (1.0, 1.0, false)
+        }
+        
+        var isActive = false
+        var progress: CGFloat = 0
+        
+        // Hangi yöne gidiyoruz?
+        if x > threshold { // SAĞA (Like/Arkadaş Ekle)
+            isActive = (action == .like)
+            progress = min(1.0, (x - threshold) / limit)
+        } else if x < -threshold { // SOLA (Skip)
+            isActive = (action == .skip)
+            progress = min(1.0, (abs(x) - threshold) / limit)
+        } else if y < -threshold { // YUKARI (Super Like)
+            isActive = (action == .superLike)
+            progress = min(1.0, (abs(y) - threshold) / limit)
+        }
+        
+        // Rewind her zaman pasif kalır swipe sırasında
+        if action == .rewind && (abs(x) > threshold || abs(y) > threshold) {
+            isActive = false
+            // Progress en büyük olanı al
+            let maxProgress = max(
+                min(1.0, (abs(x) - threshold) / limit),
+                min(1.0, (abs(y) - threshold) / limit)
+            )
+            progress = maxProgress
+        }
+        
+        if isActive {
+            // Aktif buton büyür ve opak kalır
+            return (1.0 + (progress * 0.3), 1.0, true)
+        } else {
+            // Pasif butonlar küçülür ve silikleşir
+            return (1.0 - (progress * 0.5), 1.0 - progress, false)
+        }
     }
     
-    private var highlightLike: Bool {
-        cardOffset.width > 50
-    }
-    
-    private var highlightSuperLike: Bool {
-        cardOffset.height < -50
+    enum ActionType {
+        case rewind, skip, superLike, like
     }
     
     var body: some View {
         HStack(spacing: 16) {
             // Rewind (Turuncu gradient)
+            let rewindState = getButtonState(for: .rewind)
             GlassActionButton(
                 icon: "arrow.uturn.backward",
                 size: 54,
@@ -1518,48 +2049,51 @@ struct TinderActionBar: View {
                 colors: [Color(red: 1.0, green: 0.8, blue: 0), Color(red: 1.0, green: 0.5, blue: 0)],
                 action: onRewind
             )
+            .scaleEffect(rewindState.scale)
+            .opacity(rewindState.opacity)
             
-            // Skip (X - Pembe gradient) - Sola kaydırınca highlight
+            // Skip (X - Pembe gradient)
+            let skipState = getButtonState(for: .skip)
             GlassActionButton(
                 icon: "xmark",
                 size: 64,
                 iconSize: 32,
                 colors: [Color(red: 1.0, green: 0.3, blue: 0.5), Color(red: 1.0, green: 0.15, blue: 0.4)],
                 action: onSkip,
-                isHighlighted: highlightSkip
+                isHighlighted: skipState.isHighlighted
             )
+            .scaleEffect(skipState.scale)
+            .opacity(skipState.opacity)
             
-            // Super Like (Yıldız) - Yukarı kaydırınca highlight
+            // Super Like (Yıldız)
+            let superLikeState = getButtonState(for: .superLike)
             GlassActionButton(
                 icon: "star.fill",
                 size: 54,
                 iconSize: 26,
                 colors: [Color(red: 0.3, green: 0.85, blue: 1.0), Color(red: 0.1, green: 0.5, blue: 1.0)],
                 action: onSuperLike,
-                isHighlighted: highlightSuperLike
+                isHighlighted: superLikeState.isHighlighted
             )
+            .scaleEffect(superLikeState.scale)
+            .opacity(superLikeState.opacity)
             
-            // Like (Kalp) - Sağa kaydırınca highlight
-            GlassActionButton(
-                icon: "heart.fill",
-                size: 64,
-                iconSize: 32,
-                colors: [Color(red: 0.5, green: 1.0, blue: 0.3), Color(red: 0.2, green: 0.9, blue: 0.4)],
-                action: onLike,
-                isHighlighted: highlightLike
-            )
-            
-            // Arkadaş Ekle (Mor gradient) - Modern SF Symbol
+            // Arkadaş Ekle (Mor gradient) - "Like" action type kullanıldı sağ swipe için
+            let likeState = getButtonState(for: .like)
             GlassActionButton(
                 icon: "person.badge.plus.fill",
-                size: 54,
-                iconSize: 24,
+                size: 54, // Diğerlerinden biraz daha büyük
+                iconSize: 28,
                 colors: [Color(red: 0.6, green: 0.3, blue: 1.0), Color(red: 0.4, green: 0.2, blue: 0.8)],
-                action: onAddFriend
+                action: onAddFriend,
+                isHighlighted: likeState.isHighlighted
             )
+            .scaleEffect(likeState.scale)
+            .opacity(likeState.opacity)
         }
         .padding(.horizontal, 20)
         .padding(.vertical, 16)
+        .animation(.interactiveSpring(response: 0.4, dampingFraction: 0.7), value: cardOffset)
     }
 }
 
@@ -1632,97 +2166,146 @@ struct FilterSheet: View {
     // Country Toggle Binding
     @Binding var isGlobalMode: Bool
     
+    // Current user's age for age pool boundaries
+    let currentUserAge: Int
+    
     // Filter States
-    @State private var minAge: Double = 18
+    @State private var minAge: Double = 15
     @State private var maxAge: Double = 35
-    @State private var maxDistance: Double = 50
     @State private var showVerifiedOnly: Bool = false
     @State private var showWithPhotoOnly: Bool = true
-    
-    // İlgi Alanları
-    @State private var selectedInterests: Set<String> = []
-    let allInterests = ["Müzik", "Spor", "Seyahat", "Yemek", "Film", "Kitap", "Oyun", "Sanat", "Dans", "Yoga", "Fotoğraf", "Doğa"]
     
     // İlişki Amacı
     @State private var selectedRelationshipGoal: String = "Hepsi"
     let relationshipGoals = ["Hepsi", "Ciddi İlişki", "Arkadaşlık", "Belirsiz", "Evlilik"]
     
-    // Burç
-    @State private var selectedZodiac: String = "Hepsi"
-    let zodiacSigns = ["Hepsi", "Koç", "Boğa", "İkizler", "Yengeç", "Aslan", "Başak", "Terazi", "Akrep", "Yay", "Oğlak", "Kova", "Balık"]
+    // Age Pool Boundaries based on current user's age
+    private var isMinor: Bool {
+        currentUserAge < 18
+    }
+    
+    private var minAgeLimit: Double {
+        isMinor ? 15 : 18
+    }
+    
+    private var maxAgeLimit: Double {
+        isMinor ? 17 : 99
+    }
     
     var body: some View {
         NavigationStack {
             ScrollView {
                 VStack(spacing: 20) {
                     
-                    // MARK: - Keşif Modu (Kendi Ülkem / Global Toggle) (REAL GLASS STYLE)
+                    // MARK: - Keşif Modu (Premium Glass Design)
                     Button {
-                        withAnimation(.spring(response: 0.4, dampingFraction: 0.6)) {
+                        let impact = UIImpactFeedbackGenerator(style: .medium)
+                        impact.impactOccurred()
+                        withAnimation(.spring(response: 0.4, dampingFraction: 0.7)) {
                             isGlobalMode.toggle()
                         }
                     } label: {
-                        HStack {
+                        HStack(spacing: 16) {
+                            // Icon Container with Glow
                             ZStack {
+                                // Glow Effect
+                                Circle()
+                                    .fill(
+                                        RadialGradient(
+                                            colors: isGlobalMode ? [.cyan.opacity(0.4), .clear] : [.red.opacity(0.4), .clear],
+                                            center: .center,
+                                            startRadius: 10,
+                                            endRadius: 40
+                                        )
+                                    )
+                                    .frame(width: 70, height: 70)
+                                    .blur(radius: 10)
+                                
                                 Circle()
                                     .fill(
                                         LinearGradient(
-                                            colors: isGlobalMode ? [.cyan, .blue] : [.red, .orange], // Red Gradient for TR
+                                            colors: isGlobalMode ? [.cyan, .blue] : [.red, .orange],
                                             startPoint: .topLeading,
                                             endPoint: .bottomTrailing
                                         )
                                     )
-                                    .frame(width: 48, height: 48) // Slightly larger icon container matches FilterSectionCard logic usually
-                                    .shadow(color: (isGlobalMode ? Color.blue : Color.red).opacity(0.3), radius: 5, x: 0, y: 3)
+                                    .frame(width: 56, height: 56)
+                                    .shadow(color: (isGlobalMode ? Color.cyan : Color.red).opacity(0.5), radius: 12, x: 0, y: 6)
+                                    .overlay {
+                                        Circle()
+                                            .stroke(Color.white.opacity(0.3), lineWidth: 1)
+                                    }
                                 
                                 if isGlobalMode {
                                     Image(systemName: "globe.americas.fill")
-                                        .font(.system(size: 20, weight: .semibold))
+                                        .font(.system(size: 26, weight: .bold))
                                         .foregroundStyle(.white)
+                                        .transition(.scale.combined(with: .opacity))
                                 } else {
                                     Text("🇹🇷")
-                                        .font(.system(size: 24))
+                                        .font(.system(size: 30))
+                                        .transition(.scale.combined(with: .opacity))
                                 }
                             }
                             
                             VStack(alignment: .leading, spacing: 4) {
                                 Text("Keşif Modu")
-                                    .font(.system(size: 18, weight: .bold)) // Match FilterSectionCard Title
+                                    .font(.system(size: 18, weight: .bold))
                                     .foregroundStyle(colorScheme == .dark ? .white : .black)
                                 
-                                Text(isGlobalMode ? "Global" : "Türkiye")
-                                    .font(.system(size: 14, weight: .medium))
-                                    .foregroundStyle(isGlobalMode ? .cyan : .red.opacity(0.8))
+                                Text(isGlobalMode ? "🌍 Global (Dünya Geneli)" : "🇹🇷 Türkiye (Yerel)")
+                                    .font(.system(size: 14, weight: .semibold))
+                                    .foregroundStyle(isGlobalMode ? .cyan : .red)
                             }
-                            .padding(.leading, 6)
                             
                             Spacer()
                             
-                            // Status Indicator (Simplified)
-                            Capsule()
-                                .fill(isGlobalMode ? Color.cyan.opacity(0.1) : Color.red.opacity(0.1))
-                                .frame(width: 70, height: 28)
-                                .overlay(
-                                    Text(isGlobalMode ? "🌍" : "🇹🇷")
-                                        .font(.system(size: 16))
-                                )
+                            // Premium Toggle Switch
+                            ZStack {
+                                Capsule()
+                                    .fill(
+                                        isGlobalMode ?
+                                        LinearGradient(colors: [.cyan.opacity(0.3), .blue.opacity(0.3)], startPoint: .leading, endPoint: .trailing) :
+                                        LinearGradient(colors: [.red.opacity(0.3), .orange.opacity(0.3)], startPoint: .leading, endPoint: .trailing)
+                                    )
+                                    .frame(width: 56, height: 32)
+                                    .overlay {
+                                        Capsule()
+                                            .stroke(
+                                                isGlobalMode ? Color.cyan.opacity(0.5) : Color.red.opacity(0.5),
+                                                lineWidth: 1.5
+                                            )
+                                    }
+                                
+                                Circle()
+                                    .fill(.white)
+                                    .frame(width: 26, height: 26)
+                                    .shadow(color: .black.opacity(0.25), radius: 4, y: 2)
+                                    .overlay {
+                                        Image(systemName: isGlobalMode ? "globe" : "flag.fill")
+                                            .font(.system(size: 12, weight: .bold))
+                                            .foregroundStyle(isGlobalMode ? .cyan : .red)
+                                    }
+                                    .offset(x: isGlobalMode ? 12 : -12)
+                            } // ZStack (toggle)
+                        } // HStack
+                        .padding(20)
+                        .background {
+                            RoundedRectangle(cornerRadius: 24)
+                                .fill(colorScheme == .dark ? Color.white.opacity(0.05) : Color.black.opacity(0.05))
+                                .overlay {
+                                    RoundedRectangle(cornerRadius: 24)
+                                        .stroke(
+                                            colorScheme == .dark ?
+                                                Color.white.opacity(0.1) :
+                                                Color.black.opacity(0.05),
+                                            lineWidth: 1
+                                        )
+                                }
                         }
-                        .padding(16) // Match FilterSectionCard padding
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .background(
-                            RoundedRectangle(cornerRadius: 20)
-                                .fill(colorScheme == .dark ? Color.white.opacity(0.05) : Color.black.opacity(0.05)) // Match FilterSectionCard Background
-                        )
                     }
-                    .buttonStyle(ScaleButtonStyle())
-                    // Remove external padding if FilterSectionCard doesn't rely on it, but FilterSectionCard usage usually needs horizontal padding if parent doesn't have it.
-                    // Given the previous code had external padding, I will keep it consistent with the layout flow but ensure the BOX matches.
-                    // If the box below is full width, this should be too. If the box below has offset, this should too.
-                    // I will remove the extra .padding(.horizontal, 16) applied to the button itself in the previous version IF FilterSectionCard doesn't have it.
-                    // BUT, based on the previous file view, FilterSectionCard is used directly in VStack. 
-                    // If VStack(spacing: 20) is directly in ScrollView, items stretch.
-                    // Let's assume we need to apply horizontal padding to key align with app margins.
-                    .padding(.vertical, 8)
+                    .buttonStyle(.plain)
+                    .padding(.vertical, 4)
                     // MARK: - Yaş Aralığı
                     FilterSectionCard(title: "Yaş Aralığı", icon: "calendar") {
                         VStack(spacing: 16) {
@@ -1747,6 +2330,7 @@ struct FilterSheet: View {
                             
                             // Custom Range Slider
                             GeometryReader { geo in
+                                let ageRange = maxAgeLimit - minAgeLimit
                                 ZStack(alignment: .leading) {
                                     // Track
                                     Capsule()
@@ -1756,20 +2340,20 @@ struct FilterSheet: View {
                                     // Active Track
                                     Capsule()
                                         .fill(LinearGradient(colors: [.purple, .pink], startPoint: .leading, endPoint: .trailing))
-                                        .frame(width: CGFloat((maxAge - minAge) / 82) * geo.size.width, height: 6)
-                                        .offset(x: CGFloat((minAge - 18) / 82) * geo.size.width)
+                                        .frame(width: CGFloat((maxAge - minAge) / ageRange) * geo.size.width, height: 6)
+                                        .offset(x: CGFloat((minAge - minAgeLimit) / ageRange) * geo.size.width)
                                     
                                     // Min Thumb
                                     Circle()
                                         .fill(.white)
                                         .frame(width: 28, height: 28)
                                         .shadow(color: .black.opacity(0.2), radius: 4, y: 2)
-                                        .offset(x: CGFloat((minAge - 18) / 82) * geo.size.width - 14)
+                                        .offset(x: CGFloat((minAge - minAgeLimit) / ageRange) * geo.size.width - 14)
                                         .gesture(
                                             DragGesture()
                                                 .onChanged { value in
-                                                    let newValue = 18 + (value.location.x / geo.size.width) * 82
-                                                    minAge = min(max(18, newValue), maxAge - 1)
+                                                    let newValue = minAgeLimit + (value.location.x / geo.size.width) * ageRange
+                                                    minAge = min(max(minAgeLimit, newValue), maxAge - 1)
                                                 }
                                         )
                                     
@@ -1778,12 +2362,12 @@ struct FilterSheet: View {
                                         .fill(.white)
                                         .frame(width: 28, height: 28)
                                         .shadow(color: .black.opacity(0.2), radius: 4, y: 2)
-                                        .offset(x: CGFloat((maxAge - 18) / 82) * geo.size.width - 14)
+                                        .offset(x: CGFloat((maxAge - minAgeLimit) / ageRange) * geo.size.width - 14)
                                         .gesture(
                                             DragGesture()
                                                 .onChanged { value in
-                                                    let newValue = 18 + (value.location.x / geo.size.width) * 82
-                                                    maxAge = max(min(100, newValue), minAge + 1)
+                                                    let newValue = minAgeLimit + (value.location.x / geo.size.width) * ageRange
+                                                    maxAge = max(min(maxAgeLimit, newValue), minAge + 1)
                                                 }
                                         )
                                 }
@@ -1793,81 +2377,13 @@ struct FilterSheet: View {
                         }
                     }
                     
-
-
-// MARK: - Mesafe (Konum Bazlı)
-FilterSectionCard(title: "Maksimum Mesafe", icon: "location.fill") {
-    VStack(spacing: 12) {
-        HStack {
-            Text("\(Int(maxDistance)) km")
-                .font(.system(size: 24, weight: .bold))
-                .foregroundStyle(colorScheme == .dark ? .white : .black)
-            
-            Spacer()
-            
-            if maxDistance >= 100 {
-                Text("Sınırsız")
-                    .font(.system(size: 14, weight: .medium))
-                    .foregroundStyle(.purple)
-            }
-        }
-        
-        // Konum durumu göstergesi
-        HStack(spacing: 6) {
-            Image(systemName: LocationManager.shared.isLocationEnabled ? "location.fill" : "location.slash.fill")
-                .font(.system(size: 12))
-                .foregroundStyle(LocationManager.shared.isLocationEnabled ? .green : .orange)
-            
-            Text(LocationManager.shared.isLocationEnabled ? "Konum aktif" : "Konum izni gerekli")
-                .font(.system(size: 12, weight: .medium))
-                .foregroundStyle(colorScheme == .dark ? .white.opacity(0.6) : .black.opacity(0.6))
-            
-            if !LocationManager.shared.isLocationEnabled {
-                Button {
-                    LocationManager.shared.requestLocationPermission()
-                } label: {
-                    Text("Aç")
-                        .font(.system(size: 11, weight: .bold))
-                        .foregroundStyle(.white)
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 4)
-                        .background(Capsule().fill(.orange))
-                }
-            }
-        }
-        .padding(.vertical, 4)
-        
-        Slider(value: $maxDistance, in: 1...100, step: 1)
-            .tint(.purple)
-            .disabled(!LocationManager.shared.isLocationEnabled && maxDistance < 100)
-    }
-}
-
-// MARK: - Hızlı Filtreler
-FilterSectionCard(title: "Hızlı Filtreler", icon: "bolt.fill") {
-    VStack(spacing: 12) {
-        FilterToggleRow(title: "Sadece Doğrulanmış", icon: "checkmark.seal.fill", iconColor: .blue, isOn: $showVerifiedOnly)
-        FilterToggleRow(title: "Fotoğraflı Profiller", icon: "photo.fill", iconColor: .purple, isOn: $showWithPhotoOnly)
-    }
-}
-
-// MARK: - İlgi Alanları
-FilterSectionCard(title: "İlgi Alanları", icon: "heart.fill") {
-    FlowLayout(spacing: 10) {
-        ForEach(allInterests, id: \.self) { interest in
-            InterestChip(
-                title: interest,
-                isSelected: selectedInterests.contains(interest)
-            ) {
-                if selectedInterests.contains(interest) {
-                    selectedInterests.remove(interest)
-                } else {
-                    selectedInterests.insert(interest)
-                }
-            }
-        }
-    }
-}
+                    // MARK: - Hızlı Filtreler
+                    FilterSectionCard(title: "Hızlı Filtreler", icon: "bolt.fill") {
+                        VStack(spacing: 12) {
+                            FilterToggleRow(title: "Sadece Doğrulanmış", icon: "checkmark.seal.fill", iconColor: .blue, isOn: $showVerifiedOnly)
+                            FilterToggleRow(title: "Fotoğraflı Profiller", icon: "photo.fill", iconColor: .purple, isOn: $showWithPhotoOnly)
+                        }
+                    }
 
                     // MARK: - İlişki Amacı
                     FilterSectionCard(title: "İlişki Amacı", icon: "heart.circle.fill") {
@@ -1885,19 +2401,7 @@ FilterSectionCard(title: "İlgi Alanları", icon: "heart.fill") {
                         }
                     }
                     
-                    // MARK: - Burç
-                    FilterSectionCard(title: "Burç", icon: "sparkles") {
-                        LazyVGrid(columns: [GridItem(.adaptive(minimum: 80))], spacing: 10) {
-                            ForEach(zodiacSigns, id: \.self) { sign in
-                                FilterOptionChip(
-                                    title: sign,
-                                    isSelected: selectedZodiac == sign
-                                ) {
-                                    selectedZodiac = sign
-                                }
-                            }
-                        }
-                    }
+
                     
                     // MARK: - Filtreleri Sıfırla
                     Button {
@@ -1951,37 +2455,53 @@ FilterSectionCard(title: "İlgi Alanları", icon: "heart.fill") {
     }
     
     private func loadFilters() {
-        minAge = UserDefaults.standard.double(forKey: "filter_minAge")
-        if minAge < 18 { minAge = 18 }
-        maxAge = UserDefaults.standard.double(forKey: "filter_maxAge")
-        if maxAge < 18 { maxAge = 35 }
-        maxDistance = UserDefaults.standard.double(forKey: "filter_maxDistance")
-        if maxDistance < 1 { maxDistance = 50 }
+        let savedMinAge = UserDefaults.standard.double(forKey: "filter_minAge")
+        let savedMaxAge = UserDefaults.standard.double(forKey: "filter_maxAge")
+        
+        // Enforce age pool boundaries
+        if savedMinAge <= 0 {
+            minAge = minAgeLimit
+        } else {
+            minAge = max(savedMinAge, minAgeLimit)
+        }
+        
+        if savedMaxAge <= 0 {
+            maxAge = maxAgeLimit
+        } else {
+            maxAge = min(savedMaxAge, maxAgeLimit)
+        }
+        
+        // Ensure min <= max
+        if minAge > maxAge {
+            minAge = minAgeLimit
+            maxAge = maxAgeLimit
+        }
+        
         showVerifiedOnly = UserDefaults.standard.bool(forKey: "filter_verifiedOnly")
         showWithPhotoOnly = UserDefaults.standard.bool(forKey: "filter_withPhoto")
     }
     
     private func applyFilters() {
-        UserDefaults.standard.set(minAge, forKey: "filter_minAge")
-        UserDefaults.standard.set(maxAge, forKey: "filter_maxAge")
-        UserDefaults.standard.set(maxDistance, forKey: "filter_maxDistance")
+        // Clamp values to age pool boundaries before saving
+        let clampedMinAge = max(minAge, minAgeLimit)
+        let clampedMaxAge = min(maxAge, maxAgeLimit)
+        
+        UserDefaults.standard.set(clampedMinAge, forKey: "filter_minAge")
+        UserDefaults.standard.set(clampedMaxAge, forKey: "filter_maxAge")
         UserDefaults.standard.set(showVerifiedOnly, forKey: "filter_verifiedOnly")
         UserDefaults.standard.set(showWithPhotoOnly, forKey: "filter_withPhoto")
         UserDefaults.standard.synchronize()
     }
     
     private func resetFilters() {
-        minAge = 18
-        maxAge = 35
-        maxDistance = 50
+        minAge = minAgeLimit
+        maxAge = maxAgeLimit
         showVerifiedOnly = false
         showWithPhotoOnly = true
-        selectedInterests = []
         
         // Clear UserDefaults
         UserDefaults.standard.removeObject(forKey: "filter_minAge")
         UserDefaults.standard.removeObject(forKey: "filter_maxAge")
-        UserDefaults.standard.removeObject(forKey: "filter_maxDistance")
         UserDefaults.standard.removeObject(forKey: "filter_verifiedOnly")
         UserDefaults.standard.removeObject(forKey: "filter_withPhoto")
         UserDefaults.standard.synchronize()
@@ -8827,10 +9347,130 @@ struct CardLockedSocialIcon: View {
 
 
 // MARK: - Country Helpers
-func countryFlag(for countryCode: String) -> String {
+func countryFlag(for countryInput: String) -> String {
+    // Map full country names to ISO codes
+    let countryToCode: [String: String] = [
+        // Turkish
+        "türkiye": "TR",
+        "turkey": "TR",
+        "turkiye": "TR",
+        // USA - ALL VARIATIONS
+        "abd": "US",
+        "amerika": "US",
+        "united states": "US",
+        "usa": "US",
+        "united states of america": "US",
+        // UAE - ALL VARIATIONS
+        "bae": "AE",
+        "birleşik arap emirlikleri": "AE",
+        "united arab emirates": "AE",
+        "uae": "AE",
+        "dubai": "AE",
+        // UK - ALL VARIATIONS
+        "ingiltere": "GB",
+        "İngiltere": "GB",
+        "united kingdom": "GB",
+        "england": "GB",
+        "uk": "GB",
+        "great britain": "GB",
+        "britain": "GB",
+        // Germany
+        "almanya": "DE",
+        "germany": "DE",
+        // France
+        "fransa": "FR",
+        "france": "FR",
+        // Italy
+        "italya": "IT",
+        "italy": "IT",
+        // Spain
+        "ispanya": "ES",
+        "spain": "ES",
+        // Netherlands
+        "hollanda": "NL",
+        "netherlands": "NL",
+        // Belgium
+        "belçika": "BE",
+        "belgium": "BE",
+        // Sweden
+        "isveç": "SE",
+        "sweden": "SE",
+        // Norway
+        "norveç": "NO",
+        "norway": "NO",
+        // Denmark
+        "danimarka": "DK",
+        "denmark": "DK",
+        // Finland
+        "finlandiya": "FI",
+        "finland": "FI",
+        // Poland
+        "polonya": "PL",
+        "poland": "PL",
+        // Austria
+        "avusturya": "AT",
+        "austria": "AT",
+        // Switzerland
+        "isviçre": "CH",
+        "İsviçre": "CH",
+        "switzerland": "CH",
+        // Canada
+        "kanada": "CA",
+        "canada": "CA",
+        // Australia
+        "avustralya": "AU",
+        "australia": "AU",
+        // Brazil
+        "brezilya": "BR",
+        "brazil": "BR",
+        // Russia
+        "rusya": "RU",
+        "russia": "RU",
+        // Japan
+        "japonya": "JP",
+        "japan": "JP",
+        // China
+        "çin": "CN",
+        "china": "CN",
+        // South Korea
+        "güney kore": "KR",
+        "south korea": "KR",
+        // India
+        "hindistan": "IN",
+        "india": "IN",
+        // Mexico
+        "meksika": "MX",
+        "mexico": "MX",
+        // Portugal
+        "portekiz": "PT",
+        "portugal": "PT",
+        // Greece
+        "yunanistan": "GR",
+        "greece": "GR",
+        // Ireland
+        "irlanda": "IE",
+        "ireland": "IE",
+        // Scotland (UK)
+        "iskoçya": "GB",
+        "scotland": "GB",
+    ]
+    
+    // Check if input is already a 2-letter ISO code
+    let input = countryInput.trimmingCharacters(in: .whitespaces)
+    let countryCode: String
+    
+    if input.count == 2 && input.uppercased() == input.uppercased().filter({ $0.isLetter }) {
+        countryCode = input.uppercased()
+    } else {
+        // Look up the country name - use Turkish locale for proper İ→i conversion
+        let normalizedInput = input.lowercased(with: Locale(identifier: "tr_TR"))
+        countryCode = countryToCode[normalizedInput] ?? countryToCode[input.lowercased()] ?? "TR"
+    }
+    
+    // Generate flag emoji from ISO code
     let base: UInt32 = 127397
     var flag = ""
-    for scalar in countryCode.uppercased().unicodeScalars {
+    for scalar in countryCode.unicodeScalars {
         if let scalarValue = UnicodeScalar(base + scalar.value) {
             flag.append(String(scalarValue))
         }
@@ -8838,7 +9478,35 @@ func countryFlag(for countryCode: String) -> String {
     return flag
 }
 
-func countryName(for countryCode: String) -> String {
-    let locale = Locale(identifier: "tr_TR")
-    return locale.localizedString(forRegionCode: countryCode) ?? countryCode
+func countryName(for countryInput: String) -> String {
+    // If input is already a full name, return it formatted
+    let input = countryInput.trimmingCharacters(in: .whitespaces)
+    
+    // If 2-letter code, convert to localized name
+    if input.count == 2 {
+        let locale = Locale(identifier: "tr_TR")
+        return locale.localizedString(forRegionCode: input.uppercased()) ?? input
+    }
+    
+    // Return the input with proper capitalization
+    return input.capitalized
+}
+
+// MARK: - Local Helpers
+private extension View {
+    func localGlassEffect(isDark: Bool = true) -> some View {
+        self
+            .background(
+                RoundedRectangle(cornerRadius: 16)
+                    .fill(isDark ? Color.white.opacity(0.05) : Color.black.opacity(0.05))
+                    .background(
+                        RoundedRectangle(cornerRadius: 16)
+                            .fill(.ultraThinMaterial)
+                    )
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 16)
+                    .stroke(isDark ? Color.white.opacity(0.1) : Color.black.opacity(0.1), lineWidth: 1)
+            )
+    }
 }

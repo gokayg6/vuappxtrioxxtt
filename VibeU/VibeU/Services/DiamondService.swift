@@ -8,6 +8,8 @@ enum DiamondTransactionType: String, Codable {
     case matchRequest = "match_request"
     case purchase = "purchase"
     case admin = "admin"
+    case adReward = "ad_reward"
+    case firstLaunchReward = "first_launch_reward"
 }
 
 // MARK: - Diamond Errors
@@ -46,12 +48,30 @@ actor DiamondService {
     
     private init() {}
     
+    // MARK: - Helper to safely extract diamond balance (handles Int/Int64/Double)
+    private func extractDiamondBalance(from data: [String: Any]?, defaultValue: Int = 100) -> Int {
+        guard let data = data else { return defaultValue }
+        
+        if let balance = data["diamond_balance"] as? Int {
+            return balance
+        } else if let balance64 = data["diamond_balance"] as? Int64 {
+            return Int(balance64)
+        } else if let balanceDouble = data["diamond_balance"] as? Double {
+            return Int(balanceDouble)
+        } else if let balanceNSNumber = data["diamond_balance"] as? NSNumber {
+            return balanceNSNumber.intValue
+        }
+        
+        print("⚠️ [DiamondService] diamond_balance field missing or invalid type, using default: \(defaultValue)")
+        return defaultValue
+    }
+    
     // MARK: - Get Balance
     func getBalance() async throws -> Int {
         guard let uid = Auth.auth().currentUser?.uid else { return 0 }
         
         let doc = try await usersRef.document(uid).getDocument()
-        return doc.data()?["diamond_balance"] as? Int ?? 100 // Default 100 elmas
+        return extractDiamondBalance(from: doc.data())
     }
     
     // MARK: - Can Claim Daily Reward
@@ -99,7 +119,17 @@ actor DiamondService {
                 return nil
             }
             
-            let currentBalance = snapshot.data()?["diamond_balance"] as? Int ?? 100
+            // Use safe extraction for balance
+            let currentBalance: Int
+            if let balance = snapshot.data()?["diamond_balance"] as? Int {
+                currentBalance = balance
+            } else if let balance64 = snapshot.data()?["diamond_balance"] as? Int64 {
+                currentBalance = Int(balance64)
+            } else if let balanceNSNumber = snapshot.data()?["diamond_balance"] as? NSNumber {
+                currentBalance = balanceNSNumber.intValue
+            } else {
+                currentBalance = 100 // Default
+            }
             let newBalance = currentBalance + 100
             
             transaction.updateData([
@@ -138,7 +168,21 @@ actor DiamondService {
                 return nil
             }
             
-            let currentBalance = snapshot.data()?["diamond_balance"] as? Int ?? 0
+            // Use safe extraction for balance - CRITICAL: Don't default to 0, check actual value
+            let currentBalance: Int
+            if let balance = snapshot.data()?["diamond_balance"] as? Int {
+                currentBalance = balance
+            } else if let balance64 = snapshot.data()?["diamond_balance"] as? Int64 {
+                currentBalance = Int(balance64)
+            } else if let balanceNSNumber = snapshot.data()?["diamond_balance"] as? NSNumber {
+                currentBalance = balanceNSNumber.intValue
+            } else {
+                // Field doesn't exist - give default starting balance
+                currentBalance = 100
+                print("⚠️ [DiamondService] No diamond_balance field found, using default 100")
+            }
+            
+            print("🔍 [DiamondService] Current balance: \(currentBalance), attempting to spend: \(amount)")
             
             // Check sufficient balance
             guard currentBalance >= amount else {

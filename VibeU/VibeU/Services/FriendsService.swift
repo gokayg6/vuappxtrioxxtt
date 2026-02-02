@@ -148,7 +148,17 @@ actor FriendsService {
                     return nil
                 }
                 
-                let currentBalance = snapshot.data()?["diamond_balance"] as? Int ?? 0
+                // FIX: Safe extraction for Int/Int64/NSNumber
+                let currentBalance: Int
+                if let balance = snapshot.data()?["diamond_balance"] as? Int {
+                    currentBalance = balance
+                } else if let balance64 = snapshot.data()?["diamond_balance"] as? Int64 {
+                    currentBalance = Int(balance64)
+                } else if let balanceNSNumber = snapshot.data()?["diamond_balance"] as? NSNumber {
+                    currentBalance = balanceNSNumber.intValue
+                } else {
+                    currentBalance = 100 // Default balance
+                }
                 
                 // Check sufficient balance
                 guard currentBalance >= 10 else {
@@ -194,6 +204,40 @@ actor FriendsService {
         
         let docRef = try await requestsRef.addDocument(data: data)
         print("✅ [FriendsService] Firestore Request Sent! DocID: \(docRef.documentID)")
+    }
+    
+    /// Send friend request WITHOUT charging diamonds (used by Super Like which already charged)
+    func sendFriendRequestWithoutCharge(userId: String) async throws {
+        guard let currentUid = Auth.auth().currentUser?.uid else {
+            print("❌ [FriendsService] No current user for sending request!")
+            throw FriendRequestError.userNotFound
+        }
+        
+        print("📤 [FriendsService] Sending FREE request from \(currentUid) to \(userId) (Super Like)")
+        
+        // 1. Check if request already exists
+        let query = requestsRef
+            .whereField("fromId", isEqualTo: currentUid)
+            .whereField("toId", isEqualTo: userId)
+            .whereField("status", isEqualTo: "pending")
+        
+        let existing = try await query.getDocuments()
+        if !existing.isEmpty {
+            print("⚠️ [FriendsService] Request already pending")
+            return
+        }
+        
+        // 2. Create Request (NO diamond charge - Super Like already paid)
+        let data: [String: Any] = [
+            "fromId": currentUid,
+            "toId": userId,
+            "status": "pending",
+            "createdAt": FieldValue.serverTimestamp(),
+            "superLike": true // Mark as super like origin
+        ]
+        
+        let docRef = try await requestsRef.addDocument(data: data)
+        print("✅ [FriendsService] Super Like Request Sent! DocID: \(docRef.documentID)")
     }
     
     // Fetch pending requests received by current user
