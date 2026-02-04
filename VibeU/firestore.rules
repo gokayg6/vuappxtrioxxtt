@@ -2,10 +2,7 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     
-    // ============================================
-    // HELPER FUNCTIONS
-    // ============================================
-    
+    // Temel Yetkilendirme Fonksiyonları
     function isAuthenticated() {
       return request.auth != null;
     }
@@ -14,150 +11,114 @@ service cloud.firestore {
       return isAuthenticated() && request.auth.uid == userId;
     }
     
-    // ============================================
-    // USERS COLLECTION - RELAXED FOR MOCK DATA
-    // ============================================
-    
+    // ----------------------------
+    // USERS & PROFILES
+    // ----------------------------
     match /users/{userId} {
-      // Herkes okuyabilir
       allow read: if isAuthenticated();
-      
-      // Herkes oluşturabilir (mock data için)
       allow create: if isAuthenticated();
-      
-      // Sadece kendi profilini güncelleyebilir
-      allow update: if isOwner(userId);
-      
-      // Sadece kendi hesabını silebilir
+      allow update: if isOwner(userId); // Sadece sahibi profilini güncelleyebilir
       allow delete: if isOwner(userId);
       
-      // Subcollections
+      // Kullanıcı alt koleksiyonları (streak, photos, vb.)
       match /{subcollection}/{document=**} {
-        allow read: if isAuthenticated();
-        allow write: if isAuthenticated();
+        allow read, write: if isAuthenticated();
       }
     }
     
-    // ============================================
-    // FRIEND REQUESTS - RELAXED
-    // ============================================
-    
-    match /friend_requests/{requestId} {
-      allow read: if isAuthenticated();
-      allow create: if isAuthenticated();
-      allow update: if isAuthenticated();
-      allow delete: if isAuthenticated();
+    // ----------------------------
+    // MATCHING SYSTEM (Speed Date & Voice) - KRİTİK EKLENTİ
+    // ----------------------------
+    match /match_queue/{userId} {
+      // Kuyruğa girmek ve eşleşme aramak için okuma/yazma izni gerekli
+      // Başkasının dokümanını yazmak (Eşleşme onayı için) gerekli olduğu için
+      // authenticated kullanıcılara izin veriyoruz.
+      allow read, write: if isAuthenticated();
     }
-    
-    // ============================================
-    // DIAMOND TRANSACTIONS
-    // ============================================
-    
-    match /diamond_transactions/{transactionId} {
-      allow read: if isAuthenticated();
-      allow create: if isAuthenticated();
-      allow update, delete: if false;
-    }
-    
-    // ============================================
-    // MESSAGES
-    // ============================================
-    
-    match /messages/{messageId} {
-      allow read: if isAuthenticated();
-      allow create: if isAuthenticated();
-      allow update: if false;
-      allow delete: if isAuthenticated();
-    }
-    
-    // ============================================
-    // MATCHES
-    // ============================================
     
     match /matches/{matchId} {
-      allow read: if isAuthenticated();
-      allow create: if isAuthenticated();
-      allow delete: if isAuthenticated();
+      allow read, create, delete: if isAuthenticated();
+      allow update: if false; // Eşleşmeler değiştirilemez, silinip yenisi oluşturulur
+    }
+
+    // ----------------------------
+    // LIKES & INTERACTIONS - KRİTİK EKLENTİ
+    // ----------------------------
+    match /likes/{likeId} {
+      allow read, write: if isAuthenticated();
+    }
+    
+    match /friend_requests/{requestId} {
+      allow read, write: if isAuthenticated();
+    }
+    
+    // ----------------------------
+    // COMMUNICATION
+    // ----------------------------
+    match /messages/{messageId} {
+      allow read, create, delete: if isAuthenticated();
+      // Mesajlar değiştirilemez (Update kapalı)
       allow update: if false;
     }
     
-    // ============================================
-    // DOUBLE DATE
-    // ============================================
-    
+    match /notifications/{notificationId} {
+      allow read, write: if isAuthenticated();
+    }
+
+    // ----------------------------
+    // DOUBLE DATES
+    // ----------------------------
     match /double_date_teams/{teamId} {
-      allow read: if isAuthenticated();
-      allow create: if isAuthenticated();
-      allow update: if isAuthenticated();
-      allow delete: if isAuthenticated();
+      allow read, write: if isAuthenticated();
     }
     
     match /double_date_invites/{inviteId} {
-      allow read: if isAuthenticated();
-      allow create: if isAuthenticated();
-      allow update: if isAuthenticated();
-      allow delete: if isAuthenticated();
+      allow read, write: if isAuthenticated();
     }
     
     match /double_date_matches/{matchId} {
-      allow read: if isAuthenticated();
-      allow create: if isAuthenticated();
-      allow delete: if isAuthenticated();
+      allow read, create, delete: if isAuthenticated();
       allow update: if false;
     }
     
-    // ============================================
-    // REPORTS & BLOCKS
-    // ============================================
+    // ----------------------------
+    // EXPLORE & EVENTS
+    // ----------------------------
+    match /live_events/{eventId} {
+      allow read: if isAuthenticated();
+      // Etkinlik oluşturma admin panelinden yapılmalı, ancak kullanıcılar katılım için yazabilir mi?
+      // Geçici olarak write açık, production'da kapatılmalı
+      allow write: if isAuthenticated();
+    }
+    
+    // Yeni Keşfet Özellikleri (Restoranlar, Kitaplar vb.)
+    match /restaurants/{docId} { allow read: if isAuthenticated(); }
+    match /books/{docId} { allow read: if isAuthenticated(); }
+    match /games/{docId} { allow read: if isAuthenticated(); }
+    match /music/{docId} { allow read: if isAuthenticated(); }
+    
+    // ----------------------------
+    // SYSTEM & SECURITY
+    // ----------------------------
+    match /diamond_transactions/{transactionId} {
+      allow read, create: if isAuthenticated();
+      allow update, delete: if false;
+    }
     
     match /reports/{reportId} {
-      allow read: if isAuthenticated();
-      allow create: if isAuthenticated();
+      allow read, create: if isAuthenticated();
       allow update, delete: if false;
     }
     
     match /blocks/{blockId} {
-      allow read: if isAuthenticated();
-      allow create: if isAuthenticated();
-      allow delete: if isAuthenticated();
+      allow read, create, delete: if isAuthenticated();
       allow update: if false;
     }
     
-    // ============================================
-    // NOTIFICATIONS
-    // ============================================
-    
-    match /notifications/{notificationId} {
-      allow read: if isAuthenticated();
-      allow create: if isAuthenticated();
-      allow update: if isAuthenticated();
-      allow delete: if isAuthenticated();
-    }
-    
-    // ============================================
-    // LIVE EVENTS
-    // ============================================
-    
-    match /live_events/{eventId} {
-      allow read: if isAuthenticated();
-      allow create: if isAuthenticated();
-      allow update: if isAuthenticated();
-      allow delete: if isAuthenticated();
-    }
-    
-    // ============================================
-    // LOGS
-    // ============================================
-    
     match /logs/{logId} {
-      allow read: if isAuthenticated();
-      allow create: if isAuthenticated();
+      allow read, create: if isAuthenticated();
       allow update, delete: if false;
     }
-    
-    // ============================================
-    // ADMIN - NO ACCESS
-    // ============================================
     
     match /admin/{document=**} {
       allow read, write: if false;

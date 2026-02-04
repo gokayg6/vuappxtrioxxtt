@@ -36,108 +36,108 @@ actor LiveEventsService {
             // Music Events
             LiveEvent(
                 id: "1",
-                title: "Canlı Müzik - Indie Rock",
+                title: "Canlı Müzik - Indie Rock".localized,
                 category: .music,
                 location: "Kadıköy Sahne, İstanbul",
                 date: futureDate(daysFromNow: 2, hour: 21),
                 attendees: 48,
                 maxAttendees: 80,
                 imageURL: "https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?w=1920&h=1080&fit=crop",
-                description: "Yerel indie rock gruplarının performansı",
+                description: "Yerel indie rock gruplarının performansı".localized,
                 ticketURL: "https://www.bubilet.com.tr"
             ),
             LiveEvent(
                 id: "2",
-                title: "Jazz Night",
+                title: "Jazz Night".localized,
                 category: .music,
                 location: "Nardis Jazz Club, Beyoğlu",
                 date: futureDate(daysFromNow: 3, hour: 22),
                 attendees: 35,
                 maxAttendees: 60,
                 imageURL: "https://images.unsplash.com/photo-1415201364774-f6f0bb35f28f?w=1920&h=1080&fit=crop",
-                description: "Caz müzik severler için özel gece",
+                description: "Caz müzik severler için özel gece".localized,
                 ticketURL: "https://www.bubilet.com.tr"
             ),
             
             // Coffee Meetups
             LiveEvent(
                 id: "3",
-                title: "Kahve & Sohbet",
+                title: "Kahve & Sohbet".localized,
                 category: .coffee,
                 location: "Starbucks Reserve, Beşiktaş",
                 date: futureDate(daysFromNow: 1, hour: 15),
                 attendees: 23,
                 maxAttendees: 30,
                 imageURL: "https://images.unsplash.com/photo-1511920170033-f8396924c348?w=1920&h=1080&fit=crop",
-                description: "Yeni insanlarla tanış, kahve iç",
+                description: "Yeni insanlarla tanış, kahve iç".localized,
                 ticketURL: nil
             ),
             LiveEvent(
                 id: "4",
-                title: "Kitap Okuma Kulübü",
+                title: "Kitap Okuma Kulübü".localized,
                 category: .coffee,
                 location: "Kahve Dünyası, Nişantaşı",
                 date: futureDate(daysFromNow: 4, hour: 14),
                 attendees: 18,
                 maxAttendees: 25,
                 imageURL: "https://images.unsplash.com/photo-1481833761820-0509d3217039?w=1920&h=1080&fit=crop",
-                description: "Bu ay: Sabahattin Ali - Kürk Mantolu Madonna",
+                description: "Bu ay: Sabahattin Ali - Kürk Mantolu Madonna".localized,
                 ticketURL: nil
             ),
             
             // Yoga & Wellness
             LiveEvent(
                 id: "5",
-                title: "Yoga & Tanışma",
+                title: "Yoga & Tanışma".localized,
                 category: .wellness,
                 location: "Caddebostan Sahil, İstanbul",
                 date: futureDate(daysFromNow: 5, hour: 10),
                 attendees: 31,
                 maxAttendees: 40,
                 imageURL: "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=1920&h=1080&fit=crop",
-                description: "Sabah yogası ve kahvaltı",
+                description: "Sabah yogası ve kahvaltı".localized,
                 ticketURL: nil
             ),
             
             // Food Events
             LiveEvent(
                 id: "6",
-                title: "Gurme Akşam Yemeği",
+                title: "Gurme Akşam Yemeği".localized,
                 category: .food,
                 location: "Mikla Restaurant, Beyoğlu",
                 date: futureDate(daysFromNow: 6, hour: 20),
                 attendees: 42,
                 maxAttendees: 50,
                 imageURL: "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=1920&h=1080&fit=crop",
-                description: "Şef menüsü ve yeni tanışmalar",
+                description: "Şef menüsü ve yeni tanışmalar".localized,
                 ticketURL: "https://www.bubilet.com.tr"
             ),
             
             // Art & Culture
             LiveEvent(
                 id: "7",
-                title: "Sanat Galerisi Turu",
+                title: "Sanat Galerisi Turu".localized,
                 category: .art,
                 location: "İstanbul Modern, Karaköy",
                 date: futureDate(daysFromNow: 7, hour: 18),
                 attendees: 27,
                 maxAttendees: 35,
                 imageURL: "https://images.unsplash.com/photo-1531243269054-5ebf6f34081e?w=1920&h=1080&fit=crop",
-                description: "Çağdaş sanat sergisi gezisi",
+                description: "Çağdaş sanat sergisi gezisi".localized,
                 ticketURL: "https://www.bubilet.com.tr"
             ),
             
             // Sports
             LiveEvent(
                 id: "8",
-                title: "Plaj Voleybolu",
+                title: "Plaj Voleybolu".localized,
                 category: .sports,
                 location: "Florya Sahil, İstanbul",
                 date: futureDate(daysFromNow: 3, hour: 16),
                 attendees: 16,
                 maxAttendees: 20,
                 imageURL: "https://images.unsplash.com/photo-1612872087720-bb876e2e67d1?w=1920&h=1080&fit=crop",
-                description: "Dostluk maçı ve eğlence",
+                description: "Dostluk maçı ve eğlence".localized,
                 ticketURL: nil
             )
         ]
@@ -185,6 +185,10 @@ enum EventCategory: String, CaseIterable {
     case food = "Yemek"
     case art = "Sanat"
     case sports = "Spor"
+    
+    var localizedName: String {
+        return rawValue.localized
+    }
     
     var icon: String {
         switch self {

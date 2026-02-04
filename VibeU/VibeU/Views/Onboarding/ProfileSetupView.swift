@@ -1504,7 +1504,7 @@ struct AdditionalPhotosStep: View {
                                 image: photo,
                                 isPrimary: false,
                                 onDelete: {
-                                    withAnimation(.spring(response: 0.3)) {
+                                    _ = withAnimation(.spring(response: 0.3)) {
                                         profileData.additionalPhotos.remove(at: index)
                                     }
                                     let impact = UIImpactFeedbackGenerator(style: .medium)

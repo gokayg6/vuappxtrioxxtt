@@ -15,7 +15,7 @@ class AuthService: @unchecked Sendable {
     }
     
     private init() {
-        Auth.auth().addStateDidChangeListener { [weak self] _, user in
+        _ = Auth.auth().addStateDidChangeListener { [weak self] _, user in
             if let user = user {
                 self?.authToken = user.uid
                 Task { [weak self] in
@@ -63,9 +63,9 @@ class AuthService: @unchecked Sendable {
             age: Calendar.current.dateComponents([.year], from: data.dateOfBirth, to: Date()).year ?? 18,
             ageGroup: .adult,
             gender: Gender(rawValue: data.gender.rawValue) ?? .preferNotToSay,
-            country: data.country ?? "Turkey",
-            city: data.city ?? "Istanbul",
-            bio: data.bio ?? "VibeU dünyasına katıldım! 👋",
+            country: data.country,
+            city: data.city,
+            bio: data.bio,
             profilePhotoURL: "https://ui-avatars.com/api/?name=\(data.firstName)+\(data.lastName)&background=random",
             photos: [],
             tags: [],

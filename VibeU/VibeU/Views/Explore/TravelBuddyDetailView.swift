@@ -8,9 +8,9 @@ struct TravelBuddyDetailView: View {
     @Environment(\.colorScheme) private var systemColorScheme
     
     @State private var selectedDestination: TravelDestination?
-    @State private var selectedTravelStyle: String = "Hepsi"
-    @State private var selectedBudget: String = "Hepsi"
-    @State private var selectedDuration: String = "Hepsi"
+    @State private var selectedTravelStyle: String = "Hepsi".localized
+    @State private var selectedBudget: String = "Hepsi".localized
+    @State private var selectedDuration: String = "Hepsi".localized
     @State private var searchText = ""
     
     private var isDark: Bool {
@@ -23,14 +23,16 @@ struct TravelBuddyDetailView: View {
     
     private var colors: ThemeColors { isDark ? .dark : .light }
     
-    let travelStyles = ["Hepsi", "Macera", "Kültür", "Plaj", "Doğa", "Şehir Turu", "Gastronomi", "Tarih", "Lüks", "Backpacking"]
-    let budgets = ["Hepsi", "Ekonomik (₺)", "Orta (₺₺)", "Konforlu (₺₺₺)", "Lüks (₺₺₺₺)"]
-    let durations = ["Hepsi", "Hafta Sonu", "3-5 Gün", "1 Hafta", "2 Hafta", "1 Ay+"]
+    let travelStyles = ["Hepsi".localized, "Macera".localized, "Kültür".localized, "Plaj".localized, "Doğa".localized, "Şehir Turu".localized, "Gastronomi".localized, "Tarih".localized, "Lüks".localized, "Backpacking".localized]
+    let budgets = ["Hepsi".localized, "Ekonomik (₺)", "Orta (₺₺)", "Konforlu (₺₺₺)", "Lüks (₺₺₺₺)"]
+    let durations = ["Hepsi".localized, "Hafta Sonu".localized, "3-5 Gün".localized, "1 Hafta".localized, "2 Hafta".localized, "1 Ay+".localized]
+
     
     var filteredDestinations: [TravelDestination] {
         destinations.filter { dest in
-            (selectedTravelStyle == "Hepsi" || dest.styles.contains(selectedTravelStyle)) &&
-            (selectedBudget == "Hepsi" || dest.budget == selectedBudget) &&
+            (selectedTravelStyle == "Hepsi".localized || dest.styles.contains(selectedTravelStyle)) &&
+            (selectedBudget == "Hepsi".localized || dest.budget == selectedBudget) &&
+
             (searchText.isEmpty || dest.name.localizedCaseInsensitiveContains(searchText) || dest.country.localizedCaseInsensitiveContains(searchText))
         }
     }
@@ -45,12 +47,13 @@ struct TravelBuddyDetailView: View {
                     VStack(spacing: 8) {
                         Text("✈️")
                             .font(.system(size: 60))
-                        Text("Seyahat Arkadaşı")
+                        Text("Seyahat Arkadaşı".localized)
                             .font(.system(size: 28, weight: .bold))
                             .foregroundStyle(colors.primaryText)
-                        Text("Dünyayı birlikte keşfet")
+                        Text("Dünyayı birlikte keşfet".localized)
                             .font(.system(size: 15))
                             .foregroundStyle(colors.secondaryText)
+
                     }
                     .padding(.top, 20)
                     .padding(.bottom, 16)
@@ -60,7 +63,8 @@ struct TravelBuddyDetailView: View {
                         Image(systemName: "magnifyingglass")
                             .foregroundStyle(colors.secondaryText)
                         
-                        TextField("Destinasyon ara...", text: $searchText)
+                        TextField("Destinasyon ara...".localized, text: $searchText)
+
                             .textFieldStyle(.plain)
                             .foregroundStyle(colors.primaryText)
                     }
@@ -73,10 +77,11 @@ struct TravelBuddyDetailView: View {
                     // Filters
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack(spacing: 8) {
-                            FilterMenu(title: "Stil", selection: $selectedTravelStyle, options: travelStyles)
-                            FilterMenu(title: "Bütçe", selection: $selectedBudget, options: budgets)
-                            FilterMenu(title: "Süre", selection: $selectedDuration, options: durations)
+                            FilterMenu(title: "Stil".localized, selection: $selectedTravelStyle, options: travelStyles)
+                            FilterMenu(title: "Bütçe".localized, selection: $selectedBudget, options: budgets)
+                            FilterMenu(title: "Süre".localized, selection: $selectedDuration, options: durations)
                         }
+
                         .padding(.horizontal, 16)
                     }
                     .padding(.bottom, 12)
@@ -118,26 +123,27 @@ struct TravelBuddyDetailView: View {
     private var destinations: [TravelDestination] {
         [
             // Türkiye
-            TravelDestination(id: "1", name: "Kapadokya", country: "Türkiye", imageURL: "https://images.unsplash.com/photo-1541432901042-2d8bd64b4a9b?w=800", styles: ["Macera", "Kültür", "Doğa"], budget: "Orta (₺₺)", travelers: 450, rating: 4.9, description: "Balon turu, peribacaları, yeraltı şehirleri", highlights: ["Sıcak Hava Balonu", "Göreme Açık Hava Müzesi", "Yeraltı Şehirleri", "Kaya Oteller"]),
-            TravelDestination(id: "2", name: "Antalya", country: "Türkiye", imageURL: "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800", styles: ["Plaj", "Tarih", "Doğa"], budget: "Orta (₺₺)", travelers: 680, rating: 4.7, description: "Akdeniz kıyısı, antik kentler", highlights: ["Kaleiçi", "Düden Şelalesi", "Aspendos", "Plajlar"]),
-            TravelDestination(id: "3", name: "İstanbul", country: "Türkiye", imageURL: "https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=800", styles: ["Şehir Turu", "Kültür", "Tarih", "Gastronomi"], budget: "Orta (₺₺)", travelers: 920, rating: 4.8, description: "İki kıta, binlerce yıllık tarih", highlights: ["Ayasofya", "Topkapı Sarayı", "Boğaz Turu", "Kapalıçarşı"]),
+            TravelDestination(id: "1", name: "Kapadokya", country: "Türkiye".localized, imageURL: "https://images.unsplash.com/photo-1541432901042-2d8bd64b4a9b?w=800", styles: ["Macera".localized, "Kültür".localized, "Doğa".localized], budget: "Orta (₺₺)".localized, travelers: 450, rating: 4.9, description: "Balon turu, peribacaları, yeraltı şehirleri".localized, highlights: ["Sıcak Hava Balonu".localized, "Göreme Açık Hava Müzesi".localized, "Yeraltı Şehirleri".localized, "Kaya Oteller".localized]),
+            TravelDestination(id: "2", name: "Antalya", country: "Türkiye".localized, imageURL: "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800", styles: ["Plaj".localized, "Tarih".localized, "Doğa".localized], budget: "Orta (₺₺)".localized, travelers: 680, rating: 4.7, description: "Akdeniz kıyısı, antik kentler".localized, highlights: ["Kaleiçi".localized, "Düden Şelalesi".localized, "Aspendos".localized, "Plajlar".localized]),
+            TravelDestination(id: "3", name: "İstanbul", country: "Türkiye".localized, imageURL: "https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=800", styles: ["Şehir Turu".localized, "Kültür".localized, "Tarih".localized, "Gastronomi".localized], budget: "Orta (₺₺)".localized, travelers: 920, rating: 4.8, description: "İki kıta, binlerce yıllık tarih".localized, highlights: ["Ayasofya".localized, "Topkapı Sarayı".localized, "Boğaz Turu".localized, "Kapalıçarşı".localized]),
             
             // Avrupa
-            TravelDestination(id: "4", name: "Paris", country: "Fransa", imageURL: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=800", styles: ["Şehir Turu", "Kültür", "Gastronomi", "Lüks"], budget: "Konforlu (₺₺₺)", travelers: 1200, rating: 4.9, description: "Aşk şehri, sanat ve moda başkenti", highlights: ["Eyfel Kulesi", "Louvre", "Notre Dame", "Champs-Élysées"]),
-            TravelDestination(id: "5", name: "Roma", country: "İtalya", imageURL: "https://images.unsplash.com/photo-1552832230-c0197dd311b5?w=800", styles: ["Tarih", "Kültür", "Gastronomi"], budget: "Orta (₺₺)", travelers: 890, rating: 4.8, description: "Antik Roma'nın kalbi", highlights: ["Kolezyum", "Vatikan", "Trevi Çeşmesi", "Pantheon"]),
-            TravelDestination(id: "6", name: "Barselona", country: "İspanya", imageURL: "https://images.unsplash.com/photo-1583422409516-2895a77efded?w=800", styles: ["Şehir Turu", "Plaj", "Kültür"], budget: "Orta (₺₺)", travelers: 750, rating: 4.7, description: "Gaudí'nin şehri", highlights: ["Sagrada Familia", "Park Güell", "La Rambla", "Plajlar"]),
-            TravelDestination(id: "7", name: "Amsterdam", country: "Hollanda", imageURL: "https://images.unsplash.com/photo-1534351590666-13e3e96b5017?w=800", styles: ["Şehir Turu", "Kültür"], budget: "Konforlu (₺₺₺)", travelers: 620, rating: 4.6, description: "Kanallar şehri", highlights: ["Anne Frank Evi", "Van Gogh Müzesi", "Kanal Turu", "Bisiklet"]),
+            TravelDestination(id: "4", name: "Paris", country: "Fransa".localized, imageURL: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=800", styles: ["Şehir Turu".localized, "Kültür".localized, "Gastronomi".localized, "Lüks".localized], budget: "Konforlu (₺₺₺)".localized, travelers: 1200, rating: 4.9, description: "Aşk şehri, sanat ve moda başkenti".localized, highlights: ["Eyfel Kulesi".localized, "Louvre".localized, "Notre Dame".localized, "Champs-Élysées".localized]),
+            TravelDestination(id: "5", name: "Roma", country: "İtalya".localized, imageURL: "https://images.unsplash.com/photo-1552832230-c0197dd311b5?w=800", styles: ["Tarih".localized, "Kültür".localized, "Gastronomi".localized], budget: "Orta (₺₺)".localized, travelers: 890, rating: 4.8, description: "Antik Roma'nın kalbi".localized, highlights: ["Kolezyum".localized, "Vatikan".localized, "Trevi Çeşmesi".localized, "Pantheon".localized]),
+            TravelDestination(id: "6", name: "Barselona", country: "İspanya".localized, imageURL: "https://images.unsplash.com/photo-1583422409516-2895a77efded?w=800", styles: ["Şehir Turu".localized, "Plaj".localized, "Kültür".localized], budget: "Orta (₺₺)".localized, travelers: 750, rating: 4.7, description: "Gaudí'nin şehri".localized, highlights: ["Sagrada Familia".localized, "Park Güell".localized, "La Rambla".localized, "Plajlar".localized]),
+            TravelDestination(id: "7", name: "Amsterdam", country: "Hollanda".localized, imageURL: "https://images.unsplash.com/photo-1534351590666-13e3e96b5017?w=800", styles: ["Şehir Turu".localized, "Kültür".localized], budget: "Konforlu (₺₺₺)".localized, travelers: 620, rating: 4.6, description: "Kanallar şehri".localized, highlights: ["Anne Frank Evi".localized, "Van Gogh Müzesi".localized, "Kanal Turu".localized, "Bisiklet".localized]),
             
             // Asya
-            TravelDestination(id: "8", name: "Tokyo", country: "Japonya", imageURL: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=800", styles: ["Şehir Turu", "Kültür", "Gastronomi"], budget: "Konforlu (₺₺₺)", travelers: 980, rating: 4.9, description: "Gelecek ve gelenek", highlights: ["Shibuya", "Senso-ji", "Tokyo Tower", "Akihabara"]),
-            TravelDestination(id: "9", name: "Bali", country: "Endonezya", imageURL: "https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=800", styles: ["Plaj", "Doğa", "Macera"], budget: "Ekonomik (₺)", travelers: 1100, rating: 4.8, description: "Cennet ada", highlights: ["Ubud", "Tanah Lot", "Plajlar", "Pirinç Tarlaları"]),
-            TravelDestination(id: "10", name: "Dubai", country: "BAE", imageURL: "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=800", styles: ["Lüks", "Şehir Turu", "Macera"], budget: "Lüks (₺₺₺₺)", travelers: 850, rating: 4.7, description: "Çöldeki mucize", highlights: ["Burj Khalifa", "Dubai Mall", "Çöl Safari", "Palm Jumeirah"]),
+            TravelDestination(id: "8", name: "Tokyo", country: "Japonya".localized, imageURL: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=800", styles: ["Şehir Turu".localized, "Kültür".localized, "Gastronomi".localized], budget: "Konforlu (₺₺₺)".localized, travelers: 980, rating: 4.9, description: "Gelecek ve gelenek".localized, highlights: ["Shibuya".localized, "Senso-ji".localized, "Tokyo Tower".localized, "Akihabara".localized]),
+            TravelDestination(id: "9", name: "Bali", country: "Endonezya".localized, imageURL: "https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=800", styles: ["Plaj".localized, "Doğa".localized, "Macera".localized], budget: "Ekonomik (₺)".localized, travelers: 1100, rating: 4.8, description: "Cennet ada".localized, highlights: ["Ubud".localized, "Tanah Lot".localized, "Plajlar".localized, "Pirinç Tarlaları".localized]),
+            TravelDestination(id: "10", name: "Dubai", country: "BAE".localized, imageURL: "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=800", styles: ["Lüks".localized, "Şehir Turu".localized, "Macera".localized], budget: "Lüks (₺₺₺₺)".localized, travelers: 850, rating: 4.7, description: "Çöldeki mucize".localized, highlights: ["Burj Khalifa".localized, "Dubai Mall".localized, "Çöl Safari".localized, "Palm Jumeirah".localized]),
             
             // Add 40 more destinations
-            TravelDestination(id: "11", name: "Santorini", country: "Yunanistan", imageURL: "https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?w=800", styles: ["Plaj", "Romantik"], budget: "Konforlu (₺₺₺)", travelers: 560, rating: 4.9, description: "Beyaz evler, mavi kubbeler", highlights: ["Oia Gün Batımı", "Fira", "Plajlar", "Şarap Turları"]),
-            TravelDestination(id: "12", name: "Prag", country: "Çek Cumhuriyeti", imageURL: "https://images.unsplash.com/photo-1541849546-216549ae216d?w=800", styles: ["Şehir Turu", "Tarih"], budget: "Ekonomik (₺)", travelers: 490, rating: 4.6, description: "Masal şehri", highlights: ["Prag Kalesi", "Charles Köprüsü", "Eski Şehir Meydanı"]),
-            TravelDestination(id: "13", name: "Maldivler", country: "Maldivler", imageURL: "https://images.unsplash.com/photo-1514282401047-d79a71a590e8?w=800", styles: ["Plaj", "Lüks"], budget: "Lüks (₺₺₺₺)", travelers: 320, rating: 5.0, description: "Tropik cennet", highlights: ["Su Üstü Villalar", "Dalış", "Spa", "Romantik Akşam Yemekleri"]),
+            TravelDestination(id: "11", name: "Santorini", country: "Yunanistan".localized, imageURL: "https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?w=800", styles: ["Plaj".localized, "Romantik".localized], budget: "Konforlu (₺₺₺)".localized, travelers: 560, rating: 4.9, description: "Beyaz evler, mavi kubbeler".localized, highlights: ["Oia Gün Batımı".localized, "Fira".localized, "Plajlar".localized, "Şarap Turları".localized]),
+            TravelDestination(id: "12", name: "Prag", country: "Çek Cumhuriyeti".localized, imageURL: "https://images.unsplash.com/photo-1541849546-216549ae216d?w=800", styles: ["Şehir Turu".localized, "Tarih".localized], budget: "Ekonomik (₺)".localized, travelers: 490, rating: 4.6, description: "Masal şehri".localized, highlights: ["Prag Kalesi".localized, "Charles Köprüsü".localized, "Eski Şehir Meydanı".localized]),
+            TravelDestination(id: "13", name: "Maldivler", country: "Maldivler".localized, imageURL: "https://images.unsplash.com/photo-1514282401047-d79a71a590e8?w=800", styles: ["Plaj".localized, "Lüks".localized], budget: "Lüks (₺₺₺₺)".localized, travelers: 320, rating: 5.0, description: "Tropik cennet".localized, highlights: ["Su Üstü Villalar".localized, "Dalış".localized, "Spa".localized, "Romantik Akşam Yemekleri".localized]),
         ]
+
     }
 }
 
@@ -357,7 +363,8 @@ private struct DestinationDetailView: View {
                         
                         // Highlights
                         VStack(alignment: .leading, spacing: 10) {
-                            Text("Öne Çıkanlar")
+                            Text("Öne Çıkanlar".localized)
+
                                 .font(.system(size: 16, weight: .bold))
                                 .foregroundStyle(colors.primaryText)
                             
@@ -399,7 +406,8 @@ private struct DestinationDetailView: View {
                                 HStack(spacing: 8) {
                                     Image(systemName: "airplane")
                                         .font(.system(size: 16))
-                                    Text("Uçak Bileti Al")
+                                    Text("Uçak Bileti Al".localized)
+
                                         .font(.system(size: 16, weight: .semibold))
                                 }
                                 .foregroundStyle(.white)
@@ -419,7 +427,8 @@ private struct DestinationDetailView: View {
                                 HStack(spacing: 8) {
                                     Image(systemName: "person.2.fill")
                                         .font(.system(size: 16))
-                                    Text("Seyahat Arkadaşı Bul")
+                                    Text("Seyahat Arkadaşı Bul".localized)
+
                                         .font(.system(size: 16, weight: .semibold))
                                 }
                                 .foregroundStyle(colors.primaryText)
@@ -478,7 +487,8 @@ private struct FilterMenu: View {
             }
         } label: {
             HStack(spacing: 6) {
-                Text(selection == "Hepsi" ? title : selection)
+                Text(selection == "Hepsi".localized ? title : selection)
+
                     .font(.system(size: 13, weight: .medium))
                     .lineLimit(1)
                 Image(systemName: "chevron.down")

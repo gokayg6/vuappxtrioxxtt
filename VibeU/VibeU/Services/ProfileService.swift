@@ -145,7 +145,7 @@ final class ProfileService {
         let userDocRef = db.collection("users").document(userId)
         let snapshot = try await userDocRef.getDocument()
         
-        if var userData = snapshot.data(),
+        if let userData = snapshot.data(),
            var photos = userData["photos"] as? [[String: Any]] {
             
             let originalCount = photos.count

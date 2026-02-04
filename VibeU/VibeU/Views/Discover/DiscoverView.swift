@@ -299,7 +299,7 @@ struct DiscoverView: View {
                     .shadow(color: Color(red: 1.0, green: 0.84, blue: 0.0).opacity(0.5), radius: 15, y: 8)
                     
                     // Current balance text
-                    Text("Bakiye: \(appState.currentUser?.diamondBalance ?? 0) 💎")
+                    Text("\("Bakiye:".localized) \(appState.currentUser?.diamondBalance ?? 0) 💎")
                         .font(.system(size: 12, weight: .medium))
                         .foregroundStyle(.white.opacity(0.7))
                 }
@@ -374,7 +374,7 @@ struct DiscoverView: View {
                             .renderingMode(.original)
                             .scaledToFit()
                             .frame(width: 16, height: 16)
-                        Text("Elmaslarım")
+                        Text("Elmaslarım".localized)
                     }
                 }
             } label: {
@@ -472,7 +472,7 @@ struct DiscoverView: View {
                     self.isLoading = false
                     
                     if users.isEmpty {
-                        loadError = "Filtrelerinize uygun kullanıcı bulunamadı"
+                        loadError = "Filtrelerinize uygun kullanıcı bulunamadı".localized
                     } else {
                         // Prefetch images for first 5 cards
                         prefetchNextImages()
@@ -484,7 +484,7 @@ struct DiscoverView: View {
                     if !appState.cachedDiscoverUsers.isEmpty {
                         self.users = appState.cachedDiscoverUsers
                     } else {
-                        self.loadError = "Kullanıcılar yüklenirken hata oluştu: \(error.localizedDescription)"
+                        self.loadError = "\("Kullanıcılar yüklenirken hata oluştu".localized): \(error.localizedDescription)"
                     }
                     self.isLoading = false
                 }
@@ -540,7 +540,7 @@ struct DiscoverView: View {
             }
             
             // Verified filter
-            if showVerifiedOnly && !user.isBoosted {
+            if showVerifiedOnly && !user.isVerified {
                 return false
             }
             
@@ -564,17 +564,24 @@ struct DiscoverView: View {
     
     // MARK: - Friend Request (Sağa kaydırma - Arkadaşlık isteği gönderir)
     private func likeCurrentUser() {
+        // 🔔 Haptic Feedback on swipe right
+        let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
+        impactFeedback.impactOccurred()
+        
         // 🚨 CRITICAL: Pre-validate diamond balance BEFORE proceeding
         let currentDiamonds = appState.currentUser?.diamondBalance ?? 0
         guard currentDiamonds >= 10 else {
             // Show error and reset card position - DO NOT proceed
+            let errorFeedback = UINotificationFeedbackGenerator()
+            errorFeedback.notificationOccurred(.error)
+            
             withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
                 cardOffset = .zero
                 cardRotation = 0
             }
             
             requestSuccess = false
-            requestMessage = "Yetersiz elmas! Arkadaşlık isteği göndermek için 10 elmas gerekli."
+            requestMessage = "Yetersiz elmas! Arkadaşlık isteği göndermek için 10 elmas gerekli.".localized
             showRequestToast = true
             
             DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
@@ -595,11 +602,12 @@ struct DiscoverView: View {
                     // FriendsService.sendFriendRequest already handles diamond deduction (10 diamonds)
                     try await FriendsService.shared.sendFriendRequest(userId: user.id)
                     
-                    // Refresh diamond balance in AppState
+                    // ✅ FIXED: Safely refresh diamond balance (Read then Write to avoid simultaneous access)
                     await MainActor.run {
-                        if var currentUser = appState.currentUser {
-                            currentUser.diamondBalance = max(0, (currentUser.diamondBalance ?? 0) - 10)
-                            // Update local state - the actual update is in Firestore
+                        if var updatedUser = appState.currentUser {
+                            let newBalance = max(0, (updatedUser.diamondBalance ?? 0) - 10)
+                            updatedUser.diamondBalance = newBalance
+                            appState.currentUser = updatedUser
                         }
                     }
                     
@@ -830,7 +838,7 @@ struct DiscoverView: View {
                     .font(.system(size: 50))
                     .foregroundStyle(.white)
                 
-                Text("Reklam Süresi")
+                Text("Reklam Süresi".localized)
                     .font(.system(size: 22, weight: .bold))
                     .foregroundStyle(.white)
                 
@@ -839,14 +847,14 @@ struct DiscoverView: View {
                         .tint(.white)
                         .scaleEffect(1.5)
                     
-                    Text("Reklam izleniyor...")
+                    Text("Reklam izleniyor...".localized)
                         .font(.system(size: 14))
                         .foregroundStyle(.white.opacity(0.7))
                 } else {
                     Button {
                         watchAdAndContinue()
                     } label: {
-                        Text("İzle ve Devam Et")
+                        Text("İzle ve Devam Et".localized)
                             .font(.system(size: 17, weight: .bold))
                             .foregroundStyle(.black)
                             .frame(maxWidth: .infinity)
@@ -863,7 +871,7 @@ struct DiscoverView: View {
                 } label: {
                     HStack {
                         Image(systemName: "crown.fill")
-                        Text("Premium ile reklamsız kullan")
+                        Text("Premium ile reklamsız kullan".localized)
                     }
                     .font(.system(size: 14, weight: .semibold))
                     .foregroundStyle(Color(red: 1.0, green: 0.84, blue: 0.0))
@@ -876,10 +884,24 @@ struct DiscoverView: View {
     private func watchAdAndContinue() {
         isWatchingAd = true
         
-        // Simulate ad (in real app, integrate AdMob/Unity Ads)
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+        // Find root controller to present ad
+        guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+              let rootVC = windowScene.windows.first?.rootViewController else {
+            // Fallback if no root VC (should rarely happen)
             isWatchingAd = false
             showAdOverlay = false
+            return
+        }
+        
+        // Show Rewarded Ad
+        AdMobManager.shared.showRewardedAd(from: rootVC) {
+            // Ad finished or failed, continue user flow
+            // Use MainActor to update UI
+            Task { @MainActor in
+                self.isWatchingAd = false
+                self.showAdOverlay = false
+                // Reset counter or give reward if needed (here reward is just "continue swiping")
+            }
         }
     }
     
@@ -905,9 +927,12 @@ struct DiscoverView: View {
                     } label: {
                         Image(systemName: "xmark")
                             .font(.system(size: 14, weight: .bold))
-                            .foregroundStyle(.white.opacity(0.6))
+                            .foregroundStyle(colorScheme == .dark ? .white.opacity(0.6) : .black.opacity(0.6))
                             .frame(width: 28, height: 28)
-                            .background(Color.white.opacity(0.1), in: Circle())
+                            .background(
+                                (colorScheme == .dark ? Color.white : Color.black).opacity(0.1),
+                                in: Circle()
+                            )
                     }
                 }
                 
@@ -924,22 +949,22 @@ struct DiscoverView: View {
                     .shadow(color: Color.orange.opacity(0.4), radius: 15)
                 
                 VStack(spacing: 8) {
-                    Text("Premium'a Geç")
+                    Text("Premium'a Geç".localized)
                         .font(.system(size: 22, weight: .bold))
-                        .foregroundStyle(.white)
+                        .foregroundStyle(colorScheme == .dark ? .white : .black)
                     
-                    Text("Sınırsız beğeni, reklamsız kullanım, özel özellikler")
+                    Text("Sınırsız beğeni, reklamsız kullanım, özel özellikler".localized)
                         .font(.system(size: 14))
-                        .foregroundStyle(.white.opacity(0.7))
+                        .foregroundStyle(colorScheme == .dark ? .white.opacity(0.7) : .black.opacity(0.7))
                         .multilineTextAlignment(.center)
                 }
                 
                 // Features
                 VStack(alignment: .leading, spacing: 10) {
-                    premiumFeatureRow(icon: "heart.fill", text: "Sınırsız beğeni gönder")
-                    premiumFeatureRow(icon: "eye.slash.fill", text: "Gizli profil görüntüleme")
-                    premiumFeatureRow(icon: "bolt.fill", text: "Öncelikli eşleşme")
-                    premiumFeatureRow(icon: "xmark.circle.fill", text: "Reklamsız deneyim")
+                    premiumFeatureRow(icon: "heart.fill", text: "Sınırsız beğeni gönder".localized)
+                    premiumFeatureRow(icon: "eye.slash.fill", text: "Gizli profil görüntüleme".localized)
+                    premiumFeatureRow(icon: "bolt.fill", text: "Öncelikli eşleşme".localized)
+                    premiumFeatureRow(icon: "xmark.circle.fill", text: "Reklamsız deneyim".localized)
                 }
                 
                 // CTA Button
@@ -947,7 +972,7 @@ struct DiscoverView: View {
                     showSoftPremiumPopup = false
                     showPremiumSheet = true
                 } label: {
-                    Text("Premium'u Keşfet")
+                    Text("Premium'u Keşfet".localized)
                         .font(.system(size: 17, weight: .bold))
                         .foregroundStyle(.black)
                         .frame(maxWidth: .infinity)
@@ -967,15 +992,15 @@ struct DiscoverView: View {
                         showSoftPremiumPopup = false
                     }
                 } label: {
-                    Text("Daha sonra")
+                    Text("Daha sonra".localized)
                         .font(.system(size: 14))
-                        .foregroundStyle(.white.opacity(0.5))
+                        .foregroundStyle(colorScheme == .dark ? .white.opacity(0.5) : .black.opacity(0.5))
                 }
             }
             .padding(24)
             .background(
                 RoundedRectangle(cornerRadius: 28)
-                    .fill(Color(red: 0.1, green: 0.08, blue: 0.15))
+                    .fill(colorScheme == .dark ? Color(red: 0.1, green: 0.08, blue: 0.15) : Color.white)
                     .overlay(
                         RoundedRectangle(cornerRadius: 28)
                             .stroke(
@@ -987,6 +1012,7 @@ struct DiscoverView: View {
                                 lineWidth: 1
                             )
                     )
+                    .shadow(color: Color.black.opacity(0.15), radius: 20, y: 10)
             )
             .padding(20)
         }
@@ -1001,7 +1027,7 @@ struct DiscoverView: View {
             
             Text(text)
                 .font(.system(size: 14))
-                .foregroundStyle(.white.opacity(0.9))
+                .foregroundStyle(colorScheme == .dark ? .white.opacity(0.9) : .black.opacity(0.8))
         }
     }
 }
@@ -1012,6 +1038,7 @@ struct ModeSelectorView: View {
     @Binding var showDoubleDateSheet: Bool
     @Binding var showShareSheet: Bool
     @Namespace private var namespace
+    @Environment(AppState.self) private var appState
     @Environment(\.colorScheme) private var colorScheme
     
     // Track which button is "active" for the blob animation
@@ -1043,7 +1070,7 @@ struct ModeSelectorView: View {
                     activeButton = .sanaOzel
                 }
             } label: {
-                Text("Sana Özel")
+                Text("Sana Özel".localized)
                     .font(.system(size: 11, weight: .semibold))
                     .foregroundStyle(activeButton == .sanaOzel ? selectedTextColor : unselectedTextColor)
                     .fixedSize()
@@ -1071,7 +1098,7 @@ struct ModeSelectorView: View {
                 HStack(spacing: 4) {
                     Image(systemName: "qrcode")
                         .font(.system(size: 10, weight: .semibold))
-                    Text("Paylaş")
+                    Text("Paylaş".localized)
                 }
                     .font(.system(size: 11, weight: .semibold))
                     .foregroundStyle(activeButton == .paylas ? selectedTextColor : unselectedTextColor)
@@ -1100,7 +1127,7 @@ struct ModeSelectorView: View {
                     showDoubleDateSheet = true
                 }
             } label: {
-                Text("Çift Randevu")
+                Text("Çift Randevu".localized)
                     .font(.system(size: 11, weight: .semibold))
                     .foregroundStyle(activeButton == .ciftRandevu ? selectedTextColor : unselectedTextColor)
                     .fixedSize()
@@ -1267,7 +1294,7 @@ struct TinderStyleCard: View {
                                         Circle()
                                             .fill(.green)
                                             .frame(width: 8, height: 8)
-                                        Text("Son Zamanlarda Aktif")
+                                        Text("Son Zamanlarda Aktif".localized)
                                             .font(.system(size: 12, weight: .medium))
                                     }
                                     .foregroundStyle(.black)
@@ -1854,7 +1881,7 @@ struct FirstImpressionSection: View {
                 Image(systemName: "paperplane.fill")
                     .font(.system(size: 14, weight: .medium))
                     .foregroundStyle(.blue)
-                Text("İlk İzlenim ile öne çık")
+                Text("İlk İzlenim ile öne çık".localized)
                     .font(.system(size: 14, weight: .semibold))
                     .foregroundStyle(primaryTextColor)
                 
@@ -1874,14 +1901,14 @@ struct FirstImpressionSection: View {
                 }
             }
             
-            Text("Eşleşmeden önce ona mesaj göndererek dikkatini çek. Ona profilinde hoşuna giden şeyin ne olduğunu söyleyebilir, iltifat edebilir veya onu güldürebilirsin.")
+            Text("Eşleşmeden önce ona mesaj göndererek dikkatini çek. Ona profilinde hoşuna giden şeyin ne olduğunu söyleyebilir, iltifat edebilir veya onu güldürebilirsin.".localized)
                 .font(.system(size: 14))
                 .foregroundStyle(secondaryTextColor)
                 .lineSpacing(4)
             
             // Message Input - Açık tema uyumlu
             HStack(spacing: 12) {
-                TextField("Mesajın...", text: $messageText)
+                TextField("Mesajın...".localized, text: $messageText)
                     .font(.system(size: 15))
                     .foregroundStyle(primaryTextColor)
                     .padding(14)
@@ -1906,7 +1933,7 @@ struct FirstImpressionSection: View {
                 HStack(spacing: 8) {
                     Image(systemName: "checkmark.circle.fill")
                         .foregroundStyle(.green)
-                    Text("Mesajın gönderildi!")
+                    Text("Mesajın gönderildi!".localized)
                         .font(.system(size: 14, weight: .medium))
                         .foregroundStyle(.green)
                 }
@@ -2249,11 +2276,11 @@ struct FilterSheet: View {
                             }
                             
                             VStack(alignment: .leading, spacing: 4) {
-                                Text("Keşif Modu")
+                                Text("Keşif Modu".localized)
                                     .font(.system(size: 18, weight: .bold))
                                     .foregroundStyle(colorScheme == .dark ? .white : .black)
                                 
-                                Text(isGlobalMode ? "🌍 Global (Dünya Geneli)" : "🇹🇷 Türkiye (Yerel)")
+                                Text(isGlobalMode ? "🌍 Global (Dünya Geneli)".localized : "🇹🇷 Türkiye (Yerel)".localized)
                                     .font(.system(size: 14, weight: .semibold))
                                     .foregroundStyle(isGlobalMode ? .cyan : .red)
                             }
@@ -2307,7 +2334,7 @@ struct FilterSheet: View {
                     .buttonStyle(.plain)
                     .padding(.vertical, 4)
                     // MARK: - Yaş Aralığı
-                    FilterSectionCard(title: "Yaş Aralığı", icon: "calendar") {
+                    FilterSectionCard(title: "Yaş Aralığı".localized, icon: "calendar") {
                         VStack(spacing: 16) {
                             HStack {
                                 Text("\(Int(minAge))")
@@ -2378,20 +2405,20 @@ struct FilterSheet: View {
                     }
                     
                     // MARK: - Hızlı Filtreler
-                    FilterSectionCard(title: "Hızlı Filtreler", icon: "bolt.fill") {
+                    FilterSectionCard(title: "Hızlı Filtreler".localized, icon: "bolt.fill") {
                         VStack(spacing: 12) {
-                            FilterToggleRow(title: "Sadece Doğrulanmış", icon: "checkmark.seal.fill", iconColor: .blue, isOn: $showVerifiedOnly)
-                            FilterToggleRow(title: "Fotoğraflı Profiller", icon: "photo.fill", iconColor: .purple, isOn: $showWithPhotoOnly)
+                            FilterToggleRow(title: "Sadece Doğrulanmış".localized, icon: "checkmark.seal.fill", iconColor: .blue, isOn: $showVerifiedOnly)
+                            FilterToggleRow(title: "Fotoğraflı Profiller".localized, icon: "photo.fill", iconColor: .purple, isOn: $showWithPhotoOnly)
                         }
                     }
 
                     // MARK: - İlişki Amacı
-                    FilterSectionCard(title: "İlişki Amacı", icon: "heart.circle.fill") {
+                    FilterSectionCard(title: "İlişki Amacı".localized, icon: "heart.circle.fill") {
                         ScrollView(.horizontal, showsIndicators: false) {
                             HStack(spacing: 10) {
                                 ForEach(relationshipGoals, id: \.self) { goal in
                                     FilterOptionChip(
-                                        title: goal,
+                                        title: goal.localized,
                                         isSelected: selectedRelationshipGoal == goal
                                     ) {
                                         selectedRelationshipGoal = goal
@@ -2409,15 +2436,15 @@ struct FilterSheet: View {
                     } label: {
                         HStack {
                             Image(systemName: "arrow.counterclockwise")
-                            Text("Filtreleri Sıfırla")
+                            Text("Filtreleri Sıfırla".localized)
                         }
                         .font(.system(size: 16, weight: .semibold))
-                        .foregroundStyle(.white.opacity(0.7))
+                        .foregroundStyle(colorScheme == .dark ? .white.opacity(0.7) : .black.opacity(0.7))
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 16)
                         .background(
                             RoundedRectangle(cornerRadius: 16)
-                                .fill(Color.white.opacity(0.05))
+                                .fill(colorScheme == .dark ? Color.white.opacity(0.05) : Color.black.opacity(0.05))
                                 .glassEffect(.regular.interactive(), in: RoundedRectangle(cornerRadius: 16))
                         )
                     }
@@ -2427,20 +2454,20 @@ struct FilterSheet: View {
                 .padding(16)
             }
             .background((colorScheme == .dark ? Color(red: 0.04, green: 0.02, blue: 0.08) : Color(UIColor.systemBackground)).ignoresSafeArea())
-            .navigationTitle("Filtreler")
+            .navigationTitle("Filtreler".localized)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
-                    Button("Sıfırla") {
+                    Button("Sıfırla".localized) {
                         resetFilters()
                         Task {
-                            await LogService.shared.info("Filtreler sıfırlandı", category: "Filters")
+                            await LogService.shared.info("Filtreler sıfırlandı".localized, category: "Filters")
                         }
                     }
                     .foregroundStyle(colorScheme == .dark ? .white.opacity(0.7) : .black.opacity(0.7))
                 }
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button("Uygula") {
+                    Button("Uygula".localized) {
                         applyFilters()
                         dismiss()
                     }
@@ -2657,7 +2684,7 @@ struct DoubleDateSheet: View {
                 // Arkadaş Ekleme Bölümü
                 VStack(alignment: .leading, spacing: 16) {
                     HStack {
-                        Text("Çifte Randevu arkadaşları")
+                        Text("Çifte Randevu arkadaşları".localized)
                             .font(.system(size: 16, weight: .medium))
                             .foregroundStyle(colorScheme == .dark ? .white : .black)
                         
@@ -2685,14 +2712,14 @@ struct DoubleDateSheet: View {
                 
                 // Bilgi Metni
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("Çifte Randevu'da en fazla 3 arkadaşınla çift olabilirsin.")
+                    Text("Çifte Randevu'da en fazla 3 arkadaşınla çift olabilirsin.".localized)
                         .font(.system(size: 14))
                         .foregroundStyle(colorScheme == .dark ? .white.opacity(0.7) : .black.opacity(0.7))
                     
                     Button {
                         // Daha fazla bilgi
                     } label: {
-                        Text("Daha fazla bilgi edin")
+                        Text("Daha fazla bilgi edin".localized)
                             .font(.system(size: 14, weight: .medium))
                             .foregroundStyle(Color.purple)
                     }
@@ -2702,7 +2729,7 @@ struct DoubleDateSheet: View {
                 
                 // Davetler Bölümü
                 VStack(alignment: .leading, spacing: 16) {
-                    Text("Arkadaşlardan gelen davetler")
+                    Text("Arkadaşlardan gelen davetler".localized)
                         .font(.system(size: 16, weight: .medium))
                         .foregroundStyle(colorScheme == .dark ? .white : .black)
                     
@@ -2715,7 +2742,7 @@ struct DoubleDateSheet: View {
                                 .font(.system(size: 40))
                                 .foregroundStyle(colorScheme == .dark ? .white.opacity(0.3) : .black.opacity(0.3))
                             
-                            Text("Çifte Randevu davetlerini burada göreceksin.")
+                            Text("Çifte Randevu davetlerini burada göreceksin.".localized)
                                 .font(.system(size: 14))
                                 .foregroundStyle(colorScheme == .dark ? .white.opacity(0.5) : .black.opacity(0.5))
                                 .multilineTextAlignment(.center)
@@ -2748,7 +2775,7 @@ struct DoubleDateSheet: View {
                 Button {
                     showFriendPicker = true
                 } label: {
-                    Text("Arkadaşlarını Davet Et")
+                    Text("Arkadaşlarını Davet Et".localized)
                         .font(.system(size: 17, weight: .semibold))
                         .foregroundStyle(.white)
                         .frame(maxWidth: .infinity)
@@ -2762,7 +2789,7 @@ struct DoubleDateSheet: View {
                 .padding(.bottom, 20)
             }
             .background((colorScheme == .dark ? Color(red: 0.04, green: 0.02, blue: 0.08) : Color(UIColor.systemBackground)).ignoresSafeArea())
-            .navigationTitle("Arkadaşlar")
+            .navigationTitle("Arkadaşlar".localized)
             .navigationBarTitleDisplayMode(.inline)
             .navigationBarItems(
                 leading: Button {
@@ -2774,7 +2801,7 @@ struct DoubleDateSheet: View {
                         .frame(width: 36, height: 36)
                         .background(Circle().fill(colorScheme == .dark ? .white.opacity(0.1) : .black.opacity(0.1)))
                 },
-                trailing: Button("Ayarlar") {
+                trailing: Button("Ayarlar".localized) {
                     showSettings = true
                 }
                 .foregroundStyle(Color.purple)
@@ -2941,7 +2968,7 @@ struct DoubleDateInviteRow: View {
             
             // İsim ve Mesaj
             VStack(alignment: .leading, spacing: 2) {
-                Text(invite.fromUser?.displayName ?? "Kullanıcı")
+                Text(invite.fromUser?.displayName ?? "Kullanıcı".localized)
                     .font(.system(size: 14, weight: .semibold))
                     .foregroundStyle(colorScheme == .dark ? .white : .black)
                 
@@ -2951,7 +2978,7 @@ struct DoubleDateInviteRow: View {
                         .foregroundStyle(colorScheme == .dark ? .white.opacity(0.6) : .black.opacity(0.6))
                         .lineLimit(1)
                 } else {
-                    Text("Seni Çifte Randevu'ya davet etti")
+                    Text("Seni Çifte Randevu'ya davet etti".localized)
                         .font(.system(size: 12))
                         .foregroundStyle(colorScheme == .dark ? .white.opacity(0.6) : .black.opacity(0.6))
                 }
@@ -2992,6 +3019,7 @@ struct DoubleDateInviteRow: View {
 // MARK: - Friend Picker Sheet
 struct DoubleDateFriendPickerSheet: View {
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.colorScheme) private var colorScheme
     let friends: [Friendship]
     let existingMemberIds: [String]
     let onSelect: (String) -> Void
@@ -3004,17 +3032,17 @@ struct DoubleDateFriendPickerSheet: View {
                         VStack(spacing: 16) {
                             Image(systemName: "person.2.slash")
                                 .font(.system(size: 48))
-                                .foregroundStyle(.white.opacity(0.3))
+                                .foregroundStyle(colorScheme == .dark ? .white.opacity(0.3) : .black.opacity(0.3))
                             
                             Text("Davet edilecek arkadaş bulunamadı")
                                 .font(.system(size: 16))
-                                .foregroundStyle(.white.opacity(0.6))
+                                .foregroundStyle(colorScheme == .dark ? .white.opacity(0.6) : .black.opacity(0.6))
                         }
                         .frame(maxWidth: .infinity)
                         .padding(.top, 60)
                     } else {
                         ForEach(availableFriends, id: \.id) { friendship in
-                            FriendPickerRow(friendship: friendship) {
+                            FriendPickerRow(friendship: friendship, colorScheme: colorScheme) {
                                 onSelect(friendship.friend.id)
                                 dismiss()
                             }
@@ -3023,7 +3051,7 @@ struct DoubleDateFriendPickerSheet: View {
                 }
                 .padding(20)
             }
-            .background(Color(red: 0.04, green: 0.02, blue: 0.08).ignoresSafeArea())
+            .background((colorScheme == .dark ? Color(red: 0.04, green: 0.02, blue: 0.08) : Color(UIColor.systemBackground)).ignoresSafeArea())
             .navigationTitle("Arkadaş Seç")
             .navigationBarTitleDisplayMode(.inline)
             .navigationBarItems(
@@ -3032,7 +3060,7 @@ struct DoubleDateFriendPickerSheet: View {
                 } label: {
                     Image(systemName: "xmark")
                         .font(.system(size: 16, weight: .semibold))
-                        .foregroundStyle(.white)
+                        .foregroundStyle(colorScheme == .dark ? .white : .black)
                 }
             )
         }
@@ -3047,6 +3075,7 @@ struct DoubleDateFriendPickerSheet: View {
 // MARK: - Friend Picker Row
 struct FriendPickerRow: View {
     let friendship: Friendship
+    var colorScheme: ColorScheme = .dark
     let onSelect: () -> Void
     
     var body: some View {
@@ -3059,10 +3088,10 @@ struct FriendPickerRow: View {
                     case .success(let image):
                         image.resizable().scaledToFill()
                     default:
-                        Circle().fill(.white.opacity(0.2))
+                        Circle().fill(colorScheme == .dark ? .white.opacity(0.2) : .black.opacity(0.1))
                             .overlay {
                                 Image(systemName: "person.fill")
-                                    .foregroundStyle(.white.opacity(0.5))
+                                    .foregroundStyle(colorScheme == .dark ? .white.opacity(0.5) : .black.opacity(0.5))
                             }
                     }
                 }
@@ -3072,14 +3101,14 @@ struct FriendPickerRow: View {
                 VStack(alignment: .leading, spacing: 2) {
                     Text(friendship.friend.displayName)
                         .font(.system(size: 16, weight: .semibold))
-                        .foregroundStyle(.white)
+                        .foregroundStyle(colorScheme == .dark ? .white : .black)
                     
                     if friendship.friend.isOnline {
                         HStack(spacing: 4) {
                             Circle().fill(.green).frame(width: 6, height: 6)
                             Text("Çevrimiçi")
                                 .font(.system(size: 12))
-                                .foregroundStyle(.white.opacity(0.6))
+                                .foregroundStyle(colorScheme == .dark ? .white.opacity(0.6) : .black.opacity(0.6))
                         }
                     }
                 }
@@ -3093,7 +3122,7 @@ struct FriendPickerRow: View {
                     )
             }
             .padding(12)
-            .background(RoundedRectangle(cornerRadius: 12).fill(.white.opacity(0.05)))
+            .background(RoundedRectangle(cornerRadius: 12).fill(colorScheme == .dark ? .white.opacity(0.05) : .black.opacity(0.05)))
         }
     }
 }

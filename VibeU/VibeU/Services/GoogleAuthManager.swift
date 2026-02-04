@@ -13,19 +13,16 @@ actor GoogleAuthManager {
                     return
                 }
                 
-                GIDSignIn.sharedInstance.signIn(withPresenting: rootViewController) { result, error in
-                    if let error = error {
-                        continuation.resume(throwing: error)
-                        return
+                do {
+                    let result = try await GIDSignIn.sharedInstance.signIn(withPresenting: rootViewController)
+                    let user = result.user
+                    guard let idToken = user.idToken?.tokenString else {
+                         continuation.resume(throwing: NSError(domain: "GoogleAuth", code: -1, userInfo: [NSLocalizedDescriptionKey: "Failed to get tokens"]))
+                         return
                     }
-                    
-                    guard let user = result?.user,
-                          let idToken = user.idToken?.tokenString else {
-                        continuation.resume(throwing: NSError(domain: "GoogleAuth", code: -1, userInfo: [NSLocalizedDescriptionKey: "Failed to get tokens"]))
-                        return
-                    }
-                    
                     continuation.resume(returning: (idToken, user.accessToken.tokenString, user))
+                } catch {
+                    continuation.resume(throwing: error)
                 }
             }
         }

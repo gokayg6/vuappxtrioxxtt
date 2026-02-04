@@ -39,7 +39,7 @@ struct QRProfileView: View {
                     
                     // MARK: - Share Section
                     VStack(spacing: 20) {
-                        Text("Hikayende Paylaş")
+                        Text("Hikayende Paylaş".localized)
                             .font(.subheadline.weight(.medium))
                             .foregroundStyle(colors.secondaryText)
                         
@@ -96,7 +96,7 @@ struct QRProfileView: View {
                         Button { showShareSheet = true } label: {
                             HStack {
                                 Image(systemName: "square.and.arrow.up")
-                                Text("Paylaş")
+                                Text("Paylaş".localized)
                             }
                             .font(.system(size: 16, weight: .semibold))
                             .foregroundStyle(colors.primaryText)
@@ -109,7 +109,7 @@ struct QRProfileView: View {
                         Button { saveQR() } label: {
                             HStack {
                                 Image(systemName: "arrow.down.to.line")
-                                Text("Kaydet")
+                                Text("Kaydet".localized)
                             }
                             .font(.system(size: 16, weight: .semibold))
                             .foregroundStyle(.white)
@@ -124,17 +124,17 @@ struct QRProfileView: View {
                 }
             }
         }
-        .navigationTitle("QR Profilim")
+        .navigationTitle("QR Profilim".localized)
         .navigationBarTitleDisplayMode(.inline)
         .toolbarColorScheme(isDark ? .dark : .light, for: .navigationBar)
         .onAppear {
             generateQR()
             loadProfilePhoto()
         }
-        .alert("Kaydedildi ✓", isPresented: $showSavedAlert) {
-            Button("Tamam") { }
+        .alert("Kaydedildi ✓".localized, isPresented: $showSavedAlert) {
+            Button("Tamam".localized) { }
         } message: {
-            Text("QR kod fotoğraflarına kaydedildi.")
+            Text("QR kod fotoğraflarına kaydedildi.".localized)
         }
         .sheet(isPresented: $showShareSheet) {
             if let image = qrImageWithLogo ?? qrImage {
@@ -418,11 +418,11 @@ struct ShareView: View {
                     )
             }
             
-            Text("Arkadaş Ekle")
+            Text("Arkadaş Ekle".localized)
                 .font(.title2.weight(.bold))
                 .foregroundStyle(colors.primaryText)
             
-            Text("QR kod veya AirDrop ile arkadaşlarını ekle")
+            Text("QR kod veya AirDrop ile arkadaşlarını ekle".localized)
                 .font(.subheadline)
                 .foregroundStyle(colors.secondaryText)
                 .multilineTextAlignment(.center)
@@ -434,8 +434,8 @@ struct ShareView: View {
         ShareOptionCard(
             icon: "qrcode",
             iconColor: .purple,
-            title: "QR Kodunu Göster",
-            description: "Arkadaşların seni tarayarak ekleyebilir",
+            title: "QR Kodunu Göster".localized,
+            description: "Arkadaşların seni tarayarak ekleyebilir".localized,
             colors: colors
         ) {
             showMyQRCode = true
@@ -447,8 +447,8 @@ struct ShareView: View {
         ShareOptionCard(
             icon: "qrcode.viewfinder",
             iconColor: .cyan,
-            title: "QR Kod Tara",
-            description: "Arkadaşının QR kodunu tara ve ekle",
+            title: "QR Kod Tara".localized,
+            description: "Arkadaşının QR kodunu tara ve ekle".localized,
             colors: colors
         ) {
             showQRScanner = true
@@ -460,8 +460,8 @@ struct ShareView: View {
         ShareOptionCard(
             icon: "antenna.radiowaves.left.and.right",
             iconColor: .orange,
-            title: "Yakındakileri Bul",
-            description: "AirDrop ile yakındaki VibeU kullanıcılarını bul",
+            title: "Yakındakileri Bul".localized,
+            description: "AirDrop ile yakındaki VibeU kullanıcılarını bul".localized,
             colors: colors,
             isLoading: isSearchingNearby
         ) {
@@ -472,7 +472,7 @@ struct ShareView: View {
     // MARK: - Nearby Users Section
     private var nearbyUsersSection: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text("Yakındaki Kullanıcılar")
+            Text("Yakındaki Kullanıcılar".localized)
                 .font(.headline)
                 .foregroundStyle(colors.primaryText)
             
@@ -639,7 +639,7 @@ struct MyQRCodeView: View {
                         .shadow(color: colors.primaryText.opacity(0.1), radius: 20, y: 10)
                 }
                 
-                Text("Bu QR kodu arkadaşlarına göster")
+                Text("Bu QR kodu arkadaşlarına göster".localized)
                     .font(.subheadline)
                     .foregroundStyle(colors.secondaryText)
                 
@@ -647,11 +647,11 @@ struct MyQRCodeView: View {
             }
             .padding(32)
             .background(colors.background.ignoresSafeArea())
-            .navigationTitle("QR Kodum")
+            .navigationTitle("QR Kodum".localized)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button("Kapat") {
+                    Button("Kapat".localized) {
                         dismiss()
                     }
                     .foregroundStyle(colors.accent)
@@ -722,7 +722,7 @@ struct QRScannerView_New: View {
                     
                     Spacer()
                     
-                    Text("QR Kodu çerçevenin içine hizalayın")
+                    Text("QR Kodu çerçevenin içine hizalayın".localized)
                     .font(.subheadline)
                     .foregroundStyle(.white)
                     .padding(.bottom, 50)
@@ -739,12 +739,12 @@ struct QRScannerView_New: View {
                     }
                 }
             }
-            .navigationTitle("QR Kod Tara")
+            .navigationTitle("QR Kod Tara".localized)
             .navigationBarTitleDisplayMode(.inline)
             .toolbarColorScheme(.dark, for: .navigationBar)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
-                    Button("İptal") {
+                    Button("İptal".localized) {
                         dismiss()
                     }
                     .foregroundStyle(.white)

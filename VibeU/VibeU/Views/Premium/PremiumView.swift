@@ -79,13 +79,13 @@ struct PremiumView: View {
             } message: {
                 Text(viewModel.errorMessage)
             }
-            .alert("Tebrikler! 🎉", isPresented: $viewModel.showSuccess) {
-                Button("Harika!") {
+            .alert("Tebrikler! 🎉".localized, isPresented: $viewModel.showSuccess) {
+                Button("Harika!".localized) {
                     appState.isPremium = true
                     dismiss()
                 }
             } message: {
-                Text("Premium üyeliğiniz aktif edildi!")
+                Text("Premium üyeliğiniz aktif edildi!".localized)
             }
         }
     }
@@ -140,7 +140,7 @@ struct PremiumView: View {
                 }
                 .font(.system(size: 32, weight: .bold, design: .rounded))
                 
-                Text("Sınırsız eşleşme, sınırsız bağlantı")
+                Text("Sınırsız eşleşme, sınırsız bağlantı".localized)
                     .font(.subheadline)
                     .foregroundStyle(.white.opacity(0.6))
             }
@@ -153,43 +153,43 @@ struct PremiumView: View {
         VStack(spacing: 10) {
             PremiumFeatureRow(
                 icon: "heart.fill",
-                title: "Sınırsız Beğeni",
-                description: "Günlük limit olmadan beğen",
+                title: "Sınırsız Beğeni".localized,
+                description: "Günlük limit olmadan beğen".localized,
                 color: .red
             )
             
             PremiumFeatureRow(
                 icon: "eyes",
-                title: "Seni Beğenenleri Gör",
-                description: "Kimin beğendiğini anında öğren",
+                title: "Seni Beğenenleri Gör".localized,
+                description: "Kimin beğendiğini anında öğren".localized,
                 color: .pink
             )
             
             PremiumFeatureRow(
                 icon: "globe",
-                title: "Global Keşif",
-                description: "Dünyanın her yerinden bağlan",
+                title: "Global Keşif".localized,
+                description: "Dünyanın her yerinden bağlan".localized,
                 color: .blue
             )
             
             PremiumFeatureRow(
                 icon: "sparkles",
-                title: "Özel Profil Çerçevesi",
-                description: "Premium rozeti ile öne çık",
+                title: "Özel Profil Çerçevesi".localized,
+                description: "Premium rozeti ile öne çık".localized,
                 color: .purple
             )
             
             PremiumFeatureRow(
                 icon: "bolt.fill",
-                title: "Öncelikli Görünürlük",
-                description: "Profilin daha çok gösterilsin",
+                title: "Öncelikli Görünürlük".localized,
+                description: "Profilin daha çok gösterilsin".localized,
                 color: .orange
             )
             
             PremiumFeatureRow(
                 icon: "arrow.uturn.backward",
-                title: "Sınırsız Geri Alma",
-                description: "Yanlışlıkla geçtiklerini geri al",
+                title: "Sınırsız Geri Alma".localized,
+                description: "Yanlışlıkla geçtiklerini geri al".localized,
                 color: .yellow
             )
         }
@@ -199,7 +199,7 @@ struct PremiumView: View {
     // MARK: - Pricing Plans
     private var pricingPlans: some View {
         VStack(spacing: 12) {
-            Text("Planını Seç")
+            Text("Planını Seç".localized)
                 .font(.headline)
                 .foregroundStyle(.white)
             
@@ -242,7 +242,7 @@ struct PremiumView: View {
                         ProgressView()
                             .tint(.white)
                     } else {
-                        Text("Premium'a Geç")
+                        Text("Premium'a Geç".localized)
                             .font(.headline)
                         Image(systemName: "arrow.right")
                             .font(.headline)
@@ -269,7 +269,7 @@ struct PremiumView: View {
                     appState.hasSkippedPremium = true
                     dismiss()
                 } label: {
-                    Text("Şimdilik Geç")
+                    Text("Şimdilik Geç".localized)
                         .font(.subheadline)
                         .foregroundStyle(.white.opacity(0.5))
                 }
@@ -282,15 +282,15 @@ struct PremiumView: View {
     // MARK: - Terms
     private var termsSection: some View {
         VStack(spacing: 8) {
-            Text("Abonelik otomatik olarak yenilenir. İstediğiniz zaman iptal edebilirsiniz.")
+            Text("Abonelik otomatik olarak yenilenir. İstediğin zaman iptal edebilirsin.".localized)
                 .font(.caption)
                 .foregroundStyle(.white.opacity(0.4))
                 .multilineTextAlignment(.center)
             
             HStack(spacing: 16) {
-                Button("Kullanım Şartları") {}
-                Button("Gizlilik Politikası") {}
-                Button("Satın Alımları Geri Yükle") {
+                Button("Kullanım Şartları".localized) {}
+                Button("Gizlilik Politikası".localized) {}
+                Button("Satın Alımları Geri Yükle".localized) {
                     Task {
                         await viewModel.restorePurchases()
                     }
@@ -312,9 +312,9 @@ enum PremiumPlan: String, CaseIterable {
     
     var title: String {
         switch self {
-        case .weekly: return "Haftalık"
-        case .monthly: return "Aylık"
-        case .yearly: return "Yıllık"
+        case .weekly: return "Haftalık".localized
+        case .monthly: return "Aylık".localized
+        case .yearly: return "Yıllık".localized
         }
     }
     
@@ -328,17 +328,17 @@ enum PremiumPlan: String, CaseIterable {
     
     var perWeekPrice: String {
         switch self {
-        case .weekly: return "₺49,99/hafta"
-        case .monthly: return "₺37,50/hafta"
-        case .yearly: return "₺17,30/hafta"
+        case .weekly: return "₺49,99" + "/hafta".localized
+        case .monthly: return "₺37,50" + "/hafta".localized
+        case .yearly: return "₺17,30" + "/hafta".localized
         }
     }
     
     var savings: String? {
         switch self {
         case .weekly: return nil
-        case .monthly: return "%25 Tasarruf"
-        case .yearly: return "%65 Tasarruf"
+        case .monthly: return "%25 " + "Tasarruf".localized
+        case .yearly: return "%65 " + "Tasarruf".localized
         }
     }
     
@@ -363,7 +363,7 @@ struct PlanCard: View {
             VStack(spacing: 8) {
                 // Badge
                 if plan.isBestValue {
-                    Text("EN İYİ")
+                    Text("EN İYİ".localized)
                         .font(.system(size: 9, weight: .bold))
                         .foregroundStyle(.white)
                         .padding(.horizontal, 8)
@@ -373,7 +373,7 @@ struct PlanCard: View {
                         )
                         .clipShape(Capsule())
                 } else if plan.isMostPopular {
-                    Text("POPÜLER")
+                    Text("POPÜLER".localized)
                         .font(.system(size: 9, weight: .bold))
                         .foregroundStyle(.white)
                         .padding(.horizontal, 8)

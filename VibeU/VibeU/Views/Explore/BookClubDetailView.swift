@@ -21,11 +21,13 @@ struct BookClubDetailView: View {
     
     private var colors: ThemeColors { isDark ? .dark : .light }
     
-    let genres = ["Hepsi", "Roman", "Klasik", "Bilim Kurgu", "Fantastik", "Polisiye", "Tarih", "Biyografi", "Felsefe", "Psikoloji", "Şiir"]
+    let genres = ["Hepsi".localized, "Roman".localized, "Klasik".localized, "Bilim Kurgu".localized, "Fantastik".localized, "Polisiye".localized, "Tarih".localized, "Biyografi".localized, "Felsefe".localized, "Psikoloji".localized, "Şiir".localized]
+
     
     var filteredBooks: [Book] {
         books.filter { book in
-            (selectedGenre == "Hepsi" || book.genre == selectedGenre) &&
+            (selectedGenre == "Hepsi".localized || book.genre == selectedGenre) &&
+
             (searchText.isEmpty || book.title.localizedCaseInsensitiveContains(searchText) || book.author.localizedCaseInsensitiveContains(searchText))
         }
     }
@@ -40,12 +42,13 @@ struct BookClubDetailView: View {
                     VStack(spacing: 8) {
                         Text("📚")
                             .font(.system(size: 60))
-                        Text("Kitap Kulübü")
+                        Text("Kitap Kulübü".localized)
                             .font(.system(size: 28, weight: .bold))
                             .foregroundStyle(colors.primaryText)
-                        Text("Aynı kitabı okuyan insanlarla tanış")
+                        Text("Aynı kitabı okuyan insanlarla tanış".localized)
                             .font(.system(size: 15))
                             .foregroundStyle(colors.secondaryText)
+
                     }
                     .padding(.top, 20)
                     .padding(.bottom, 16)
@@ -55,7 +58,8 @@ struct BookClubDetailView: View {
                         Image(systemName: "magnifyingglass")
                             .foregroundStyle(colors.secondaryText)
                         
-                        TextField("Kitap veya yazar ara...", text: $searchText)
+                        TextField("Kitap veya yazar ara...".localized, text: $searchText)
+
                             .textFieldStyle(.plain)
                             .foregroundStyle(colors.primaryText)
                     }
@@ -128,16 +132,17 @@ struct BookClubDetailView: View {
     // MARK: - Books Database
     private var books: [Book] {
         [
-            Book(id: "1", title: "Kürk Mantolu Madonna", author: "Sabahattin Ali", genre: "Klasik", year: 1943, pages: 176, rating: 4.8, readers: 1250, imageURL: "https://images.unsplash.com/photo-1512820790803-83ca734da794?w=400", description: "Türk edebiyatının başyapıtlarından biri"),
-            Book(id: "2", title: "Tutunamayanlar", author: "Oğuz Atay", genre: "Roman", year: 1971, pages: 724, rating: 4.7, readers: 890, imageURL: "https://images.unsplash.com/photo-1543002588-bfa74002ed7e?w=400", description: "Modern Türk romanının kilometre taşı"),
-            Book(id: "3", title: "1984", author: "George Orwell", genre: "Bilim Kurgu", year: 1949, pages: 328, rating: 4.9, readers: 2100, imageURL: "https://images.unsplash.com/photo-1495446815901-a7297e633e8d?w=400", description: "Distopik edebiyatın başyapıtı"),
-            Book(id: "4", title: "Suç ve Ceza", author: "Dostoyevski", genre: "Klasik", year: 1866, pages: 671, rating: 4.8, readers: 1560, imageURL: "https://images.unsplash.com/photo-1524578271613-d550eacf6090?w=400", description: "Psikolojik roman"),
-            Book(id: "5", title: "Yüzüklerin Efendisi", author: "J.R.R. Tolkien", genre: "Fantastik", year: 1954, pages: 1178, rating: 4.9, readers: 3200, imageURL: "https://images.unsplash.com/photo-1532012197267-da84d127e765?w=400", description: "Fantastik edebiyatın zirvesi"),
-            Book(id: "6", title: "Şeker Portakalı", author: "Jose Mauro de Vasconcelos", genre: "Roman", year: 1968, pages: 192, rating: 4.7, readers: 980, imageURL: "https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=400", description: "Çocukluk ve yoksulluk"),
-            Book(id: "7", title: "Simyacı", author: "Paulo Coelho", genre: "Roman", year: 1988, pages: 208, rating: 4.6, readers: 1780, imageURL: "https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=400", description: "Kişisel efsane arayışı"),
-            Book(id: "8", title: "Beyaz Zambaklar Ülkesinde", author: "Grigory Petrov", genre: "Tarih", year: 1923, pages: 144, rating: 4.5, readers: 670, imageURL: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400", description: "Finlandiya'nın gelişimi"),
-            Book(id: "9", title: "İnce Memed", author: "Yaşar Kemal", genre: "Roman", year: 1955, pages: 448, rating: 4.7, readers: 1120, imageURL: "https://images.unsplash.com/photo-1519682337058-a94d519337bc?w=400", description: "Çukurova destanı"),
-            Book(id: "10", title: "Fareler ve İnsanlar", author: "John Steinbeck", genre: "Klasik", year: 1937, pages: 107, rating: 4.6, readers: 890, imageURL: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400", description: "Dostluk ve hayaller"),
+            Book(id: "1", title: "Kürk Mantolu Madonna", author: "Sabahattin Ali", genre: "Klasik".localized, year: 1943, pages: 176, rating: 4.8, readers: 1250, imageURL: "https://images.unsplash.com/photo-1512820790803-83ca734da794?w=400", description: "Türk edebiyatının başyapıtlarından biri".localized),
+            Book(id: "2", title: "Tutunamayanlar", author: "Oğuz Atay", genre: "Roman".localized, year: 1971, pages: 724, rating: 4.7, readers: 890, imageURL: "https://images.unsplash.com/photo-1543002588-bfa74002ed7e?w=400", description: "Modern Türk romanının kilometre taşı".localized),
+            Book(id: "3", title: "1984", author: "George Orwell", genre: "Bilim Kurgu".localized, year: 1949, pages: 328, rating: 4.9, readers: 2100, imageURL: "https://images.unsplash.com/photo-1495446815901-a7297e633e8d?w=400", description: "Distopik edebiyatın başyapıtı".localized),
+            Book(id: "4", title: "Suç ve Ceza", author: "Dostoyevski", genre: "Klasik".localized, year: 1866, pages: 671, rating: 4.8, readers: 1560, imageURL: "https://images.unsplash.com/photo-1524578271613-d550eacf6090?w=400", description: "Psikolojik roman".localized),
+            Book(id: "5", title: "Yüzüklerin Efendisi", author: "J.R.R. Tolkien", genre: "Fantastik".localized, year: 1954, pages: 1178, rating: 4.9, readers: 3200, imageURL: "https://images.unsplash.com/photo-1532012197267-da84d127e765?w=400", description: "Fantastik edebiyatın zirvesi".localized),
+            Book(id: "6", title: "Şeker Portakalı", author: "Jose Mauro de Vasconcelos", genre: "Roman".localized, year: 1968, pages: 192, rating: 4.7, readers: 980, imageURL: "https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=400", description: "Çocukluk ve yoksulluk".localized),
+            Book(id: "7", title: "Simyacı", author: "Paulo Coelho", genre: "Roman".localized, year: 1988, pages: 208, rating: 4.6, readers: 1780, imageURL: "https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=400", description: "Kişisel efsane arayışı".localized),
+            Book(id: "8", title: "Beyaz Zambaklar Ülkesinde", author: "Grigory Petrov", genre: "Tarih".localized, year: 1923, pages: 144, rating: 4.5, readers: 670, imageURL: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400", description: "Finlandiya'nın gelişimi".localized),
+            Book(id: "9", title: "İnce Memed", author: "Yaşar Kemal", genre: "Roman".localized, year: 1955, pages: 448, rating: 4.7, readers: 1120, imageURL: "https://images.unsplash.com/photo-1519682337058-a94d519337bc?w=400", description: "Çukurova destanı".localized),
+            Book(id: "10", title: "Fareler ve İnsanlar", author: "John Steinbeck", genre: "Klasik".localized, year: 1937, pages: 107, rating: 4.6, readers: 890, imageURL: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400", description: "Dostluk ve hayaller".localized),
+
         ]
     }
 }
@@ -229,13 +234,15 @@ private struct BookCard: View {
                             Image(systemName: "person.2.fill")
                                 .font(.system(size: 10))
                                 .foregroundStyle(.cyan)
-                            Text("\(book.readers) okuyucu")
+                            Text("\(book.readers) " + "okuyucu".localized)
+
                                 .font(.system(size: 11))
                                 .foregroundStyle(colors.secondaryText)
                         }
                     }
                     
-                    Text("\(book.pages) sayfa • \(book.year)")
+                    Text("\(book.pages) " + "sayfa".localized + " • \(book.year)")
+
                         .font(.system(size: 11))
                         .foregroundStyle(colors.tertiaryText)
                 }
@@ -317,7 +324,8 @@ private struct BookDetailSheet: View {
                                             .font(.system(size: 16, weight: .semibold))
                                             .foregroundStyle(colors.primaryText)
                                     }
-                                    Text("Puan")
+                                    Text("Puan".localized)
+
                                         .font(.system(size: 11))
                                         .foregroundStyle(colors.tertiaryText)
                                 }
@@ -326,7 +334,8 @@ private struct BookDetailSheet: View {
                                     Text("\(book.readers)")
                                         .font(.system(size: 16, weight: .semibold))
                                         .foregroundStyle(colors.primaryText)
-                                    Text("Okuyucu")
+                                    Text("Okuyucu".localized)
+
                                         .font(.system(size: 11))
                                         .foregroundStyle(colors.tertiaryText)
                                 }
@@ -335,7 +344,8 @@ private struct BookDetailSheet: View {
                                     Text("\(book.pages)")
                                         .font(.system(size: 16, weight: .semibold))
                                         .foregroundStyle(colors.primaryText)
-                                    Text("Sayfa")
+                                    Text("Sayfa".localized)
+
                                         .font(.system(size: 11))
                                         .foregroundStyle(colors.tertiaryText)
                                 }
@@ -353,7 +363,8 @@ private struct BookDetailSheet: View {
                             } label: {
                                 HStack {
                                     Image(systemName: "person.badge.plus.fill")
-                                    Text("Okuma Grubuna Katıl")
+                                    Text("Okuma Grubuna Katıl".localized)
+
                                 }
                                 .font(.system(size: 16, weight: .semibold))
                                 .foregroundStyle(.white)

@@ -34,7 +34,7 @@ struct NotificationsView: View {
                             // Today Section
                             if !todayNotifications.isEmpty {
                                 NotificationSection(
-                                    title: "Bugün",
+                                    title: "Bugün".localized,
                                     notifications: todayNotifications,
                                     isLight: isLight,
                                     onTap: viewModel.handleTap,
@@ -45,7 +45,7 @@ struct NotificationsView: View {
                             // This Week Section
                             if !thisWeekNotifications.isEmpty {
                                 NotificationSection(
-                                    title: "Bu Hafta",
+                                    title: "Bu Hafta".localized,
                                     notifications: thisWeekNotifications,
                                     isLight: isLight,
                                     onTap: viewModel.handleTap,
@@ -56,7 +56,7 @@ struct NotificationsView: View {
                             // Earlier Section
                             if !earlierNotifications.isEmpty {
                                 NotificationSection(
-                                    title: "Daha Önce",
+                                    title: "Daha Önce".localized,
                                     notifications: earlierNotifications,
                                     isLight: isLight,
                                     onTap: viewModel.handleTap,
@@ -73,7 +73,7 @@ struct NotificationsView: View {
                 }
             }
         }
-        .navigationTitle("Bildirimler")
+        .navigationTitle("Bildirimler".localized)
         .navigationBarTitleDisplayMode(.large)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
@@ -81,7 +81,7 @@ struct NotificationsView: View {
                     Button {
                         Task { await viewModel.markAllAsRead() }
                     } label: {
-                        Text("Tümünü Oku")
+                        Text("Tümünü Oku".localized)
                             .font(.subheadline.weight(.medium))
                             .foregroundStyle(.purple)
                     }
@@ -159,7 +159,7 @@ struct NotificationFilterBar: View {
                         HStack(spacing: 6) {
                             Image(systemName: filter.icon)
                                 .font(.caption)
-                            Text(filter.rawValue)
+                            Text(filter.rawValue.localized)
                                 .font(.subheadline.weight(.medium))
                         }
                         .foregroundStyle(selectedFilter == filter ? .white : (isLight ? .black.opacity(0.6) : .white.opacity(0.6)))
@@ -384,11 +384,11 @@ struct EmptyNotificationsView: View {
                     LinearGradient(colors: [.purple.opacity(0.5), .pink.opacity(0.5)], startPoint: .topLeading, endPoint: .bottomTrailing)
                 )
             
-            Text("Bildirim Yok")
+            Text("Bildirim Yok".localized)
                 .font(.title3.weight(.semibold))
                 .foregroundStyle(isLight ? .black : .white)
             
-            Text("Yeni bildirimler geldiğinde burada görünecek")
+            Text("Yeni bildirimler geldiğinde burada görünecek".localized)
                 .font(.subheadline)
                 .foregroundStyle(isLight ? .black.opacity(0.5) : .white.opacity(0.5))
                 .multilineTextAlignment(.center)

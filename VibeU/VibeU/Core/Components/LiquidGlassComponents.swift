@@ -3,7 +3,7 @@ import SwiftUI
 // MARK: - Liquid Glass Button (Layer 3 - Micro Glass)
 
 struct GlassButton: View {
-    let title: LocalizedStringKey
+    let title: String
     let icon: String?
     let style: GlassButtonStyle
     let action: () -> Void
@@ -16,7 +16,7 @@ struct GlassButton: View {
     }
     
     init(
-        _ title: LocalizedStringKey,
+        _ title: String,
         icon: String? = nil,
         style: GlassButtonStyle = .primary,
         action: @escaping () -> Void
@@ -157,7 +157,7 @@ struct GlassContainer<Content: View>: View {
 
 struct GlassSegmentControl<T: Hashable>: View {
     @Binding var selection: T
-    let options: [(T, LocalizedStringKey, String?)]
+    let options: [(T, String, String?)]
     
     var body: some View {
         HStack(spacing: 4) {
@@ -180,7 +180,7 @@ struct GlassSegmentControl<T: Hashable>: View {
 }
 
 struct GlassSegmentButton: View {
-    let title: LocalizedStringKey
+    let title: String
     let icon: String?
     let isSelected: Bool
     let action: () -> Void
@@ -271,7 +271,7 @@ struct GlassPillTag: View {
 // MARK: - Glass Text Field
 
 struct GlassTextField: View {
-    let placeholder: LocalizedStringKey
+    let placeholder: String
     @Binding var text: String
     var keyboardType: UIKeyboardType = .default
     
@@ -300,16 +300,16 @@ struct GlassLoadingView: View {
 
 struct GlassEmptyState: View {
     let icon: String
-    let title: LocalizedStringKey
-    let message: LocalizedStringKey
-    let actionTitle: LocalizedStringKey?
+    let title: String
+    let message: String
+    let actionTitle: String?
     let action: (() -> Void)?
     
     init(
         icon: String,
-        title: LocalizedStringKey,
-        message: LocalizedStringKey,
-        actionTitle: LocalizedStringKey? = nil,
+        title: String,
+        message: String,
+        actionTitle: String? = nil,
         action: (() -> Void)? = nil
     ) {
         self.icon = icon

@@ -23,6 +23,11 @@
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
 	<string>1.0</string>
+    <key>CFBundleLocalizations</key>
+    <array>
+        <string>tr</string>
+        <string>en</string>
+    </array>
 	<key>GIDClientID</key>
 	<string>901614024126-jk45khdkb2gegbuk8o9u7h5ngmhso765.apps.googleusercontent.com</string>
 	<key>CFBundleURLTypes</key>
@@ -92,5 +97,14 @@
 	</array>
 	<key>UIUserInterfaceStyle</key>
 	<string>Dark</string>
+    <key>GADApplicationIdentifier</key>
+    <string>ca-app-pub-7489124652159259~8141198835</string>
+    <key>SKAdNetworkItems</key>
+    <array>
+        <dict>
+            <key>SKAdNetworkIdentifier</key>
+            <string>cstr6suwn9.skadnetwork</string>
+        </dict>
+    </array>
 </dict>
 </plist>

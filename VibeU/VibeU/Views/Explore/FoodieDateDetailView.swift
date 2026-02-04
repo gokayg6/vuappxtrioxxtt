@@ -7,9 +7,9 @@ struct FoodieDateDetailView: View {
     @Environment(AppState.self) private var appState
     @Environment(\.colorScheme) private var systemColorScheme
     
-    @State private var selectedCuisine: String = "Hepsi"
+    @State private var selectedCuisine: String = "Hepsi".localized
     @State private var selectedCity: String = "İstanbul"
-    @State private var selectedPriceRange: String = "Hepsi"
+    @State private var selectedPriceRange: String = "Hepsi".localized
     @State private var searchText = ""
     
     private var isDark: Bool {
@@ -22,15 +22,17 @@ struct FoodieDateDetailView: View {
     
     private var colors: ThemeColors { isDark ? .dark : .light }
     
-    let cuisines = ["Hepsi", "Türk", "İtalyan", "Japon", "Çin", "Hint", "Meksika", "Fransız", "Deniz Ürünleri", "Vejetaryen", "Vegan", "Fast Food"]
-    let cities = ["İstanbul", "Ankara", "İzmir", "Antalya", "Bursa"]
-    let priceRanges = ["Hepsi", "₺", "₺₺", "₺₺₺", "₺₺₺₺"]
+    let cuisines = ["Hepsi".localized, "Türk".localized, "İtalyan".localized, "Japon".localized, "Çin".localized, "Hint".localized, "Meksika".localized, "Fransız".localized, "Deniz Ürünleri".localized, "Vejetaryen".localized, "Vegan".localized, "Fast Food".localized]
+    let cities = ["Hepsi".localized, "İstanbul", "Ankara", "İzmir", "Antalya", "Bursa"]
+    let priceRanges = ["Hepsi".localized, "₺", "₺₺", "₺₺₺", "₺₺₺₺"]
+
     
     var filteredRestaurants: [Restaurant] {
         restaurants.filter { restaurant in
-            (selectedCuisine == "Hepsi" || restaurant.cuisine == selectedCuisine) &&
-            (selectedCity == "Hepsi" || restaurant.city == selectedCity) &&
-            (selectedPriceRange == "Hepsi" || restaurant.priceRange == selectedPriceRange) &&
+            (selectedCuisine == "Hepsi".localized || restaurant.cuisine == selectedCuisine) &&
+            (selectedCity == "Hepsi".localized || restaurant.city == selectedCity) &&
+            (selectedPriceRange == "Hepsi".localized || restaurant.priceRange == selectedPriceRange) &&
+
             (searchText.isEmpty || restaurant.name.localizedCaseInsensitiveContains(searchText))
         }
     }
@@ -45,12 +47,13 @@ struct FoodieDateDetailView: View {
                     VStack(spacing: 8) {
                         Text("🍽️")
                             .font(.system(size: 60))
-                        Text("Gurme Deneyimi")
+                        Text("Gurme Deneyimi".localized)
                             .font(.system(size: 28, weight: .bold))
                             .foregroundStyle(colors.primaryText)
-                        Text("100+ restoran, rezervasyon yap, eşleş")
+                        Text("100+ restoran, rezervasyon yap, eşleş".localized)
                             .font(.system(size: 15))
                             .foregroundStyle(colors.secondaryText)
+
                     }
                     .padding(.top, 20)
                     .padding(.bottom, 16)
@@ -60,7 +63,8 @@ struct FoodieDateDetailView: View {
                         Image(systemName: "magnifyingglass")
                             .foregroundStyle(colors.secondaryText)
                         
-                        TextField("Restoran ara...", text: $searchText)
+                        TextField("Restoran ara...".localized, text: $searchText)
+
                             .textFieldStyle(.plain)
                             .foregroundStyle(colors.primaryText)
                     }
@@ -73,10 +77,11 @@ struct FoodieDateDetailView: View {
                     // Filters
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack(spacing: 8) {
-                            FilterPill(title: "Mutfak", selection: $selectedCuisine, options: cuisines)
-                            FilterPill(title: "Şehir", selection: $selectedCity, options: cities)
-                            FilterPill(title: "Fiyat", selection: $selectedPriceRange, options: priceRanges)
+                            FilterPill(title: "Mutfak".localized, selection: $selectedCuisine, options: cuisines)
+                            FilterPill(title: "Şehir".localized, selection: $selectedCity, options: cities)
+                            FilterPill(title: "Fiyat".localized, selection: $selectedPriceRange, options: priceRanges)
                         }
+
                         .padding(.horizontal, 16)
                     }
                     .padding(.bottom, 12)
@@ -113,24 +118,25 @@ struct FoodieDateDetailView: View {
     private var restaurants: [Restaurant] {
         [
             // İstanbul - Türk
-            Restaurant(id: "1", name: "Mikla", cuisine: "Türk", city: "İstanbul", district: "Beyoğlu", priceRange: "₺₺₺₺", rating: 4.8, imageURL: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800", specialty: "Çağdaş Anadolu Mutfağı"),
-            Restaurant(id: "2", name: "Neolokal", cuisine: "Türk", city: "İstanbul", district: "Karaköy", priceRange: "₺₺₺₺", rating: 4.7, imageURL: "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800", specialty: "Modern Türk"),
-            Restaurant(id: "3", name: "Çiya Sofrası", cuisine: "Türk", city: "İstanbul", district: "Kadıköy", priceRange: "₺₺", rating: 4.6, imageURL: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=800", specialty: "Geleneksel Anadolu"),
+            Restaurant(id: "1", name: "Mikla", cuisine: "Türk".localized, city: "İstanbul", district: "Beyoğlu", priceRange: "₺₺₺₺", rating: 4.8, imageURL: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800", specialty: "Çağdaş Anadolu Mutfağı".localized),
+            Restaurant(id: "2", name: "Neolokal", cuisine: "Türk".localized, city: "İstanbul", district: "Karaköy", priceRange: "₺₺₺₺", rating: 4.7, imageURL: "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800", specialty: "Modern Türk".localized),
+            Restaurant(id: "3", name: "Çiya Sofrası", cuisine: "Türk".localized, city: "İstanbul", district: "Kadıköy", priceRange: "₺₺", rating: 4.6, imageURL: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=800", specialty: "Geleneksel Anadolu".localized),
             
             // İstanbul - İtalyan
-            Restaurant(id: "4", name: "Locale", cuisine: "İtalyan", city: "İstanbul", district: "Nişantaşı", priceRange: "₺₺₺", rating: 4.5, imageURL: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=800", specialty: "Pasta & Pizza"),
-            Restaurant(id: "5", name: "Ristorante Pizzeria Venedik", cuisine: "İtalyan", city: "İstanbul", district: "Bebek", priceRange: "₺₺₺", rating: 4.4, imageURL: "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=800", specialty: "Otantik İtalyan"),
+            Restaurant(id: "4", name: "Locale", cuisine: "İtalyan".localized, city: "İstanbul", district: "Nişantaşı", priceRange: "₺₺₺", rating: 4.5, imageURL: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=800", specialty: "Pasta & Pizza"),
+            Restaurant(id: "5", name: "Ristorante Pizzeria Venedik", cuisine: "İtalyan".localized, city: "İstanbul", district: "Bebek", priceRange: "₺₺₺", rating: 4.4, imageURL: "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=800", specialty: "Otantik İtalyan".localized),
             
             // İstanbul - Japon
-            Restaurant(id: "6", name: "Zuma", cuisine: "Japon", city: "İstanbul", district: "Ortaköy", priceRange: "₺₺₺₺", rating: 4.9, imageURL: "https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?w=800", specialty: "Contemporary Japanese"),
-            Restaurant(id: "7", name: "Nobu", cuisine: "Japon", city: "İstanbul", district: "Kuruçeşme", priceRange: "₺₺₺₺", rating: 4.8, imageURL: "https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?w=800", specialty: "Sushi & Sashimi"),
+            Restaurant(id: "6", name: "Zuma", cuisine: "Japon".localized, city: "İstanbul", district: "Ortaköy", priceRange: "₺₺₺₺", rating: 4.9, imageURL: "https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?w=800", specialty: "Contemporary Japanese"),
+            Restaurant(id: "7", name: "Nobu", cuisine: "Japon".localized, city: "İstanbul", district: "Kuruçeşme", priceRange: "₺₺₺₺", rating: 4.8, imageURL: "https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?w=800", specialty: "Sushi & Sashimi"),
             
             // İstanbul - Deniz Ürünleri
-            Restaurant(id: "8", name: "Balıkçı Sabahattin", cuisine: "Deniz Ürünleri", city: "İstanbul", district: "Sultanahmet", priceRange: "₺₺₺", rating: 4.6, imageURL: "https://images.unsplash.com/photo-1559339352-11d035aa65de?w=800", specialty: "Taze Balık"),
-            Restaurant(id: "9", name: "Alancha", cuisine: "Deniz Ürünleri", city: "İstanbul", district: "Galata", priceRange: "₺₺₺", rating: 4.5, imageURL: "https://images.unsplash.com/photo-1559339352-11d035aa65de?w=800", specialty: "Akdeniz Mutfağı"),
+            Restaurant(id: "8", name: "Balıkçı Sabahattin", cuisine: "Deniz Ürünleri".localized, city: "İstanbul", district: "Sultanahmet", priceRange: "₺₺₺", rating: 4.6, imageURL: "https://images.unsplash.com/photo-1559339352-11d035aa65de?w=800", specialty: "Taze Balık".localized),
+            Restaurant(id: "9", name: "Alancha", cuisine: "Deniz Ürünleri".localized, city: "İstanbul", district: "Galata", priceRange: "₺₺₺", rating: 4.5, imageURL: "https://images.unsplash.com/photo-1559339352-11d035aa65de?w=800", specialty: "Akdeniz Mutfağı".localized),
             
             // Ankara
-            Restaurant(id: "10", name: "Trilye", cuisine: "Deniz Ürünleri", city: "Ankara", district: "Çankaya", priceRange: "₺₺₺₺", rating: 4.7, imageURL: "https://images.unsplash.com/photo-1559339352-11d035aa65de?w=800", specialty: "Premium Seafood"),
+            Restaurant(id: "10", name: "Trilye", cuisine: "Deniz Ürünleri".localized, city: "Ankara", district: "Çankaya", priceRange: "₺₺₺₺", rating: 4.7, imageURL: "https://images.unsplash.com/photo-1559339352-11d035aa65de?w=800", specialty: "Premium Seafood"),
+
             
             // Add 90 more restaurants programmatically
         ] + generateMoreRestaurants()
@@ -290,8 +296,9 @@ private struct FilterPill: View {
             }
         } label: {
             HStack(spacing: 6) {
-                Text(selection == "Hepsi" ? title : selection)
+                Text(selection == "Hepsi".localized ? title : selection)
                     .font(.system(size: 13, weight: .medium))
+
                 Image(systemName: "chevron.down")
                     .font(.system(size: 10, weight: .semibold))
             }

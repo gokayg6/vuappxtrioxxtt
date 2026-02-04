@@ -71,7 +71,7 @@ struct ProfileDetailView: View {
                                 if let distance = user.distanceKm {
                                     Text("•")
                                         .foregroundStyle(colors.secondaryText)
-                                    Text("\(Int(distance)) km away")
+                                    Text("\(Int(distance)) " + "km uzakta".localized)
                                         .foregroundStyle(colors.secondaryText)
                                 }
                             }
@@ -97,7 +97,7 @@ struct ProfileDetailView: View {
                                 HStack {
                                     Image(systemName: "sparkles")
                                         .foregroundStyle(.purple)
-                                    Text("common_interests")
+                                    Text("common_interests".localized)
                                         .font(.headline)
                                         .foregroundStyle(colors.primaryText)
                                 }
@@ -186,7 +186,7 @@ struct ProfileDetailView: View {
                                     // Failed - show error on screen!
                                     await MainActor.run {
                                         generator.notificationOccurred(.error)
-                                        errorMessage = "Hata: \(error.localizedDescription)"
+                                        errorMessage = "\("Hata".localized): \(error.localizedDescription)"
                                         showingErrorAlert = true
                                     }
                                 }
@@ -228,13 +228,13 @@ struct ProfileDetailView: View {
                     Button {
                         // Report
                     } label: {
-                        Label("Raporla", systemImage: "exclamationmark.triangle")
+                        Label("Raporla".localized, systemImage: "exclamationmark.triangle")
                     }
                     
                     Button {
                         // Block
                     } label: {
-                        Label("Engelle", systemImage: "hand.raised")
+                        Label("Engelle".localized, systemImage: "hand.raised")
                     }
                 } label: {
                     Image(systemName: "ellipsis")
@@ -246,18 +246,18 @@ struct ProfileDetailView: View {
             }
         }
         .toolbarBackground(.hidden, for: .navigationBar)
-        .alert("İstek Gönderildi", isPresented: $showingRequestSentAlert) {
-            Button("Tamam", role: .cancel) { }
+        .alert("İstek Gönderildi".localized, isPresented: $showingRequestSentAlert) {
+            Button("Tamam".localized, role: .cancel) { }
         } message: {
-            Text("\(user.displayName) kişisine arkadaşlık isteği gönderildi.")
+            Text("\(user.displayName) " + "kişisine arkadaşlık isteği gönderildi".localized)
         }
-        .alert("Yetersiz Elmas 💎", isPresented: $showingErrorAlert) {
-            Button("Elmas Al") { 
+        .alert("Yetersiz Elmas 💎".localized, isPresented: $showingErrorAlert) {
+            Button("Elmas Al".localized) { 
                 showDiamondSheet = true
             }
-            Button("İptal", role: .cancel) { }
+            Button("İptal".localized, role: .cancel) { }
         } message: {
-            Text("Arkadaşlık isteği göndermek için 10 elmas gerekiyor. Günlük ücretsiz elmasını alabilirsin!")
+            Text("Arkadaşlık isteği göndermek için 10 elmas gerekiyor. Günlük ücretsiz elmasını alabilirsin!".localized)
         }
         .sheet(isPresented: $showDiamondSheet) {
             DiamondScreen()
@@ -361,13 +361,13 @@ struct ProfileSocialMediaRow: View {
                     Image(systemName: isFriend ? "link" : "lock.fill")
                         .font(.headline)
                         .foregroundStyle(isFriend ? accentColor : .gray)
-                    Text(isFriend ? "Sosyal Medya" : "Sosyal Hesaplar")
+                    Text(isFriend ? "Sosyal Medya".localized : "Sosyal Hesaplar".localized)
                         .font(.headline)
                         .foregroundStyle(colors.primaryText)
                     
                     if !isFriend {
                         Spacer()
-                        Text("Kilitli")
+                        Text("Kilitli".localized)
                         .font(.caption.weight(.bold))
                         .foregroundStyle(.white)
                         .padding(.horizontal, 8)
@@ -402,10 +402,10 @@ struct ProfileSocialMediaRow: View {
                         }
                         
                         VStack(alignment: .leading, spacing: 4) {
-                            Text("Hesaplar Gizli")
+                            Text("Hesaplar Gizli".localized)
                             .font(.subheadline.weight(.semibold))
                             .foregroundStyle(colors.primaryText)
-                            Text("Sosyal medya hesaplarını görmek için arkadaş olmalısın.")
+                            Text("Sosyal medya hesaplarını görmek için arkadaş olmalısın.".localized)
                             .font(.caption)
                             .foregroundStyle(colors.secondaryText)
                             .fixedSize(horizontal: false, vertical: true)

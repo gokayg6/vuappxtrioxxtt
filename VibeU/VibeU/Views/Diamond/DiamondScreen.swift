@@ -56,7 +56,7 @@ struct DiamondScreen: View {
                     }
                 }
             }
-            .navigationTitle("Elmaslarım")
+            .navigationTitle("Elmaslarım".localized)
             .navigationBarTitleDisplayMode(.inline)
             .toolbarColorScheme(isDark ? .dark : .light, for: .navigationBar)
             .toolbar {
@@ -111,7 +111,7 @@ struct DiamondScreen: View {
                     .font(.system(size: 48, weight: .bold, design: .rounded))
                     .foregroundStyle(colors.primaryText)
                 
-                Text("Elmas")
+                Text("Elmas".localized)
                     .font(.subheadline)
                     .foregroundStyle(colors.secondaryText)
             }
@@ -130,6 +130,17 @@ struct DiamondScreen: View {
                     lineWidth: 1
                 )
         )
+        #if DEBUG
+        .onTapGesture(count: 3) { // Triple tap to add diamonds
+            Task {
+                try? await DiamondService.shared.addDiamonds(amount: 1000, type: .admin)
+                balance += 1000
+                // Haptic feedback
+                let generator = UINotificationFeedbackGenerator()
+                generator.notificationOccurred(.success)
+            }
+        }
+        #endif
     }
     
     // MARK: - Daily Reward Section
@@ -139,7 +150,7 @@ struct DiamondScreen: View {
                 Image(systemName: "gift.fill")
                     .foregroundStyle(.orange)
                 
-                Text("Günlük Ödül")
+                Text("Günlük Ödül".localized)
                     .font(.headline)
                     .foregroundStyle(colors.primaryText)
                 
@@ -169,7 +180,7 @@ struct DiamondScreen: View {
                                 .tint(.white)
                         } else {
                             Image(systemName: "gift.fill")
-                            Text("Ödülümü Al")
+                            Text("Ödülümü Al".localized)
                         }
                     }
                     .font(.headline)
@@ -192,13 +203,13 @@ struct DiamondScreen: View {
                         Image(systemName: "checkmark.circle.fill")
                             .foregroundStyle(.green)
                         
-                        Text("Bugünkü ödülünü aldın!")
+                        Text("Bugünkü ödülünü aldın!".localized)
                             .font(.subheadline)
                             .foregroundStyle(colors.secondaryText)
                     }
                     
                     if let time = timeUntilNextReward, time > 0 {
-                        Text("Yeni ödül: \(formatTime(time))")
+                        Text("\("Yeni ödül:".localized) \(formatTime(time))")
                             .font(.caption)
                             .foregroundStyle(colors.tertiaryText)
                     }
@@ -223,7 +234,7 @@ struct DiamondScreen: View {
                 Image(systemName: "play.rectangle.fill")
                     .foregroundStyle(.purple)
                 
-                Text("Reklam İzle")
+                Text("Reklam İzle".localized)
                     .font(.headline)
                     .foregroundStyle(colors.primaryText)
                 
@@ -251,7 +262,7 @@ struct DiamondScreen: View {
                                 .tint(.white)
                         } else {
                             Image(systemName: "play.circle.fill")
-                            Text("Reklam İzle & 25 Elmas Kazan")
+                            Text("Reklam İzle & 25 Elmas Kazan".localized)
                         }
                     }
                     .font(.headline)
@@ -269,7 +280,7 @@ struct DiamondScreen: View {
                 }
                 .disabled(isWatchingAd)
                 
-                Text("Günde 1 kez kullanılabilir")
+                Text("Günde 1 kez kullanılabilir".localized)
                     .font(.caption)
                     .foregroundStyle(colors.tertiaryText)
             } else {
@@ -278,12 +289,12 @@ struct DiamondScreen: View {
                         Image(systemName: "checkmark.circle.fill")
                             .foregroundStyle(.green)
                         
-                        Text("Bugün reklamı izledin!")
+                        Text("Bugün reklamı izledin!".localized)
                             .font(.subheadline)
                             .foregroundStyle(colors.secondaryText)
                     }
                     
-                    Text("Yarın tekrar izleyebilirsin")
+                    Text("Yarın tekrar izleyebilirsin".localized)
                         .font(.caption)
                         .foregroundStyle(colors.tertiaryText)
                 }
@@ -303,13 +314,13 @@ struct DiamondScreen: View {
     // MARK: - Info Section
     private var infoSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Elmas Nasıl Kullanılır?")
+            Text("Elmas Nasıl Kullanılır?".localized)
                 .font(.headline)
                 .foregroundStyle(colors.primaryText)
             
-            infoRow(icon: "heart.fill", color: .pink, text: "Eşleşme isteği göndermek: 10 elmas")
-            infoRow(icon: "gift.fill", color: .orange, text: "Her gün ücretsiz 100 elmas al")
-            infoRow(icon: "play.rectangle.fill", color: .purple, text: "Reklam izle, 25 elmas kazan")
+            infoRow(icon: "heart.fill", color: .pink, text: "Eşleşme isteği göndermek: 10 elmas".localized)
+            infoRow(icon: "gift.fill", color: .orange, text: "Her gün ücretsiz 100 elmas al".localized)
+            infoRow(icon: "play.rectangle.fill", color: .purple, text: "Reklam izle, 25 elmas kazan".localized)
         }
         .padding(20)
         .background(colors.cardBackground, in: RoundedRectangle(cornerRadius: 20))
@@ -400,9 +411,9 @@ struct DiamondScreen: View {
         let minutes = (Int(interval) % 3600) / 60
         
         if hours > 0 {
-            return "\(hours) saat \(minutes) dakika"
+            return "\(hours) " + "saat".localized + " \(minutes) " + "dakika".localized
         } else {
-            return "\(minutes) dakika"
+            return "\(minutes) " + "dakika".localized
         }
     }
 }

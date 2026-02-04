@@ -46,7 +46,7 @@ struct LikesView: View {
                     premiumFloatingButton
                 }
             }
-            .navigationTitle("Beğenenler")
+            .navigationTitle("Beğenenler".localized)
             .navigationBarTitleDisplayMode(.large)
             .toolbarColorScheme(isDark ? .dark : .light, for: .navigationBar)
             .navigationDestination(item: $selectedUser) { user in
@@ -69,7 +69,7 @@ struct LikesView: View {
                     .font(.system(size: 18))
                     .foregroundStyle(.pink)
                 
-                Text("Gelen Arkadaşlık İstekleri")
+                Text("Gelen Arkadaşlık İstekleri".localized)
                     .font(.system(size: 17, weight: .bold))
                     .foregroundStyle(isDark ? .white : .black)
                 
@@ -98,7 +98,7 @@ struct LikesView: View {
                         AllRequestsView()
                     } label: {
                         HStack {
-                            Text("\(pendingRequests.count - 3) istek daha")
+                            Text("\(pendingRequests.count - 3) \("istek daha".localized)")
                                 .font(.system(size: 14, weight: .semibold))
                             Image(systemName: "chevron.right")
                                 .font(.system(size: 12, weight: .bold))
@@ -137,18 +137,18 @@ struct LikesView: View {
                             .foregroundStyle(.white)
                     }
                     
-                    Text("\(likedYouUsers.count) kişi seni beğendi!")
+                    Text("\(likedYouUsers.count) \("kişi seni beğendi!".localized)")
                         .font(.system(size: 20, weight: .bold))
                         .foregroundStyle(isDark ? .white : .black)
                     
-                    Text("Premium ile kimlerin beğendiğini gör")
+                    Text("Premium ile kimlerin beğendiğini gör".localized)
                         .font(.system(size: 14))
                         .foregroundStyle(isDark ? .white.opacity(0.5) : .black.opacity(0.5))
                 }
                 .padding(.vertical, 10)
             } else {
                 HStack {
-                    Text("Seni Beğenenler")
+                    Text("Seni Beğenenler".localized)
                         .font(.system(size: 17, weight: .bold))
                         .foregroundStyle(isDark ? .white : .black)
                     
@@ -190,7 +190,7 @@ struct LikesView: View {
             HStack(spacing: 10) {
                 Image(systemName: "crown.fill")
                     .font(.system(size: 18))
-                Text("Seni Kimlerin Beğendiğini Gör")
+                Text("Seni Kimlerin Beğendiğini Gör".localized)
                     .font(.system(size: 16, weight: .bold))
             }
             .foregroundStyle(.black)
@@ -290,11 +290,11 @@ struct FriendRequestRow: View {
             
             // Info
             VStack(alignment: .leading, spacing: 3) {
-                Text(request.fromUser?.displayName ?? "Kullanıcı")
+                Text(request.fromUser?.displayName ?? "Kullanıcı".localized)
                     .font(.system(size: 15, weight: .semibold))
                     .foregroundStyle(isDark ? .white : .black)
                 
-                Text("Arkadaşlık isteği gönderdi")
+                Text("Arkadaşlık isteği gönderdi".localized)
                     .font(.system(size: 12))
                     .foregroundStyle(isDark ? .white.opacity(0.5) : .black.opacity(0.5))
             }
@@ -428,7 +428,7 @@ struct AllRequestsView: View {
             }
         }
         .listStyle(.plain)
-        .navigationTitle("Tüm İstekler")
+        .navigationTitle("Tüm İstekler".localized)
         .task {
             await loadRequests()
         }

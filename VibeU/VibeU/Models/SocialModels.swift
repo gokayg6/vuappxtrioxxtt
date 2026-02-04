@@ -60,6 +60,7 @@ struct Friend: Identifiable, Codable, Equatable {
     let age: Int
     let city: String
     let profilePhotoURL: String
+    let photos: [String]?
     let isOnline: Bool
     let lastActiveAt: Date
     let tiktokUsername: String?
@@ -70,7 +71,7 @@ struct Friend: Identifiable, Codable, Equatable {
     let friendshipCreatedAt: Date
     
     enum CodingKeys: String, CodingKey {
-        case id, age, city
+        case id, age, city, photos
         case displayName = "displayName"
         case profilePhotoURL = "profilePhotoURL"
         case isOnline = "isOnline"
@@ -86,6 +87,15 @@ struct Friend: Identifiable, Codable, Equatable {
     var hasTikTok: Bool { tiktokUsername != nil }
     var hasInstagram: Bool { instagramUsername != nil }
     var hasSnapchat: Bool { snapchatUsername != nil }
+    
+    /// Returns the friend's photos array, or falls back to profile photo if not available
+    var displayPhotos: [String] {
+        if let photos = photos, !photos.isEmpty {
+            return photos
+        } else {
+            return [profilePhotoURL]
+        }
+    }
 }
 
 struct SocialRequest: Identifiable, Codable, Equatable {

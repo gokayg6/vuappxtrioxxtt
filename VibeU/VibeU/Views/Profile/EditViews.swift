@@ -144,12 +144,12 @@ struct EditProfileView: View {
                 .padding(.top, 16)
             }
         }
-        .navigationTitle("Profili Düzenle")
+        .navigationTitle("Profili Düzenle".localized)
         .navigationBarTitleDisplayMode(.inline)
         .toolbarColorScheme(isDark ? .dark : .light, for: .navigationBar)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
-                Button("Kaydet") { saveProfile() }
+                Button("Kaydet".localized) { saveProfile() }
                     .fontWeight(.bold)
                     .foregroundStyle(.cyan)
             }
@@ -162,8 +162,8 @@ struct EditProfileView: View {
             ProfileCountryPickerSheet(selectedCountry: $country)
         }
         .onAppear { loadProfile() }
-        .alert("Kaydedildi ✓", isPresented: $showSavedAlert) {
-            Button("Tamam") { dismiss() }
+        .alert("Kaydedildi ✓".localized, isPresented: $showSavedAlert) {
+            Button("Tamam".localized) { dismiss() }
         }
     }
     
@@ -369,7 +369,7 @@ struct EditProfileView: View {
                 }
             }
             
-            Text("Fotoğrafı Değiştir")
+            Text("Fotoğrafı Değiştir".localized)
                 .font(.system(size: 14, weight: .medium))
                 .foregroundStyle(.cyan)
         }
@@ -379,14 +379,14 @@ struct EditProfileView: View {
     // MARK: - Basic Info Section
     private var basicInfoSection: some View {
         VStack(spacing: 0) {
-            ThemedEditSectionHeader(icon: "person.fill", title: "Temel Bilgiler", colors: colors)
+            ThemedEditSectionHeader(icon: "person.fill", title: "Temel Bilgiler".localized, colors: colors)
             
             VStack(spacing: 0) {
-                ThemedEditRow(icon: "person", title: "İsim", text: $displayName, colors: colors)
+                ThemedEditRow(icon: "person", title: "İsim".localized, text: $displayName, colors: colors)
                 ThemedEditDivider(colors: colors)
-                ThemedEditRow(icon: "at", title: "Kullanıcı Adı", text: $username, colors: colors)
+                ThemedEditRow(icon: "at", title: "Kullanıcı Adı".localized, text: $username, colors: colors)
                 ThemedEditDivider(colors: colors)
-                ThemedEditRowMultiline(icon: "text.quote", title: "Hakkımda", text: $bio, colors: colors)
+                ThemedEditRowMultiline(icon: "text.quote", title: "Hakkımda".localized, text: $bio, colors: colors)
             }
             .background(colors.cardBackground, in: RoundedRectangle(cornerRadius: 16))
             .overlay(RoundedRectangle(cornerRadius: 16).stroke(colors.border, lineWidth: 1))
@@ -396,10 +396,10 @@ struct EditProfileView: View {
     // MARK: - Location & Career Section
     private var locationCareerSection: some View {
         VStack(spacing: 0) {
-            ThemedEditSectionHeader(icon: "briefcase.fill", title: "Konum & Kariyer", colors: colors)
+            ThemedEditSectionHeader(icon: "briefcase.fill", title: "Konum & Kariyer".localized, colors: colors)
             
             VStack(spacing: 0) {
-                ThemedEditRow(icon: "location", title: "Şehir", text: $city, colors: colors)
+                ThemedEditRow(icon: "location", title: "Şehir".localized, text: $city, colors: colors)
                 ThemedEditDivider(colors: colors)
                 
                 // Country Picker Button
@@ -413,7 +413,7 @@ struct EditProfileView: View {
                             .overlay(Image(systemName: "flag").font(.system(size: 15)).foregroundStyle(colors.secondaryText))
                         
                         VStack(alignment: .leading, spacing: 2) {
-                            Text("Ülke")
+                            Text("Ülke".localized)
                                 .font(.system(size: 12))
                                 .foregroundStyle(colors.tertiaryText)
                             
@@ -433,9 +433,9 @@ struct EditProfileView: View {
                 }
                 
                 ThemedEditDivider(colors: colors)
-                ThemedEditRow(icon: "briefcase", title: "Meslek", text: $jobTitle, colors: colors)
+                ThemedEditRow(icon: "briefcase", title: "Meslek".localized, text: $jobTitle, colors: colors)
                 ThemedEditDivider(colors: colors)
-                ThemedEditRow(icon: "building.2", title: "Şirket", text: $company, colors: colors)
+                ThemedEditRow(icon: "building.2", title: "Şirket".localized, text: $company, colors: colors)
             }
             .background(colors.cardBackground, in: RoundedRectangle(cornerRadius: 16))
             .overlay(RoundedRectangle(cornerRadius: 16).stroke(colors.border, lineWidth: 1))
@@ -445,12 +445,12 @@ struct EditProfileView: View {
     // MARK: - Physical Section
     private var physicalSection: some View {
         VStack(spacing: 0) {
-            ThemedEditSectionHeader(icon: "figure.stand", title: "Fiziksel Özellikler", colors: colors)
+            ThemedEditSectionHeader(icon: "figure.stand", title: "Fiziksel Özellikler".localized, colors: colors)
             
             VStack(spacing: 0) {
-                ThemedEditRow(icon: "ruler", title: "Boy (cm)", text: $height, colors: colors)
+                ThemedEditRow(icon: "ruler", title: "Boy (cm)".localized, text: $height, colors: colors)
                 ThemedEditDivider(colors: colors)
-                ThemedEditPickerRow(icon: "sparkles", title: "Burç", selection: $zodiac, options: zodiacSigns, colors: colors)
+                ThemedEditPickerRow(icon: "sparkles", title: "Burç".localized, selection: $zodiac, options: zodiacSigns, colors: colors)
             }
             .background(colors.cardBackground, in: RoundedRectangle(cornerRadius: 16))
             .overlay(RoundedRectangle(cornerRadius: 16).stroke(colors.border, lineWidth: 1))
@@ -460,16 +460,16 @@ struct EditProfileView: View {
     // MARK: - Lifestyle Section
     private var lifestyleSection: some View {
         VStack(spacing: 0) {
-            ThemedEditSectionHeader(icon: "leaf.fill", title: "Yaşam Tarzı", colors: colors)
+            ThemedEditSectionHeader(icon: "leaf.fill", title: "Yaşam Tarzı".localized, colors: colors)
             
             VStack(spacing: 0) {
-                ThemedEditPickerRow(icon: "smoke", title: "Sigara", selection: $smoking, options: frequencyOptions, colors: colors)
+                ThemedEditPickerRow(icon: "smoke", title: "Sigara".localized, selection: $smoking, options: frequencyOptions, colors: colors)
                 ThemedEditDivider(colors: colors)
-                ThemedEditPickerRow(icon: "wineglass", title: "Alkol", selection: $drinking, options: frequencyOptions, colors: colors)
+                ThemedEditPickerRow(icon: "wineglass", title: "Alkol".localized, selection: $drinking, options: frequencyOptions, colors: colors)
                 ThemedEditDivider(colors: colors)
-                ThemedEditPickerRow(icon: "figure.run", title: "Egzersiz", selection: $exercise, options: frequencyOptions, colors: colors)
+                ThemedEditPickerRow(icon: "figure.run", title: "Egzersiz".localized, selection: $exercise, options: frequencyOptions, colors: colors)
                 ThemedEditDivider(colors: colors)
-                ThemedEditPickerRow(icon: "pawprint", title: "Evcil Hayvan", selection: $pets, options: petOptions, colors: colors)
+                ThemedEditPickerRow(icon: "pawprint", title: "Evcil Hayvan".localized, selection: $pets, options: petOptions, colors: colors)
             }
             .background(colors.cardBackground, in: RoundedRectangle(cornerRadius: 16))
             .overlay(RoundedRectangle(cornerRadius: 16).stroke(colors.border, lineWidth: 1))
@@ -479,12 +479,12 @@ struct EditProfileView: View {
     // MARK: - Relationship Section
     private var relationshipSection: some View {
         VStack(spacing: 0) {
-            ThemedEditSectionHeader(icon: "heart.fill", title: "İlişki Tercihleri", colors: colors)
+            ThemedEditSectionHeader(icon: "heart.fill", title: "İlişki Tercihleri".localized, colors: colors)
             
             VStack(spacing: 0) {
-                ThemedEditPickerRow(icon: "magnifyingglass", title: "Ne Arıyorum", selection: $lookingFor, options: lookingForOptions, colors: colors)
+                ThemedEditPickerRow(icon: "magnifyingglass", title: "Ne Arıyorum".localized, selection: $lookingFor, options: lookingForOptions, colors: colors)
                 ThemedEditDivider(colors: colors)
-                ThemedEditPickerRow(icon: "figure.2.and.child.holdinghands", title: "Çocuk İstiyor musun", selection: $wantKids, options: kidsOptions, colors: colors)
+                ThemedEditPickerRow(icon: "figure.2.and.child.holdinghands", title: "Çocuk İstiyor musun".localized, selection: $wantKids, options: kidsOptions, colors: colors)
             }
             .background(colors.cardBackground, in: RoundedRectangle(cornerRadius: 16))
             .overlay(RoundedRectangle(cornerRadius: 16).stroke(colors.border, lineWidth: 1))
@@ -494,10 +494,10 @@ struct EditProfileView: View {
     // MARK: - Hobbies Section
     private var hobbiesSection: some View {
         VStack(spacing: 0) {
-            ThemedEditSectionHeader(icon: "star.fill", title: "Hobiler & İlgi Alanları", colors: colors)
+            ThemedEditSectionHeader(icon: "star.fill", title: "Hobiler & İlgi Alanları".localized, colors: colors)
             
             VStack(alignment: .leading, spacing: 12) {
-                Text("En fazla 8 hobi seç")
+                Text("En fazla 8 hobi seç".localized)
                     .font(.system(size: 13))
                     .foregroundStyle(colors.secondaryText)
                     .padding(.horizontal, 16)
@@ -515,7 +515,7 @@ struct EditProfileView: View {
     // MARK: - Social Media Section
     private var socialMediaSection: some View {
         VStack(spacing: 0) {
-            ThemedEditSectionHeader(icon: "link", title: "Sosyal Medya", colors: colors)
+            ThemedEditSectionHeader(icon: "link", title: "Sosyal Medya".localized, colors: colors)
             
             NavigationLink {
                 SocialLinksEditView()
@@ -532,11 +532,11 @@ struct EditProfileView: View {
                     }
                     
                     VStack(alignment: .leading, spacing: 2) {
-                        Text("Sosyal Medya Hesapları")
+                        Text("Sosyal Medya Hesapları".localized)
                             .font(.system(size: 16, weight: .medium))
                             .foregroundStyle(colors.primaryText)
                         
-                        Text("Instagram, TikTok, Snapchat...")
+                        Text("Instagram, TikTok, Snapchat...".localized)
                             .font(.system(size: 13))
                             .foregroundStyle(colors.secondaryText)
                     }
@@ -658,7 +658,7 @@ private struct ThemedEditPickerRow: View {
                     }
                 } label: {
                     HStack {
-                        Text(selection.isEmpty ? "Seç" : selection)
+                        Text(selection.isEmpty ? "Seç".localized : selection)
                             .font(.system(size: 16, weight: .medium))
                             .foregroundStyle(selection.isEmpty ? colors.tertiaryText : colors.primaryText)
                         Spacer()
@@ -812,11 +812,11 @@ struct PhotosEditView: View {
                                 .foregroundStyle(LinearGradient(colors: [.cyan, .blue], startPoint: .top, endPoint: .bottom))
                         }
                         
-                        Text("Fotoğrafların")
+                        Text("Fotoğrafların".localized)
                             .font(.system(size: 24, weight: .bold))
                             .foregroundStyle(colors.primaryText)
                         
-                        Text("En az 1, en fazla \(maxPhotos) fotoğraf ekleyebilirsin")
+                        Text("1 - \(maxPhotos) " + "fotoğraf".localized)
                             .font(.system(size: 15))
                             .foregroundStyle(colors.secondaryText)
                     }
@@ -827,7 +827,7 @@ struct PhotosEditView: View {
                         Image(systemName: "photo.fill")
                             .font(.system(size: 14))
                             .foregroundStyle(.cyan)
-                        Text("\(loadedImages.count)/\(maxPhotos) fotoğraf")
+                        Text("\(loadedImages.count)/\(maxPhotos) " + "fotoğraf".localized)
                             .font(.system(size: 14, weight: .semibold))
                             .foregroundStyle(colors.primaryText)
                     }
@@ -840,7 +840,7 @@ struct PhotosEditView: View {
                         Image(systemName: "hand.draw.fill")
                             .font(.system(size: 14))
                             .foregroundStyle(.cyan)
-                        Text("Sıralamak için basılı tut ve sürükle")
+                        Text("Sıralamak için basılı tut ve sürükle".localized)
                             .font(.system(size: 13, weight: .medium))
                             .foregroundStyle(colors.secondaryText)
                     }
@@ -872,7 +872,7 @@ struct PhotosEditView: View {
                         Image(systemName: "star.fill")
                             .font(.system(size: 14))
                             .foregroundStyle(.yellow)
-                        Text("İlk fotoğraf profil fotoğrafın olacak")
+                        Text("İlk fotoğraf profil fotoğrafın olacak".localized)
                             .font(.system(size: 13, weight: .medium))
                             .foregroundStyle(colors.secondaryText)
                     }
@@ -897,10 +897,10 @@ struct PhotosEditView: View {
         } message: {
             Text("\(loadedImages.count) fotoğraf kaydedildi.")
         }
-        .alert("Silinemez", isPresented: $showDeleteError) {
-            Button("Tamam") { }
+        .alert("Silinemez".localized, isPresented: $showDeleteError) {
+            Button("Tamam".localized) { }
         } message: {
-            Text("En az 1 fotoğrafın olmalı. Son fotoğrafı silemezsin.")
+            Text("En az 1 fotoğrafın olmalı. Son fotoğrafı silemezsin.".localized)
         }
     }
     
@@ -1390,10 +1390,10 @@ struct InterestsEditView: View {
                 // Header with count
                 HStack {
                     VStack(alignment: .leading, spacing: 4) {
-                        Text("İlgi Alanlarını Seç")
+                        Text("İlgi Alanlarını Seç".localized)
                             .font(.system(size: 18, weight: .bold))
                             .foregroundStyle(colors.primaryText)
-                        Text("En fazla 10 tane seçebilirsin")
+                        Text("En fazla 10 tane seçebilirsin".localized)
                             .font(.system(size: 13))
                             .foregroundStyle(colors.secondaryText)
                     }
@@ -1471,21 +1471,21 @@ struct InterestsEditView: View {
                 }
             }
         }
-        .navigationTitle("İlgi Alanları")
+        .navigationTitle("İlgi Alanları".localized)
         .navigationBarTitleDisplayMode(.inline)
         .toolbarColorScheme(isDark ? .dark : .light, for: .navigationBar)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
-                Button("Kaydet") { saveInterests() }
+                Button("Kaydet".localized) { saveInterests() }
                     .fontWeight(.bold)
                     .foregroundStyle(.cyan)
             }
         }
         .onAppear { loadInterests() }
-        .alert("Kaydedildi ✓", isPresented: $showSavedAlert) {
-            Button("Tamam") { dismiss() }
+        .alert("Kaydedildi ✓".localized, isPresented: $showSavedAlert) {
+            Button("Tamam".localized) { dismiss() }
         } message: {
-            Text("\(selectedInterests.count) ilgi alanı kaydedildi.")
+            Text("\(selectedInterests.count) " + "ilgi alanı kaydedildi.".localized)
         }
     }
     
@@ -1603,11 +1603,11 @@ struct SocialLinksEditView: View {
                                 .foregroundStyle(LinearGradient(colors: [.cyan, .blue], startPoint: .top, endPoint: .bottom))
                         }
                         
-                        Text("Sosyal Medya")
+                        Text("Sosyal Medya".localized)
                             .font(.system(size: 24, weight: .bold))
                             .foregroundStyle(colors.primaryText)
                         
-                        Text("Hesaplarını ekle, profilinde görünsün")
+                        Text("Hesaplarını ekle, profilinde görünsün".localized)
                             .font(.system(size: 15))
                             .foregroundStyle(colors.secondaryText)
                     }
@@ -1652,7 +1652,7 @@ struct SocialLinksEditView: View {
                         Image(systemName: "eye.fill")
                             .font(.system(size: 14))
                             .foregroundStyle(.cyan)
-                        Text("Hesapların profilinde görünecek")
+                        Text("Hesapların profilinde görünecek".localized)
                             .font(.system(size: 13, weight: .medium))
                             .foregroundStyle(colors.secondaryText)
                     }
@@ -1665,21 +1665,21 @@ struct SocialLinksEditView: View {
                 }
             }
         }
-        .navigationTitle("Sosyal Medya")
+        .navigationTitle("Sosyal Medya".localized)
         .navigationBarTitleDisplayMode(.inline)
         .toolbarColorScheme(isDark ? .dark : .light, for: .navigationBar)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
-                Button("Kaydet") { saveSocialLinks() }
+                Button("Kaydet".localized) { saveSocialLinks() }
                     .fontWeight(.bold)
                     .foregroundStyle(.cyan)
             }
         }
         .onAppear { loadSocialLinks() }
-        .alert("Kaydedildi ✓", isPresented: $showSavedAlert) {
-            Button("Tamam") { dismiss() }
+        .alert("Kaydedildi ✓".localized, isPresented: $showSavedAlert) {
+            Button("Tamam".localized) { dismiss() }
         } message: {
-            Text("Sosyal medya hesapların güncellendi.")
+            Text("Sosyal medya hesapların güncellendi.".localized)
         }
     }
     
@@ -2053,13 +2053,22 @@ struct FormField: View {
 struct LanguageSettingsView: View {
     @Environment(AppState.self) private var appState
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.colorScheme) private var systemColorScheme
     @State private var selectedLang: AppLanguage?
     
-    private let bgColor = Color(red: 0.04, green: 0.02, blue: 0.08)
+    private var isDark: Bool {
+        switch appState.currentTheme {
+        case .dark: return true
+        case .light: return false
+        case .system: return systemColorScheme == .dark
+        }
+    }
+    
+    private var colors: ThemeColors { isDark ? .dark : .light }
     
     var body: some View {
         ZStack {
-            bgColor.ignoresSafeArea()
+            colors.background.ignoresSafeArea()
             
             ScrollView(showsIndicators: false) {
                 VStack(spacing: 12) {
@@ -2069,13 +2078,13 @@ struct LanguageSettingsView: View {
                             .font(.system(size: 44))
                             .foregroundStyle(LinearGradient(colors: [.cyan, .blue], startPoint: .top, endPoint: .bottom))
                         
-                        Text("Dil Seçin")
+                        Text("Dil Seçin".localized)
                             .font(.system(size: 20, weight: .bold))
-                            .foregroundStyle(.white)
+                            .foregroundStyle(colors.primaryText)
                         
-                        Text("Uygulama dilini değiştirin")
+                        Text("Uygulama dilini değiştirin".localized)
                             .font(.system(size: 14))
-                            .foregroundStyle(Color(white: 0.5))
+                            .foregroundStyle(colors.secondaryText)
                     }
                     .padding(.top, 20)
                     .padding(.bottom, 24)
@@ -2085,7 +2094,8 @@ struct LanguageSettingsView: View {
                         ForEach(AppLanguage.allCases, id: \.self) { lang in
                             LanguageOptionRow(
                                 language: lang,
-                                isSelected: appState.currentLanguage == lang
+                                isSelected: appState.currentLanguage == lang,
+                                colors: colors
                             ) {
                                 selectLanguage(lang)
                             }
@@ -2096,9 +2106,9 @@ struct LanguageSettingsView: View {
                 .padding(.bottom, 40)
             }
         }
-        .navigationTitle("Dil")
+        .navigationTitle("Dil".localized)
         .navigationBarTitleDisplayMode(.inline)
-        .toolbarColorScheme(.dark, for: .navigationBar)
+        .toolbarColorScheme(isDark ? .dark : .light, for: .navigationBar)
     }
     
     private func selectLanguage(_ lang: AppLanguage) {
@@ -2131,6 +2141,7 @@ struct LanguageSettingsView: View {
 struct LanguageOptionRow: View {
     let language: AppLanguage
     let isSelected: Bool
+    var colors: ThemeColors = .dark
     let onSelect: () -> Void
     
     var body: some View {
@@ -2144,11 +2155,11 @@ struct LanguageOptionRow: View {
                 VStack(alignment: .leading, spacing: 2) {
                     Text(language.displayName)
                         .font(.system(size: 17, weight: .semibold))
-                        .foregroundStyle(.white)
+                        .foregroundStyle(colors.primaryText)
                     
                     Text(language.rawValue.uppercased())
                         .font(.system(size: 12, weight: .medium))
-                        .foregroundStyle(Color(white: 0.4))
+                        .foregroundStyle(colors.secondaryText)
                 }
                 
                 Spacer()
@@ -2160,17 +2171,17 @@ struct LanguageOptionRow: View {
                         .foregroundStyle(.cyan)
                 } else {
                     Circle()
-                        .stroke(Color(white: 0.25), lineWidth: 2)
+                        .stroke(colors.border, lineWidth: 2)
                         .frame(width: 24, height: 24)
                 }
             }
             .padding(16)
             .background(
                 RoundedRectangle(cornerRadius: 16)
-                    .fill(isSelected ? Color.cyan.opacity(0.1) : Color(white: 0.1))
+                    .fill(isSelected ? Color.cyan.opacity(0.1) : colors.cardBackground)
                     .overlay(
                         RoundedRectangle(cornerRadius: 16)
-                            .stroke(isSelected ? Color.cyan.opacity(0.5) : Color(white: 0.15), lineWidth: isSelected ? 2 : 1)
+                            .stroke(isSelected ? Color.cyan.opacity(0.5) : colors.border, lineWidth: isSelected ? 2 : 1)
                     )
             )
         }
@@ -2189,10 +2200,21 @@ struct EditScaleButtonStyle: ButtonStyle {
 struct ThemeSettingsView: View {
     @Environment(AppState.self) private var appState
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.colorScheme) private var systemColorScheme
+    
+    private var isDark: Bool {
+        switch appState.currentTheme {
+        case .dark: return true
+        case .light: return false
+        case .system: return systemColorScheme == .dark
+        }
+    }
+    
+    private var colors: ThemeColors { isDark ? .dark : .light }
     
     var body: some View {
         ZStack {
-            Color(red: 0.04, green: 0.02, blue: 0.08).ignoresSafeArea()
+            colors.background.ignoresSafeArea()
             List {
                 ForEach(AppTheme.allCases, id: \.self) { theme in
                     Button {
@@ -2211,21 +2233,21 @@ struct ThemeSettingsView: View {
                         dismiss()
                     } label: {
                         HStack {
-                            Image(systemName: theme.icon).foregroundStyle(.purple)
-                            Text(theme.displayName).foregroundStyle(.white)
+                            Image(systemName: theme.icon).foregroundStyle(colors.accent)
+                            Text(theme.displayName).foregroundStyle(colors.primaryText)
                             Spacer()
                             if appState.currentTheme == theme {
                                 Image(systemName: "checkmark").foregroundStyle(.cyan)
                             }
                         }
                     }
-                    .listRowBackground(Color(white: 0.12))
+                    .listRowBackground(colors.cardBackground)
                 }
             }
             .scrollContentBackground(.hidden)
         }
-        .navigationTitle("Tema")
-        .toolbarColorScheme(.dark, for: .navigationBar)
+        .navigationTitle("Tema".localized)
+        .toolbarColorScheme(isDark ? .dark : .light, for: .navigationBar)
     }
 }
 
@@ -2276,7 +2298,7 @@ struct ProfileCountryPickerSheet: View {
                         Image(systemName: "magnifyingglass")
                             .foregroundStyle(colors.secondaryText)
                         
-                        TextField("Ülke Ara", text: $searchText)
+                        TextField("Ülke Ara".localized, text: $searchText)
                             .textFieldStyle(.plain)
                             .foregroundStyle(colors.primaryText)
                     }
@@ -2324,12 +2346,12 @@ struct ProfileCountryPickerSheet: View {
                     }
                 }
             }
-            .navigationTitle("Ülke Seç")
+            .navigationTitle("Ülke Seç".localized)
             .navigationBarTitleDisplayMode(.inline)
             .toolbarColorScheme(isDark ? .dark : .light, for: .navigationBar)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button("Kapat") { dismiss() }
+                    Button("Kapat".localized) { dismiss() }
                         .foregroundStyle(colors.accent)
                 }
             }

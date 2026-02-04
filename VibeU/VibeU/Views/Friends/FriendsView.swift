@@ -107,7 +107,7 @@ struct FriendsView: View {
                     loadFriends()
                 }
             }
-            .navigationTitle("Arkadaşlar")
+            .navigationTitle("Arkadaşlar".localized)
             .navigationBarTitleDisplayMode(.large)
             .toolbarColorScheme(isDark ? .dark : .light, for: .navigationBar)
             .toolbar {
@@ -163,16 +163,16 @@ struct FriendsView: View {
                     }
                 )
             }
-            .alert("Arkadaşlıktan Çıkar", isPresented: $showRemoveAlert) {
-                Button("İptal", role: .cancel) { friendToRemove = nil }
-                Button("Çıkar", role: .destructive) {
+            .alert("Arkadaşlıktan Çıkar".localized, isPresented: $showRemoveAlert) {
+                Button("İptal".localized, role: .cancel) { friendToRemove = nil }
+                Button("Çıkar".localized, role: .destructive) {
                     if let friend = friendToRemove {
                         withAnimation { friends.removeAll { $0.id == friend.id } }
                     }
                 }
             } message: {
                 if let friend = friendToRemove {
-                    Text("\(friend.displayName) arkadaş listenizden çıkarılacak.")
+                    Text("\(friend.displayName) " + "arkadaş listenizden çıkarılacak.".localized)
                 }
             }
         }
@@ -219,7 +219,7 @@ struct FriendsView: View {
                     sortOption = option
                 } label: {
                     HStack {
-                        Text(option.rawValue)
+                        Text(option.rawValue.localized)
                         if sortOption == option {
                             Image(systemName: "checkmark")
                         }
@@ -235,8 +235,8 @@ struct FriendsView: View {
     
     private var statsSection: some View {
         HStack(spacing: 12) {
-            FriendStatCard(icon: "person.2.fill", iconColor: colors.accent, value: "\(friends.count)", label: "Arkadaş", colors: colors, isDark: isDark)
-            FriendStatCard(icon: "circle.fill", iconColor: .green, value: "\(onlineCount)", label: "Çevrimiçi", colors: colors, isDark: isDark)
+            FriendStatCard(icon: "person.2.fill", iconColor: colors.accent, value: "\(friends.count)", label: "Arkadaş".localized, colors: colors, isDark: isDark)
+            FriendStatCard(icon: "circle.fill", iconColor: .green, value: "\(onlineCount)", label: "Çevrimiçi".localized, colors: colors, isDark: isDark)
         }
     }
     
@@ -245,7 +245,7 @@ struct FriendsView: View {
             HStack(spacing: 10) {
                 ForEach(FriendFilter.allCases, id: \.self) { filter in
                     FriendsFilterChip(
-                        title: filter.rawValue,
+                        title: filter.rawValue.localized,
                         count: filter == .all ? friends.count : onlineCount,
                         isSelected: selectedFilter == filter,
                         colors: colors,
@@ -276,8 +276,9 @@ struct FriendsView: View {
                     .foregroundStyle(isSearchExpanded ? colors.accent : colors.tertiaryText)
             }
             
+            
             if isSearchExpanded {
-                TextField("Arkadaş ara...", text: $searchText)
+                TextField("Arkadaş ara...".localized, text: $searchText)
                     .font(.system(size: 15))
                     .foregroundStyle(colors.primaryText)
                     .focused($isSearchFocused)
@@ -308,7 +309,7 @@ struct FriendsView: View {
                         .shadow(color: isDark ? .clear : Color.black.opacity(0.05), radius: 4, y: 2)
                 }
             } else {
-                Text("Arkadaş ara...")
+                Text("Arkadaş ara...".localized)
                     .font(.system(size: 15))
                     .foregroundStyle(colors.tertiaryText)
                 Spacer()
@@ -348,7 +349,7 @@ struct FriendsView: View {
     private var loadingView: some View {
         VStack(spacing: 16) {
             ProgressView().tint(colors.accent).scaleEffect(1.2)
-            Text("Yükleniyor...").font(.system(size: 14)).foregroundStyle(colors.secondaryText)
+            Text("Yükleniyor...".localized).font(.system(size: 14)).foregroundStyle(colors.secondaryText)
         }
         .frame(height: 200)
     }
@@ -358,10 +359,10 @@ struct FriendsView: View {
             Image(systemName: searchText.isEmpty ? "person.2.slash" : "magnifyingglass")
                 .font(.system(size: 44, weight: .light))
                 .foregroundStyle(colors.accent.opacity(0.6))
-            Text(searchText.isEmpty ? "Henüz arkadaşın yok" : "Sonuç bulunamadı")
+            Text(searchText.isEmpty ? "Henüz arkadaşın yok".localized : "Sonuç bulunamadı".localized)
                 .font(.system(size: 17, weight: .semibold))
                 .foregroundStyle(colors.primaryText)
-            Text(searchText.isEmpty ? "Keşfet'ten yeni insanlarla tanış" : "Farklı bir arama dene")
+            Text(searchText.isEmpty ? "Keşfet'ten yeni insanlarla tanış".localized : "Farklı bir arama dene".localized)
                 .font(.system(size: 14))
                 .foregroundStyle(colors.secondaryText)
         }
@@ -621,14 +622,11 @@ struct FriendDetailSheet: View {
     
     private var colors: ThemeColors { isDark ? .dark : .light }
     
-    // Mock data
-    private let mockPhotos = [
-        "https://picsum.photos/400/600?random=1",
-        "https://picsum.photos/400/600?random=2",
-        "https://picsum.photos/400/600?random=3"
-    ]
+    // Use real friend photos instead of mock data
+    private var friendPhotos: [String] { friend.displayPhotos }
     
-    private let mockHobbies = ["Müzik", "Seyahat", "Fotoğrafçılık", "Yüzme", "Yoga", "Kitap"]
+    // Default hobbies until hobbies data is available in Friend model
+    private let defaultHobbies = ["Müzik".localized, "Seyahat".localized, "Fotoğrafçılık".localized, "Yüzme".localized, "Yoga".localized, "Kitap".localized]
     
     var body: some View {
         ZStack {
@@ -758,7 +756,7 @@ struct FriendDetailSheet: View {
             HStack {
                 Image(systemName: "photo.stack")
                     .font(.system(size: 16, weight: .semibold))
-                Text("Fotoğraflar")
+                Text("Fotoğraflar".localized)
                     .font(.system(size: 16, weight: .semibold))
                 Spacer()
                 Image(systemName: isPhotosExpanded ? "chevron.up" : "chevron.down")
@@ -782,7 +780,7 @@ struct FriendDetailSheet: View {
     private var photoCarousel: some View {
         VStack(spacing: 0) {
             TabView(selection: $currentPhotoIndex) {
-                ForEach(Array(mockPhotos.enumerated()), id: \.offset) { index, url in
+                ForEach(Array(friendPhotos.enumerated()), id: \.offset) { index, url in
                     CachedAsyncImage(url: url)
                         .aspectRatio(contentMode: .fill)
                         .tag(index)
@@ -799,7 +797,7 @@ struct FriendDetailSheet: View {
             
             // Photo Indicators
             HStack(spacing: 6) {
-                ForEach(0..<mockPhotos.count, id: \.self) { index in
+                ForEach(0..<friendPhotos.count, id: \.self) { index in
                     Capsule()
                         .fill(index == currentPhotoIndex ? colors.accent : colors.tertiaryText.opacity(0.4))
                         .frame(width: index == currentPhotoIndex ? 20 : 8, height: 4)
@@ -930,7 +928,7 @@ struct FriendDetailSheet: View {
                 .foregroundStyle(colors.primaryText)
             
             FriendFlowLayout(spacing: 8) {
-                ForEach(mockHobbies, id: \.self) { hobby in
+                ForEach(defaultHobbies, id: \.self) { hobby in
                     Text(hobby)
                         .font(.system(size: 14, weight: .semibold))
                         .foregroundStyle(.black)

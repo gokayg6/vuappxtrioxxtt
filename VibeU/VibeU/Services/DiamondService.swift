@@ -1,7 +1,13 @@
 import Foundation
 import FirebaseFirestore
 import FirebaseAuth
+import NotificationCenter
 
+extension Notification.Name {
+    static let diamondBalanceChanged = Notification.Name("diamondBalanceChanged")
+}
+
+// MARK: - Diamond Transaction Types
 // MARK: - Diamond Transaction Types
 enum DiamondTransactionType: String, Codable {
     case dailyReward = "daily_reward"
@@ -110,7 +116,7 @@ actor DiamondService {
         // Use transaction for atomic update
         let docRef = usersRef.document(uid)
         
-        try await db.runTransaction { (transaction, errorPointer) -> Any? in
+        _ = try await db.runTransaction { (transaction, errorPointer) -> Any? in
             let snapshot: DocumentSnapshot
             do {
                 snapshot = try transaction.getDocument(docRef)
@@ -148,6 +154,11 @@ actor DiamondService {
         )
         
         print("✅ [DiamondService] Daily reward claimed! +100 diamonds")
+        
+        // Notify listeners
+        DispatchQueue.main.async {
+            NotificationCenter.default.post(name: .diamondBalanceChanged, object: nil)
+        }
     }
     
     // MARK: - Spend Diamonds
@@ -159,7 +170,7 @@ actor DiamondService {
         let docRef = usersRef.document(uid)
         
         // Use transaction for atomic update (prevent negative balance)
-        try await db.runTransaction { (transaction, errorPointer) -> Any? in
+        _ = try await db.runTransaction { (transaction, errorPointer) -> Any? in
             let snapshot: DocumentSnapshot
             do {
                 snapshot = try transaction.getDocument(docRef)
@@ -212,6 +223,11 @@ actor DiamondService {
         )
         
         print("✅ [DiamondService] Spent \(amount) diamonds. Type: \(type.rawValue)")
+        
+        // Notify listeners
+        DispatchQueue.main.async {
+            NotificationCenter.default.post(name: .diamondBalanceChanged, object: nil)
+        }
     }
     
     // MARK: - Add Diamonds (for purchases/admin)
@@ -234,6 +250,11 @@ actor DiamondService {
         )
         
         print("✅ [DiamondService] Added \(amount) diamonds. Type: \(type.rawValue)")
+        
+        // Notify listeners
+        DispatchQueue.main.async {
+            NotificationCenter.default.post(name: .diamondBalanceChanged, object: nil)
+        }
     }
     
     // MARK: - Log Transaction

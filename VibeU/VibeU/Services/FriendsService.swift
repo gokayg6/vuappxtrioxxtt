@@ -58,6 +58,7 @@ actor FriendsService {
                     age: user.age,
                     city: user.city,
                     profilePhotoURL: user.profilePhotoURL,
+                    photos: user.photos.map { $0.url },
                     isOnline: false, // Online status could be fetched from separate "presence" system
                     lastActiveAt: user.lastActiveAt, // Assuming User has lastActiveAt
                     tiktokUsername: user.socialLinks?.tiktok?.username,
@@ -139,7 +140,7 @@ actor FriendsService {
         let userRef = db.collection("users").document(currentUid)
         
         do {
-            try await db.runTransaction { (transaction, errorPointer) -> Any? in
+            _ = try await db.runTransaction { (transaction, errorPointer) -> Any? in
                 let snapshot: DocumentSnapshot
                 do {
                     snapshot = try transaction.getDocument(userRef)

@@ -52,7 +52,7 @@ struct ProfileView: View {
                     .padding(.top, 8)
                 }
             }
-            .navigationTitle("Profil")
+            .navigationTitle("Profil".localized)
             .navigationBarTitleDisplayMode(.large)
             .toolbarColorScheme(isDark ? .dark : .light, for: .navigationBar)
             .toolbar {
@@ -85,11 +85,11 @@ struct ProfileView: View {
             .sheet(isPresented: $viewModel.showSafety) {
                 SafetySettingsSheet()
             }
-            .confirmationDialog("Çıkış yapmak istediğine emin misin?", isPresented: $viewModel.showLogoutConfirm, titleVisibility: .visible) {
-                Button("Çıkış Yap", role: .destructive) {
+            .confirmationDialog("Çıkış yapmak istediğine emin misin?".localized, isPresented: $viewModel.showLogoutConfirm, titleVisibility: .visible) {
+                Button("Çıkış Yap".localized, role: .destructive) {
                     appState.signOut()
                 }
-                Button("İptal", role: .cancel) {}
+                Button("İptal".localized, role: .cancel) {}
             }
             .onAppear { calculateLocalCompletion() }
         }
@@ -274,7 +274,7 @@ struct ProfileHeaderCard: View {
             VStack(alignment: .leading, spacing: 14) {
                 // Name row with verification
                 HStack(spacing: 10) {
-                    Text("\(user?.displayName ?? "Kullanıcı"), \(user?.age ?? 0)")
+                    Text("\(user?.displayName ?? "Kullanıcı".localized), \(user?.age ?? 0)")
                         .font(.system(size: 24, weight: .bold, design: .rounded))
                         .foregroundStyle(colors.primaryText)
                     
@@ -298,7 +298,7 @@ struct ProfileHeaderCard: View {
                     HStack(spacing: 8) {
                         Image(systemName: isProfileComplete ? "pencil" : "pencil")
                             .font(.system(size: 13, weight: .bold))
-                        Text(isProfileComplete ? "Profili Düzenle" : "Profili Tamamla")
+                        Text(isProfileComplete ? "Profili Düzenle".localized : "Profili Tamamla".localized)
                             .font(.system(size: 15, weight: .bold, design: .rounded))
                     }
                     .foregroundStyle(.black)
@@ -415,11 +415,11 @@ struct DoubleDateBannerCard: View {
                 
                 // Text content
                 VStack(alignment: .leading, spacing: 3) {
-                    Text("Çifte Randevu")
+                    Text("Çifte Randevu".localized)
                         .font(.system(size: 16, weight: .semibold))
                         .foregroundStyle(colors.primaryText)
                     
-                    Text("Arkadaşlarınla birlikte eşleş")
+                    Text("Arkadaşlarınla birlikte eşleş".localized)
                         .font(.system(size: 13))
                         .foregroundStyle(colors.secondaryText)
                 }
@@ -465,7 +465,7 @@ struct QuickStatsRowView: View {
                 iconColor: Color(red: 0, green: 0.83, blue: 1.0),
                 count: "\(superLikeCount)",
                 title: "Super Like",
-                actionText: "DAHA FAZLA AL",
+                actionText: "DAHA FAZLA AL".localized,
                 showPlus: true,
                 colors: colors
             ) {
@@ -477,8 +477,8 @@ struct QuickStatsRowView: View {
                 icon: "bolt.fill",
                 iconColor: Color(red: 0.62, green: 0.31, blue: 0.87),
                 count: "\(boostCount)",
-                title: "Boost'larım",
-                actionText: "DAHA FAZLA AL",
+                title: "Boost'larım".localized,
+                actionText: "DAHA FAZLA AL".localized,
                 showPlus: true,
                 colors: colors
             ) {
@@ -490,8 +490,8 @@ struct QuickStatsRowView: View {
                 icon: "flame.fill",
                 iconColor: Color(red: 1.0, green: 0.42, blue: 0.42),
                 count: nil,
-                title: "Abonelikler",
-                actionText: "GÖRÜNTÜLE",
+                title: "Abonelikler".localized,
+                actionText: "GÖRÜNTÜLE".localized,
                 showPlus: false,
                 colors: colors
             ) {
@@ -582,11 +582,11 @@ struct SuperLikePurchaseSheet: View {
                     .font(.system(size: 28, weight: .bold))
                     .foregroundStyle(colors.primaryText)
                 
-                Text("Mevcut: \(currentCount)")
+                Text("\("Mevcut:".localized) \(currentCount)")
                     .font(.system(size: 16))
                     .foregroundStyle(colors.secondaryText)
                 
-                Text("Super Like ile öne çık ve eşleşme şansını 3 kat artır!")
+                Text("Super Like ile öne çık ve eşleşme şansını 3 kat artır!".localized)
                     .font(.system(size: 15))
                     .foregroundStyle(colors.secondaryText)
                     .multilineTextAlignment(.center)
@@ -669,11 +669,11 @@ struct BoostPurchaseSheet: View {
                     .font(.system(size: 28, weight: .bold))
                     .foregroundStyle(colors.primaryText)
                 
-                Text("Mevcut: \(currentCount)")
+                Text("\("Mevcut:".localized) \(currentCount)")
                     .font(.system(size: 16))
                     .foregroundStyle(colors.secondaryText)
                 
-                Text("30 dakika boyunca profilini öne çıkar ve 10 kat daha fazla görüntülenme al!")
+                Text("30 dakika boyunca profilini öne çıkar ve 10 kat daha fazla görüntülenme al!".localized)
                     .font(.system(size: 15))
                     .foregroundStyle(colors.secondaryText)
                     .multilineTextAlignment(.center)
@@ -718,12 +718,12 @@ struct ThemedPurchaseOptionRow: View {
     var body: some View {
         Button(action: action) {
             HStack {
-                Text("\(count) adet")
+                Text("\(count) " + "adet".localized)
                     .font(.system(size: 16, weight: .semibold))
                     .foregroundStyle(colors.primaryText)
                 
                 if isPopular {
-                    Text("EN İYİ FİYAT")
+                    Text("EN İYİ FİYAT".localized)
                         .font(.system(size: 9, weight: .bold))
                         .foregroundStyle(.black)
                         .padding(.horizontal, 6)
@@ -769,9 +769,9 @@ struct SubscriptionSheet: View {
     private var colors: ThemeColors { isDark ? .dark : .light }
     
     private let plans = [
-        (duration: "1 Hafta", price: "₺79.99", perWeek: "₺79.99/hafta", isPopular: false),
-        (duration: "1 Ay", price: "₺149.99", perWeek: "₺37.50/hafta", isPopular: true),
-        (duration: "6 Ay", price: "₺449.99", perWeek: "₺18.75/hafta", isPopular: false)
+        (duration: "1 Hafta".localized, price: "₺79.99", perWeek: "₺79.99" + "/hafta".localized, isPopular: false),
+        (duration: "1 Ay".localized, price: "₺149.99", perWeek: "₺37.50" + "/hafta".localized, isPopular: true),
+        (duration: "6 Ay".localized, price: "₺449.99", perWeek: "₺18.75" + "/hafta".localized, isPopular: false)
     ]
     
     var body: some View {
@@ -817,19 +817,19 @@ struct SubscriptionSheet: View {
                             .background(Color.yellow, in: RoundedRectangle(cornerRadius: 6))
                     }
                     
-                    Text("Tüm premium özelliklere eriş!")
+                    Text("Tüm premium özelliklere eriş!".localized)
                         .font(.system(size: 16))
                         .foregroundStyle(colors.secondaryText)
                     
                     // Features
                     VStack(spacing: 14) {
-                        ThemedGoldFeatureRow(icon: "heart.fill", text: "Sınırsız Beğeni", color: .pink, colors: colors)
-                        ThemedGoldFeatureRow(icon: "star.fill", text: "5 Super Like / Gün", color: .cyan, colors: colors)
-                        ThemedGoldFeatureRow(icon: "bolt.fill", text: "1 Boost / Ay", color: .purple, colors: colors)
-                        ThemedGoldFeatureRow(icon: "eye.fill", text: "Seni Kimlerin Beğendiğini Gör", color: .green, colors: colors)
-                        ThemedGoldFeatureRow(icon: "arrow.uturn.backward", text: "Geri Alma", color: .orange, colors: colors)
-                        ThemedGoldFeatureRow(icon: "mappin.circle.fill", text: "Konum Değiştir", color: .blue, colors: colors)
-                        ThemedGoldFeatureRow(icon: "eye.slash.fill", text: "Gizli Mod", color: .gray, colors: colors)
+                        ThemedGoldFeatureRow(icon: "heart.fill", text: "Sınırsız Beğeni".localized, color: .pink, colors: colors)
+                        ThemedGoldFeatureRow(icon: "star.fill", text: "5 Super Like / Gün".localized, color: .cyan, colors: colors)
+                        ThemedGoldFeatureRow(icon: "bolt.fill", text: "1 Boost / Ay".localized, color: .purple, colors: colors)
+                        ThemedGoldFeatureRow(icon: "eye.fill", text: "Seni Kimlerin Beğendiğini Gör".localized, color: .green, colors: colors)
+                        ThemedGoldFeatureRow(icon: "arrow.uturn.backward", text: "Geri Alma".localized, color: .orange, colors: colors)
+                        ThemedGoldFeatureRow(icon: "mappin.circle.fill", text: "Konum Değiştir".localized, color: .blue, colors: colors)
+                        ThemedGoldFeatureRow(icon: "eye.slash.fill", text: "Gizli Mod".localized, color: .gray, colors: colors)
                     }
                     .padding(.horizontal, 24)
                     .padding(.vertical, 16)
@@ -849,7 +849,7 @@ struct SubscriptionSheet: View {
                                                 .font(.system(size: 17, weight: .semibold))
                                                 .foregroundStyle(colors.primaryText)
                                             if plan.isPopular {
-                                                Text("EN POPÜLER")
+                                                Text("EN POPÜLER".localized)
                                                     .font(.system(size: 9, weight: .bold))
                                                     .foregroundStyle(.black)
                                                     .padding(.horizontal, 6)
@@ -899,7 +899,7 @@ struct SubscriptionSheet: View {
                     Button {
                         activatePremium()
                     } label: {
-                        Text("Satın Al - \(plans[selectedPlanIndex].price)")
+                        Text("Satın Al -".localized + " \(plans[selectedPlanIndex].price)")
                             .font(.system(size: 18, weight: .bold))
                             .foregroundStyle(.black)
                             .frame(maxWidth: .infinity)
@@ -913,7 +913,7 @@ struct SubscriptionSheet: View {
                     .padding(.top, 8)
                     
                     // Terms
-                    Text("Abonelik otomatik olarak yenilenir. İstediğin zaman iptal edebilirsin.")
+                    Text("Abonelik otomatik olarak yenilenir. İstediğin zaman iptal edebilirsin.".localized)
                         .font(.system(size: 12))
                         .foregroundStyle(colors.tertiaryText)
                         .multilineTextAlignment(.center)
@@ -924,10 +924,10 @@ struct SubscriptionSheet: View {
                 .padding(.top, 16)
             }
         }
-        .alert("Premium Aktif! 🎉", isPresented: $showActivatedAlert) {
-            Button("Harika!") { dismiss() }
+        .alert("Premium Aktif! 🎉".localized, isPresented: $showActivatedAlert) {
+            Button("Harika!".localized) { dismiss() }
         } message: {
-            Text("VibeU Gold \(plans[selectedPlanIndex].duration) aboneliğin aktif edildi!")
+            Text("VibeU Gold aboneliğin aktif edildi!".localized)
         }
     }
     
@@ -1020,12 +1020,12 @@ struct PurchaseOptionRow: View {
     var body: some View {
         Button(action: action) {
             HStack {
-                Text("\(count) adet")
+                Text("\(count) " + "adet".localized)
                     .font(.system(size: 16, weight: .semibold))
                     .foregroundStyle(.white)
                 
                 if isPopular {
-                    Text("EN İYİ FİYAT")
+                    Text("EN İYİ FİYAT".localized)
                         .font(.system(size: 9, weight: .bold))
                         .foregroundStyle(.black)
                         .padding(.horizontal, 6)
@@ -1182,28 +1182,28 @@ struct ProfileMenuSection: View {
         VStack(spacing: 0) {
             // Photos - camera with sparkle
             NavigationLink { PhotosEditView() } label: {
-                ProfileMenuRowMinimal(icon: "camera.fill", title: "Fotoğraflar", subtitle: "Profilini öne çıkar", colors: colors)
+                ProfileMenuRowMinimal(icon: "camera.fill", title: "Fotoğraflar".localized, subtitle: "Profilini öne çıkar".localized, colors: colors)
             }
             
             MinimalDivider(colors: colors)
             
             // Interests - sparkles for interests
             NavigationLink { InterestsEditView() } label: {
-                ProfileMenuRowMinimal(icon: "sparkles", title: "İlgi Alanları", subtitle: "Ortak noktalarını bul", colors: colors)
+                ProfileMenuRowMinimal(icon: "sparkles", title: "İlgi Alanları".localized, subtitle: "Ortak noktalarını bul".localized, colors: colors)
             }
             
             MinimalDivider(colors: colors)
             
             // Social Media - at symbol
             NavigationLink { SocialLinksEditView() } label: {
-                ProfileMenuRowMinimal(icon: "at", title: "Sosyal Medya", subtitle: "Hesaplarını bağla", colors: colors)
+                ProfileMenuRowMinimal(icon: "at", title: "Sosyal Medya".localized, subtitle: "Hesaplarını bağla".localized, colors: colors)
             }
             
             MinimalDivider(colors: colors)
             
             // QR Profile
             NavigationLink { QRProfileView() } label: {
-                ProfileMenuRowMinimal(icon: "qrcode.viewfinder", title: "QR Profilim", subtitle: "Hızlıca paylaş", colors: colors)
+                ProfileMenuRowMinimal(icon: "qrcode.viewfinder", title: "QR Profilim".localized, subtitle: "Hızlıca paylaş".localized, colors: colors)
             }
         }
         .background(
@@ -1359,7 +1359,7 @@ struct AccountSection: View {
             #endif
             
             Button { viewModel.showLogoutConfirm = true } label: {
-                ProfileMenuRow(icon: "rectangle.portrait.and.arrow.right", title: "Çıkış Yap", color: .orange, colors: colors)
+                ProfileMenuRow(icon: "rectangle.portrait.and.arrow.right", title: "Çıkış Yap".localized, color: .orange, colors: colors)
             }
         }
         .background(colors.cardBackground, in: RoundedRectangle(cornerRadius: 12))
@@ -1399,26 +1399,26 @@ struct SettingsSheetView: View {
                 
                 List {
                     // Appearance Section
-                    Section("Görünüm") {
+                    Section("Görünüm".localized) {
                         NavigationLink {
                             ThemeSettingsView()
                         } label: {
-                            ThemedSettingsRow(icon: "moon.fill", iconColor: .purple, title: "Tema", value: appState.currentTheme.displayName, colors: colors)
+                            ThemedSettingsRow(icon: "moon.fill", iconColor: .purple, title: "Tema".localized, value: appState.currentTheme.displayName, colors: colors)
                         }
                         .listRowBackground(colors.cardBackground)
                         
                         NavigationLink {
                             LanguageSettingsView()
                         } label: {
-                            ThemedSettingsRow(icon: "globe", iconColor: .blue, title: "Dil", value: appState.currentLanguage.displayName, colors: colors)
+                            ThemedSettingsRow(icon: "globe", iconColor: .blue, title: "Dil".localized, value: appState.currentLanguage.displayName, colors: colors)
                         }
                         .listRowBackground(colors.cardBackground)
                     }
                     
                     // Notifications Section
-                    Section("Bildirimler") {
+                    Section("Bildirimler".localized) {
                         Toggle(isOn: $notificationsEnabled) {
-                            ThemedSettingsRowLabel(icon: "bell.fill", iconColor: .orange, title: "Bildirimler", colors: colors)
+                            ThemedSettingsRowLabel(icon: "bell.fill", iconColor: .orange, title: "Bildirimler".localized, colors: colors)
                         }
                         .tint(.cyan)
                         .listRowBackground(colors.cardBackground)
@@ -1428,7 +1428,7 @@ struct SettingsSheetView: View {
                         }
                         
                         Toggle(isOn: $locationEnabled) {
-                            ThemedSettingsRowLabel(icon: "location.fill", iconColor: .green, title: "Konum", colors: colors)
+                            ThemedSettingsRowLabel(icon: "location.fill", iconColor: .green, title: "Konum".localized, colors: colors)
                         }
                         .tint(.cyan)
                         .listRowBackground(colors.cardBackground)
@@ -1439,30 +1439,30 @@ struct SettingsSheetView: View {
                     }
                     
                     // Account Section
-                    Section("Hesap") {
+                    Section("Hesap".localized) {
                         NavigationLink {
                             PrivacySettingsView()
                         } label: {
-                            ThemedSettingsRow(icon: "hand.raised.fill", iconColor: .pink, title: "Gizlilik", value: nil, colors: colors)
+                            ThemedSettingsRow(icon: "hand.raised.fill", iconColor: .pink, title: "Gizlilik".localized, value: nil, colors: colors)
                         }
                         .listRowBackground(colors.cardBackground)
                         
                         NavigationLink {
                             BlockedUsersView()
                         } label: {
-                            ThemedSettingsRow(icon: "person.crop.circle.badge.xmark", iconColor: .red, title: "Engellenenler", value: nil, colors: colors)
+                            ThemedSettingsRow(icon: "person.crop.circle.badge.xmark", iconColor: .red, title: "Engellenenler".localized, value: nil, colors: colors)
                         }
                         .listRowBackground(colors.cardBackground)
                     }
                     
                     // Support Section
-                    Section("Destek") {
+                    Section("Destek".localized) {
                         Button {
                             if let url = URL(string: "https://vibeu.app/help") {
                                 UIApplication.shared.open(url)
                             }
                         } label: {
-                            ThemedSettingsRow(icon: "questionmark.circle.fill", iconColor: .cyan, title: "Yardım Merkezi", value: nil, colors: colors)
+                            ThemedSettingsRow(icon: "questionmark.circle.fill", iconColor: .cyan, title: "Yardım Merkezi".localized, value: nil, colors: colors)
                         }
                         .listRowBackground(colors.cardBackground)
                         
@@ -1471,7 +1471,7 @@ struct SettingsSheetView: View {
                                 UIApplication.shared.open(url)
                             }
                         } label: {
-                            ThemedSettingsRow(icon: "envelope.fill", iconColor: .blue, title: "Bize Ulaşın", value: nil, colors: colors)
+                            ThemedSettingsRow(icon: "envelope.fill", iconColor: .blue, title: "Bize Ulaşın".localized, value: nil, colors: colors)
                         }
                         .listRowBackground(colors.cardBackground)
                     }
@@ -1479,7 +1479,7 @@ struct SettingsSheetView: View {
                     // About Section
                     Section {
                         HStack {
-                            Text("Sürüm")
+                            Text("Sürüm".localized)
                                 .foregroundStyle(colors.primaryText)
                             Spacer()
                             Text(Bundle.main.appVersion)
@@ -1495,7 +1495,7 @@ struct SettingsSheetView: View {
                         } label: {
                             HStack {
                                 Image(systemName: "trash.fill")
-                                Text("Hesabı Sil")
+                                Text("Hesabı Sil".localized)
                             }
                             .foregroundStyle(.red)
                         }
@@ -1504,12 +1504,12 @@ struct SettingsSheetView: View {
                 }
                 .scrollContentBackground(.hidden)
             }
-            .navigationTitle("Ayarlar")
+            .navigationTitle("Ayarlar".localized)
             .navigationBarTitleDisplayMode(.inline)
             .toolbarColorScheme(isDark ? .dark : .light, for: .navigationBar)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button("Tamam") { dismiss() }
+                    Button("Tamam".localized) { dismiss() }
                         .foregroundStyle(.cyan)
                 }
             }
@@ -1518,13 +1518,13 @@ struct SettingsSheetView: View {
                 locationEnabled = UserDefaults.standard.bool(forKey: "location_enabled")
                 Task { await LogService.shared.info("Ayarlar açıldı", category: "Settings") }
             }
-            .alert("Hesabı Sil", isPresented: $showDeleteConfirm) {
-                Button("İptal", role: .cancel) {}
-                Button("Sil", role: .destructive) {
+            .alert("Hesabı Sil".localized, isPresented: $showDeleteConfirm) {
+                Button("İptal".localized, role: .cancel) {}
+                Button("Sil".localized, role: .destructive) {
                     Task { await LogService.shared.info("Hesap silme istendi", category: "Settings") }
                 }
             } message: {
-                Text("Bu işlem geri alınamaz. Tüm verileriniz silinecektir.")
+                Text("Bu işlem geri alınamaz. Tüm verileriniz silinecektir.".localized)
             }
         }
     }
@@ -1598,50 +1598,50 @@ struct SafetySettingsSheet: View {
                 colors.background.ignoresSafeArea()
                 
                 List {
-                    Section("Gizlilik") {
+                    Section("Gizlilik".localized) {
                         Toggle(isOn: $hideAge) {
-                            ThemedSettingsRowLabel(icon: "calendar", iconColor: .orange, title: "Yaşımı Gizle", colors: colors)
+                            ThemedSettingsRowLabel(icon: "calendar", iconColor: .orange, title: "Yaşımı Gizle".localized, colors: colors)
                         }
                         .tint(.cyan)
                         .listRowBackground(colors.cardBackground)
                         
                         Toggle(isOn: $hideDistance) {
-                            ThemedSettingsRowLabel(icon: "location.slash.fill", iconColor: .green, title: "Mesafeyi Gizle", colors: colors)
+                            ThemedSettingsRowLabel(icon: "location.slash.fill", iconColor: .green, title: "Mesafeyi Gizle".localized, colors: colors)
                         }
                         .tint(.cyan)
                         .listRowBackground(colors.cardBackground)
                         
                         Toggle(isOn: $hideOnlineStatus) {
-                            ThemedSettingsRowLabel(icon: "circle.fill", iconColor: .green, title: "Çevrimiçi Durumu Gizle", colors: colors)
+                            ThemedSettingsRowLabel(icon: "circle.fill", iconColor: .green, title: "Çevrimiçi Durumu Gizle".localized, colors: colors)
                         }
                         .tint(.cyan)
                         .listRowBackground(colors.cardBackground)
                     }
                     
-                    Section("Güvenlik") {
+                    Section("Güvenlik".localized) {
                         NavigationLink {
                             ReportUserView()
                         } label: {
-                            ThemedSettingsRow(icon: "exclamationmark.triangle.fill", iconColor: .yellow, title: "Kullanıcı Bildir", value: nil, colors: colors)
+                            ThemedSettingsRow(icon: "exclamationmark.triangle.fill", iconColor: .yellow, title: "Kullanıcı Bildir".localized, value: nil, colors: colors)
                         }
                         .listRowBackground(colors.cardBackground)
                         
                         NavigationLink {
                             SafetyTipsView()
                         } label: {
-                            ThemedSettingsRow(icon: "shield.checkered", iconColor: .cyan, title: "Güvenlik İpuçları", value: nil, colors: colors)
+                            ThemedSettingsRow(icon: "shield.checkered", iconColor: .cyan, title: "Güvenlik İpuçları".localized, value: nil, colors: colors)
                         }
                         .listRowBackground(colors.cardBackground)
                     }
                 }
                 .scrollContentBackground(.hidden)
             }
-            .navigationTitle("Güvenlik")
+            .navigationTitle("Güvenlik".localized)
             .navigationBarTitleDisplayMode(.inline)
             .toolbarColorScheme(isDark ? .dark : .light, for: .navigationBar)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button("Kaydet") { saveSettings() }
+                    Button("Kaydet".localized) { saveSettings() }
                         .foregroundStyle(.cyan)
                 }
             }
@@ -1650,6 +1650,7 @@ struct SafetySettingsSheet: View {
     }
     
     private func loadSettings() {
+        // Load from UserDefaults
         hideAge = UserDefaults.standard.bool(forKey: "safety_hideAge")
         hideDistance = UserDefaults.standard.bool(forKey: "safety_hideDistance")
         hideOnlineStatus = UserDefaults.standard.bool(forKey: "safety_hideOnlineStatus")
@@ -1658,17 +1659,39 @@ struct SafetySettingsSheet: View {
     }
     
     private func saveSettings() {
+        // Save to UserDefaults
         UserDefaults.standard.set(hideAge, forKey: "safety_hideAge")
         UserDefaults.standard.set(hideDistance, forKey: "safety_hideDistance")
         UserDefaults.standard.set(hideOnlineStatus, forKey: "safety_hideOnlineStatus")
         UserDefaults.standard.set(readReceipts, forKey: "safety_readReceipts")
-        Task { 
-            await LogService.shared.info("Güvenlik ayarları kaydedildi", category: "Safety", metadata: [
-                "hideAge": "\(hideAge)",
-                "hideDistance": "\(hideDistance)",
-                "hideOnlineStatus": "\(hideOnlineStatus)",
-                "readReceipts": "\(readReceipts)"
-            ]) 
+        
+        // Sync to Firebase for real-time updates
+        guard let uid = Auth.auth().currentUser?.uid else { 
+            dismiss()
+            return 
+        }
+        
+        Task {
+            do {
+                try await Firestore.firestore().collection("users").document(uid).updateData([
+                    "hide_age": hideAge,
+                    "hide_distance": hideDistance,
+                    "hide_online_status": hideOnlineStatus,
+                    "read_receipts_enabled": readReceipts
+                ])
+                
+                await LogService.shared.info("Güvenlik ayarları Firebase'e kaydedildi", category: "Safety", metadata: [
+                    "hideAge": "\(hideAge)",
+                    "hideDistance": "\(hideDistance)",
+                    "hideOnlineStatus": "\(hideOnlineStatus)",
+                    "readReceipts": "\(readReceipts)"
+                ])
+                
+                // Haptic feedback
+                UINotificationFeedbackGenerator().notificationOccurred(.success)
+            } catch {
+                print("❌ Firebase güvenlik ayarları kaydedilemedi: \(error)")
+            }
         }
         dismiss()
     }
@@ -1676,65 +1699,302 @@ struct SafetySettingsSheet: View {
 
 // MARK: - Privacy Settings View
 struct PrivacySettingsView: View {
+    @Environment(AppState.self) private var appState
+    @Environment(\.colorScheme) private var systemColorScheme
+    @State private var hideProfileFromDiscovery = false
+    @State private var hideLastSeen = false
+    @State private var hideReadReceipts = false
+    
+    private var isDark: Bool {
+        switch appState.currentTheme {
+        case .dark: return true
+        case .light: return false
+        case .system: return systemColorScheme == .dark
+        }
+    }
+    
+    private var colors: ThemeColors { isDark ? .dark : .light }
+    
     var body: some View {
         ZStack {
-            Color(red: 0.04, green: 0.02, blue: 0.08).ignoresSafeArea()
-            Text("Gizlilik Ayarları")
-                .foregroundStyle(.white)
+            colors.background.ignoresSafeArea()
+            
+            List {
+                Section("Keşif".localized) {
+                    Toggle(isOn: $hideProfileFromDiscovery) {
+                        ThemedSettingsRowLabel(icon: "eye.slash.fill", iconColor: .orange, title: "Profilimi Keşfetten Gizle".localized, colors: colors)
+                    }
+                    .tint(.cyan)
+                    .listRowBackground(colors.cardBackground)
+                }
+                
+                Section("Görünürlük".localized) {
+                    Toggle(isOn: $hideLastSeen) {
+                        ThemedSettingsRowLabel(icon: "clock.fill", iconColor: .green, title: "Son Görülmeyi Gizle".localized, colors: colors)
+                    }
+                    .tint(.cyan)
+                    .listRowBackground(colors.cardBackground)
+                    
+                    Toggle(isOn: $hideReadReceipts) {
+                        ThemedSettingsRowLabel(icon: "checkmark.message.fill", iconColor: .blue, title: "Okundu Bilgisini Gizle".localized, colors: colors)
+                    }
+                    .tint(.cyan)
+                    .listRowBackground(colors.cardBackground)
+                }
+                
+                Section("Veri".localized) {
+                    Button {
+                        Task { await LogService.shared.info("Verilerimi indir istendi", category: "Privacy") }
+                    } label: {
+                        ThemedSettingsRow(icon: "arrow.down.doc.fill", iconColor: .purple, title: "Verilerimi İndir".localized, value: nil, colors: colors)
+                    }
+                    .listRowBackground(colors.cardBackground)
+                }
+            }
+            .scrollContentBackground(.hidden)
         }
-        .navigationTitle("Gizlilik")
-        .toolbarColorScheme(.dark, for: .navigationBar)
+        .navigationTitle("Gizlilik".localized)
+        .toolbarColorScheme(isDark ? .dark : .light, for: .navigationBar)
+        .onAppear { loadSettings() }
+        .onChange(of: hideProfileFromDiscovery) { _, newValue in
+            UserDefaults.standard.set(newValue, forKey: "privacy_hideFromDiscovery")
+        }
+        .onChange(of: hideLastSeen) { _, newValue in
+            UserDefaults.standard.set(newValue, forKey: "privacy_hideLastSeen")
+        }
+        .onChange(of: hideReadReceipts) { _, newValue in
+            UserDefaults.standard.set(newValue, forKey: "privacy_hideReadReceipts")
+        }
+    }
+    
+    private func loadSettings() {
+        hideProfileFromDiscovery = UserDefaults.standard.bool(forKey: "privacy_hideFromDiscovery")
+        hideLastSeen = UserDefaults.standard.bool(forKey: "privacy_hideLastSeen")
+        hideReadReceipts = UserDefaults.standard.bool(forKey: "privacy_hideReadReceipts")
     }
 }
 
 // MARK: - Blocked Users View
 struct BlockedUsersView: View {
+    @Environment(AppState.self) private var appState
+    @Environment(\.colorScheme) private var systemColorScheme
+    @State private var blockedUsers: [BlockedUser] = []
+    @State private var isLoading = true
+    
+    private var isDark: Bool {
+        switch appState.currentTheme {
+        case .dark: return true
+        case .light: return false
+        case .system: return systemColorScheme == .dark
+        }
+    }
+    
+    private var colors: ThemeColors { isDark ? .dark : .light }
+    
     var body: some View {
         ZStack {
-            Color(red: 0.04, green: 0.02, blue: 0.08).ignoresSafeArea()
-            VStack(spacing: 16) {
-                Image(systemName: "person.crop.circle.badge.xmark")
-                    .font(.system(size: 50))
-                    .foregroundStyle(Color(white: 0.4))
-                Text("Engellenen kullanıcı yok")
-                    .foregroundStyle(Color(white: 0.5))
+            colors.background.ignoresSafeArea()
+            
+            if isLoading {
+                ProgressView()
+            } else if blockedUsers.isEmpty {
+                VStack(spacing: 16) {
+                    Image(systemName: "person.crop.circle.badge.xmark")
+                        .font(.system(size: 50))
+                        .foregroundStyle(colors.tertiaryText)
+                    Text("Engellenen kullanıcı yok".localized)
+                        .foregroundStyle(colors.secondaryText)
+                }
+            } else {
+                List {
+                    ForEach(blockedUsers) { user in
+                        HStack {
+                            AsyncImage(url: URL(string: user.photoURL)) { phase in
+                                switch phase {
+                                case .success(let image):
+                                    image.resizable().scaledToFill().frame(width: 44, height: 44).clipShape(Circle())
+                                default:
+                                    Circle().fill(colors.cardBackground).frame(width: 44, height: 44)
+                                }
+                            }
+                            
+                                VStack(alignment: .leading, spacing: 2) {
+                                Text(user.displayName)
+                                    .font(.system(size: 16, weight: .medium))
+                                    .foregroundStyle(colors.primaryText)
+                                Text("Engellendi".localized)
+                                    .font(.system(size: 12))
+                                    .foregroundStyle(colors.secondaryText)
+                            }
+                            
+                            Spacer()
+                            
+                            Button("Engeli Kaldır".localized) {
+                                Task { await unblockUser(user) }
+                            }
+                            .font(.system(size: 14, weight: .medium))
+                            .foregroundStyle(.cyan)
+                        }
+                        .listRowBackground(colors.cardBackground)
+                    }
+                }
+                .scrollContentBackground(.hidden)
             }
         }
-        .navigationTitle("Engellenenler")
-        .toolbarColorScheme(.dark, for: .navigationBar)
+        .navigationTitle("Engellenenler".localized)
+        .toolbarColorScheme(isDark ? .dark : .light, for: .navigationBar)
+        .task { await loadBlockedUsers() }
     }
+    
+    private func loadBlockedUsers() async {
+        guard let uid = Auth.auth().currentUser?.uid else { isLoading = false; return }
+        
+        do {
+            let snapshot = try await Firestore.firestore()
+                .collection("users")
+                .document(uid)
+                .collection("blocked_users")
+                .getDocuments()
+            
+            blockedUsers = snapshot.documents.compactMap { doc in
+                guard let displayName = doc.data()["display_name"] as? String,
+                      let photoURL = doc.data()["photo_url"] as? String else { return nil }
+                return BlockedUser(id: doc.documentID, displayName: displayName, photoURL: photoURL)
+            }
+        } catch {
+            print("Error loading blocked users: \(error)")
+        }
+        isLoading = false
+    }
+    
+    private func unblockUser(_ user: BlockedUser) async {
+        guard let uid = Auth.auth().currentUser?.uid else { return }
+        
+        do {
+            try await Firestore.firestore()
+                .collection("users")
+                .document(uid)
+                .collection("blocked_users")
+                .document(user.id)
+                .delete()
+            
+            blockedUsers.removeAll { $0.id == user.id }
+            UINotificationFeedbackGenerator().notificationOccurred(.success)
+        } catch {
+            print("Error unblocking user: \(error)")
+        }
+    }
+}
+
+struct BlockedUser: Identifiable {
+    let id: String
+    let displayName: String
+    let photoURL: String
 }
 
 // MARK: - Report User View
 struct ReportUserView: View {
+    @Environment(AppState.self) private var appState
+    @Environment(\.colorScheme) private var systemColorScheme
+    @State private var selectedReason: String?
+    @State private var additionalDetails = ""
+    
+    private let reportReasons = [
+        "Uygunsuz fotoğraf",
+        "Spam veya sahte profil",
+        "Taciz veya zorbalık",
+        "Uygunsuz mesajlar",
+        "Yaşı tutmuyor",
+        "Diğer"
+    ]
+    
+    private var isDark: Bool {
+        switch appState.currentTheme {
+        case .dark: return true
+        case .light: return false
+        case .system: return systemColorScheme == .dark
+        }
+    }
+    
+    private var colors: ThemeColors { isDark ? .dark : .light }
+    
     var body: some View {
         ZStack {
-            Color(red: 0.04, green: 0.02, blue: 0.08).ignoresSafeArea()
-            Text("Kullanıcı Bildir")
-                .foregroundStyle(.white)
+            colors.background.ignoresSafeArea()
+            
+            ScrollView {
+                VStack(alignment: .leading, spacing: 20) {
+                    Text("Bildirme sebebinizi seçin:".localized)
+                        .font(.headline)
+                        .foregroundStyle(colors.primaryText)
+                    
+                    ForEach(reportReasons, id: \.self) { reason in
+                        Button {
+                            selectedReason = reason
+                        } label: {
+                            HStack {
+                                Text(reason.localized)
+                                    .foregroundStyle(colors.primaryText)
+                                Spacer()
+                                if selectedReason == reason {
+                                    Image(systemName: "checkmark.circle.fill")
+                                        .foregroundStyle(.cyan)
+                                }
+                            }
+                            .padding()
+                            .background(colors.cardBackground, in: RoundedRectangle(cornerRadius: 12))
+                        }
+                    }
+                    
+                    Text("Ek bilgi (opsiyonel):".localized)
+                        .font(.headline)
+                        .foregroundStyle(colors.primaryText)
+                        .padding(.top)
+                    
+                    TextEditor(text: $additionalDetails)
+                        .frame(height: 100)
+                        .padding(8)
+                        .background(colors.cardBackground, in: RoundedRectangle(cornerRadius: 12))
+                        .foregroundStyle(colors.primaryText)
+                }
+                .padding()
+            }
         }
-        .navigationTitle("Bildir")
-        .toolbarColorScheme(.dark, for: .navigationBar)
+        .navigationTitle("Bildir".localized)
+        .toolbarColorScheme(isDark ? .dark : .light, for: .navigationBar)
     }
 }
 
 // MARK: - Safety Tips View
 struct SafetyTipsView: View {
+    @Environment(AppState.self) private var appState
+    @Environment(\.colorScheme) private var systemColorScheme
+    
+    private var isDark: Bool {
+        switch appState.currentTheme {
+        case .dark: return true
+        case .light: return false
+        case .system: return systemColorScheme == .dark
+        }
+    }
+    
+    private var colors: ThemeColors { isDark ? .dark : .light }
+    
     var body: some View {
         ZStack {
-            Color(red: 0.04, green: 0.02, blue: 0.08).ignoresSafeArea()
+            colors.background.ignoresSafeArea()
             ScrollView {
                 VStack(alignment: .leading, spacing: 20) {
-                    SafetyTipCard(icon: "person.badge.shield.checkmark.fill", title: "Kişisel Bilgiler", description: "Adres, telefon numarası gibi kişisel bilgilerinizi paylaşmayın.")
-                    SafetyTipCard(icon: "video.fill", title: "Video Görüşme", description: "Buluşmadan önce video görüşme yapın.")
-                    SafetyTipCard(icon: "mappin.and.ellipse", title: "Halka Açık Yerler", description: "İlk buluşmalarınızı halka açık yerlerde yapın.")
-                    SafetyTipCard(icon: "person.2.fill", title: "Arkadaşlarınıza Söyleyin", description: "Nereye gittiğinizi birine söyleyin.")
+                    SafetyTipCard(icon: "person.badge.shield.checkmark.fill", title: "Kişisel Bilgiler".localized, description: "Adres, telefon numarası gibi kişisel bilgilerinizi paylaşmayın.".localized, colors: colors)
+                    SafetyTipCard(icon: "video.fill", title: "Video Görüşme".localized, description: "Buluşmadan önce video görüşme yapın.".localized, colors: colors)
+                    SafetyTipCard(icon: "mappin.and.ellipse", title: "Halka Açık Yerler".localized, description: "İlk buluşmalarınızı halka açık yerlerde yapın.".localized, colors: colors)
+                    SafetyTipCard(icon: "person.2.fill", title: "Arkadaşlarınıza Söyleyin".localized, description: "Nereye gittiğinizi birine söyleyin.".localized, colors: colors)
                 }
                 .padding()
             }
         }
-        .navigationTitle("Güvenlik İpuçları")
-        .toolbarColorScheme(.dark, for: .navigationBar)
+        .navigationTitle("Güvenlik İpuçları".localized)
+        .toolbarColorScheme(isDark ? .dark : .light, for: .navigationBar)
     }
 }
 
@@ -1742,6 +2002,7 @@ struct SafetyTipCard: View {
     let icon: String
     let title: String
     let description: String
+    var colors: ThemeColors = .dark
     
     var body: some View {
         HStack(alignment: .top, spacing: 14) {
@@ -1753,14 +2014,14 @@ struct SafetyTipCard: View {
             VStack(alignment: .leading, spacing: 4) {
                 Text(title)
                     .font(.system(size: 16, weight: .semibold))
-                    .foregroundStyle(.white)
+                    .foregroundStyle(colors.primaryText)
                 Text(description)
                     .font(.system(size: 14))
-                    .foregroundStyle(Color(white: 0.6))
+                    .foregroundStyle(colors.secondaryText)
             }
         }
         .padding(16)
-        .background(Color(white: 0.1), in: RoundedRectangle(cornerRadius: 14))
+        .background(colors.cardBackground, in: RoundedRectangle(cornerRadius: 14))
     }
 }
 
@@ -1802,8 +2063,8 @@ struct BoostDiamondCombinedSheet: View {
                 VStack(spacing: 0) {
                     // Tab Picker
                     Picker("", selection: $selectedTab) {
-                        Text("💎 Elmas").tag(0)
-                        Text("⚡ Boost").tag(1)
+                        Text("💎 " + "Elmas".localized).tag(0)
+                        Text("⚡ " + "Boost".localized).tag(1)
                     }
                     .pickerStyle(.segmented)
                     .padding()
@@ -1826,7 +2087,7 @@ struct BoostDiamondCombinedSheet: View {
                     }
                 }
             }
-            .navigationTitle("Boost & Elmas")
+            .navigationTitle("Boost & Elmas".localized)
             .navigationBarTitleDisplayMode(.inline)
             .toolbarColorScheme(isDark ? .dark : .light, for: .navigationBar)
             .toolbar {
@@ -1856,7 +2117,7 @@ struct BoostDiamondCombinedSheet: View {
                         .font(.system(size: 42, weight: .bold, design: .rounded))
                         .foregroundStyle(colors.primaryText)
                     
-                    Text("Elmas")
+                    Text("Elmas".localized)
                         .font(.subheadline)
                         .foregroundStyle(colors.secondaryText)
                 }
@@ -1872,7 +2133,7 @@ struct BoostDiamondCombinedSheet: View {
                                 ProgressView().tint(.white)
                             } else {
                                 Image(systemName: "gift.fill")
-                                Text("Günlük 100 Elmas Al")
+                                Text("Günlük 100 Elmas Al".localized)
                             }
                         }
                         .font(.headline)
@@ -1886,7 +2147,7 @@ struct BoostDiamondCombinedSheet: View {
                 } else {
                     HStack {
                         Image(systemName: "checkmark.circle.fill").foregroundStyle(.green)
-                        Text("Bugünkü ödülünüzü aldınız!").foregroundStyle(colors.secondaryText)
+                        Text("Bugünkü ödülünüzü aldınız!".localized).foregroundStyle(colors.secondaryText)
                     }
                     .padding()
                     .frame(maxWidth: .infinity)
@@ -1896,11 +2157,11 @@ struct BoostDiamondCombinedSheet: View {
                 
                 // Info
                 VStack(alignment: .leading, spacing: 12) {
-                    Text("Elmas Kullanımı").font(.headline).foregroundStyle(colors.primaryText)
+                    Text("Elmas Kullanımı".localized).font(.headline).foregroundStyle(colors.primaryText)
                     
                     HStack {
                         Image(systemName: "heart.fill").foregroundStyle(.pink).frame(width: 24)
-                        Text("Eşleşme isteği: 10 elmas").foregroundStyle(colors.secondaryText)
+                        Text("Eşleşme isteği: 10 elmas".localized).foregroundStyle(colors.secondaryText)
                     }
                 }
                 .padding()
@@ -1925,14 +2186,14 @@ struct BoostDiamondCombinedSheet: View {
                         .font(.system(size: 42, weight: .bold, design: .rounded))
                         .foregroundStyle(colors.primaryText)
                     
-                    Text("Boost")
+                    Text("Boost".localized)
                         .font(.subheadline)
                         .foregroundStyle(colors.secondaryText)
                 }
                 .padding(.top, 20)
                 
                 // Info
-                Text("30 dakika boyunca profilini öne çıkar!")
+                Text("30 dakika boyunca profilini öne çıkar!".localized)
                     .font(.subheadline)
                     .foregroundStyle(colors.secondaryText)
                     .multilineTextAlignment(.center)
@@ -1952,9 +2213,9 @@ struct BoostDiamondCombinedSheet: View {
     private func purchaseRow(count: Int, price: String, isPopular: Bool = false) -> some View {
         Button {} label: {
             HStack {
-                Text("\(count) Boost").font(.headline).foregroundStyle(colors.primaryText)
+                Text("\(count) " + "Boost".localized).font(.headline).foregroundStyle(colors.primaryText)
                 if isPopular {
-                    Text("EN İYİ").font(.caption.bold()).foregroundStyle(.black).padding(.horizontal, 6).padding(.vertical, 2).background(Color.green, in: Capsule())
+                    Text("EN İYİ".localized).font(.caption.bold()).foregroundStyle(.black).padding(.horizontal, 6).padding(.vertical, 2).background(Color.green, in: Capsule())
                 }
                 Spacer()
                 Text(price).font(.headline).foregroundStyle(isPopular ? .green : colors.primaryText)
@@ -2000,7 +2261,7 @@ struct BoostDiamondCombinedSheet: View {
             let db = Firestore.firestore()
             let docRef = db.collection("users").document(uid)
             
-            try await db.runTransaction { (transaction, errorPointer) -> Any? in
+            _ = try await db.runTransaction { (transaction, errorPointer) -> Any? in
                 let snapshot: DocumentSnapshot
                 do { snapshot = try transaction.getDocument(docRef) }
                 catch let e as NSError { errorPointer?.pointee = e; return nil }

@@ -31,8 +31,8 @@ struct FavoritesSheet: View {
                 } else if favorites.isEmpty {
                     GlassEmptyState(
                         icon: "star",
-                        title: "no_favorites",
-                        message: "no_favorites_message"
+                        title: "no_favorites".localized,
+                        message: "no_favorites_message".localized
                     )
                 } else {
                     ScrollView {
@@ -45,12 +45,12 @@ struct FavoritesSheet: View {
                     }
                 }
             }
-            .navigationTitle("favorites")
+            .navigationTitle("favorites".localized)
             .navigationBarTitleDisplayMode(.inline)
             .toolbarColorScheme(isDark ? .dark : .light, for: .navigationBar)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button("done") { dismiss() }
+                    Button("done".localized) { dismiss() }
                         .foregroundStyle(colors.accent)
                 }
             }
@@ -128,8 +128,8 @@ struct IncomingRequestsSheet: View {
                 } else if requests.isEmpty {
                     GlassEmptyState(
                         icon: "tray",
-                        title: "no_requests",
-                        message: "no_requests_message"
+                        title: "no_requests".localized,
+                        message: "no_requests_message".localized
                     )
                 } else {
                     ScrollView {
@@ -146,12 +146,12 @@ struct IncomingRequestsSheet: View {
                     }
                 }
             }
-            .navigationTitle("requests")
+            .navigationTitle("requests".localized)
             .navigationBarTitleDisplayMode(.inline)
             .toolbarColorScheme(isDark ? .dark : .light, for: .navigationBar)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button("done") { dismiss() }
+                    Button("done".localized) { dismiss() }
                         .foregroundStyle(colors.accent)
                 }
             }
@@ -227,11 +227,11 @@ struct BoostSheet: View {
                                 .foregroundStyle(.orange)
                         }
                         
-                        Text("boost_your_profile")
+                        Text("boost_your_profile".localized)
                             .font(.title2.weight(.bold))
                             .foregroundStyle(colors.primaryText)
                         
-                        Text("boost_description")
+                        Text("boost_description".localized)
                             .font(.subheadline)
                             .foregroundStyle(colors.secondaryText)
                             .multilineTextAlignment(.center)
@@ -303,7 +303,7 @@ struct BoostOptionRow: View {
                     Text(product.name)
                         .font(.headline)
                         .foregroundStyle(colors.primaryText)
-                    Text("boost_benefit")
+                    Text("boost_benefit".localized)
                         .font(.caption)
                         .foregroundStyle(colors.secondaryText)
                 }
@@ -361,16 +361,16 @@ struct LikedYouSheet: View {
                                 .foregroundStyle(.pink)
                         }
                         
-                        Text("see_who_liked_you")
+                        Text("see_who_liked_you".localized)
                             .font(.title2.weight(.bold))
                             .foregroundStyle(colors.primaryText)
                         
-                        Text("premium_required_likes")
+                        Text("premium_required_likes".localized)
                             .font(.subheadline)
                             .foregroundStyle(colors.secondaryText)
                             .multilineTextAlignment(.center)
                         
-                        GlassButton("upgrade_to_premium", icon: "crown.fill", style: .accent) {
+                        GlassButton("upgrade_to_premium".localized, icon: "crown.fill", style: .accent) {
                             // Show premium
                         }
                         .frame(width: 220)
@@ -381,8 +381,8 @@ struct LikedYouSheet: View {
                 } else if likes.isEmpty {
                     GlassEmptyState(
                         icon: "heart",
-                        title: "no_likes_yet",
-                        message: "no_likes_message"
+                        title: "no_likes_yet".localized,
+                        message: "no_likes_message".localized
                     )
                 } else {
                     ScrollView {
@@ -395,12 +395,12 @@ struct LikedYouSheet: View {
                     }
                 }
             }
-            .navigationTitle("liked_you")
+            .navigationTitle("liked_you".localized)
             .navigationBarTitleDisplayMode(.inline)
             .toolbarColorScheme(isDark ? .dark : .light, for: .navigationBar)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button("done") { dismiss() }
+                    Button("done".localized) { dismiss() }
                         .foregroundStyle(colors.accent)
                 }
             }
@@ -482,7 +482,7 @@ struct SearchSheet: View {
                         Image(systemName: "magnifyingglass")
                             .foregroundStyle(colors.secondaryText)
                         
-                        TextField("search_users", text: $searchText)
+                        TextField("search_users".localized, text: $searchText)
                             .textFieldStyle(.plain)
                             .foregroundStyle(colors.primaryText)
                     }
@@ -493,7 +493,7 @@ struct SearchSheet: View {
                     
                     if searchText.isEmpty {
                         Spacer()
-                        Text("search_hint")
+                        Text("search_hint".localized)
                             .font(.subheadline)
                             .foregroundStyle(colors.secondaryText)
                         Spacer()
@@ -505,12 +505,12 @@ struct SearchSheet: View {
                     }
                 }
             }
-            .navigationTitle("search")
+            .navigationTitle("search".localized)
             .navigationBarTitleDisplayMode(.inline)
             .toolbarColorScheme(isDark ? .dark : .light, for: .navigationBar)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button("cancel") { dismiss() }
+                    Button("cancel".localized) { dismiss() }
                         .foregroundStyle(colors.accent)
                 }
             }
@@ -570,7 +570,7 @@ struct DiamondScreen: View {
                     }
                 }
             }
-            .navigationTitle("Elmaslarım")
+            .navigationTitle("Elmaslarım".localized)
             .navigationBarTitleDisplayMode(.inline)
             .toolbarColorScheme(isDark ? .dark : .light, for: .navigationBar)
             .toolbar {
@@ -611,7 +611,7 @@ struct DiamondScreen: View {
                     .font(.system(size: 56, weight: .bold, design: .rounded))
                     .foregroundStyle(colors.primaryText)
                 
-                Text("Elmas")
+                Text("Elmas".localized)
                     .font(.title3.weight(.medium))
                     .foregroundStyle(colors.secondaryText)
             }
@@ -638,7 +638,7 @@ struct DiamondScreen: View {
         VStack(spacing: 16) {
             HStack {
                 Image(systemName: "gift.fill").foregroundStyle(.orange)
-                Text("Günlük Ödül").font(.headline).foregroundStyle(colors.primaryText)
+                Text("Günlük Ödül".localized).font(.headline).foregroundStyle(colors.primaryText)
                 Spacer()
                 Text("+100").font(.headline.weight(.bold)).foregroundStyle(colors.primaryText)
                 Image("diamond-icon")
@@ -652,7 +652,7 @@ struct DiamondScreen: View {
                 Button { Task { await claimReward() } } label: {
                     HStack {
                         if isClaiming { ProgressView().tint(.white) }
-                        else { Image(systemName: "gift.fill"); Text("Ödülümü Al") }
+                        else { Image(systemName: "gift.fill"); Text("Ödülümü Al".localized) }
                     }
                     .font(.headline)
                     .foregroundStyle(.white)
@@ -665,10 +665,10 @@ struct DiamondScreen: View {
                 VStack(spacing: 8) {
                     HStack {
                         Image(systemName: "checkmark.circle.fill").foregroundStyle(.green)
-                        Text("Bugünkü ödülünü aldın!").font(.subheadline).foregroundStyle(colors.secondaryText)
+                        Text("Bugünkü ödülünü aldın!".localized).font(.subheadline).foregroundStyle(colors.secondaryText)
                     }
                     if let time = timeUntilNextReward, time > 0 {
-                        Text("Yeni ödül: \(formatTime(time))").font(.caption).foregroundStyle(colors.tertiaryText)
+                        Text("Yeni ödül:".localized + " \(formatTime(time))").font(.caption).foregroundStyle(colors.tertiaryText)
                     }
                 }
                 .frame(maxWidth: .infinity)
@@ -683,12 +683,12 @@ struct DiamondScreen: View {
     
     private var purchaseSection: some View {
         VStack(spacing: 16) {
-            Text("Elmas Satın Al").font(.headline).foregroundStyle(colors.primaryText)
+            Text("Elmas Satın Al".localized).font(.headline).foregroundStyle(colors.primaryText)
             
             VStack(spacing: 12) {
                 DiamondPurchaseOption(amount: 100, price: "₺9,99", colors: colors)
-                DiamondPurchaseOption(amount: 500, price: "₺39,99", colors: colors, badge: "Popüler")
-                DiamondPurchaseOption(amount: 1000, price: "₺69,99", colors: colors, badge: "En İyi Değer")
+                DiamondPurchaseOption(amount: 500, price: "₺39,99", colors: colors, badge: "Popüler".localized)
+                DiamondPurchaseOption(amount: 1000, price: "₺69,99", colors: colors, badge: "En İyi Değer".localized)
             }
         }
         .padding(20)
@@ -698,15 +698,15 @@ struct DiamondScreen: View {
     
     private var infoSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Elmas Nasıl Kullanılır?").font(.headline).foregroundStyle(colors.primaryText)
+            Text("Elmas Nasıl Kullanılır?".localized).font(.headline).foregroundStyle(colors.primaryText)
             
             HStack(spacing: 12) {
                 Image(systemName: "heart.fill").foregroundStyle(.pink).frame(width: 24)
-                Text("Eşleşme isteği göndermek: 10 elmas").font(.subheadline).foregroundStyle(colors.secondaryText)
+                Text("Eşleşme isteği göndermek: 10 elmas".localized).font(.subheadline).foregroundStyle(colors.secondaryText)
             }
             HStack(spacing: 12) {
                 Image(systemName: "gift.fill").foregroundStyle(.orange).frame(width: 24)
-                Text("Her gün ücretsiz 100 elmas al").font(.subheadline).foregroundStyle(colors.secondaryText)
+                Text("Her gün ücretsiz 100 elmas al".localized).font(.subheadline).foregroundStyle(colors.secondaryText)
             }
         }
         .padding(20)

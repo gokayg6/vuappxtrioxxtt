@@ -2,7 +2,7 @@ import SwiftUI
 import FirebaseAuth
 import FirebaseFirestore
 
-// MARK: - Beğenenler View (Tinder Style Redesign)
+// MARK: - Beğenenler View (Premium Clean Redesign)
 
 struct FavoritesView: View {
     @State private var selectedTab: LikesTab = .likes
@@ -27,11 +27,14 @@ struct FavoritesView: View {
     var body: some View {
         NavigationStack {
             ZStack {
+                // Background - Clean System Background
                 colors.background.ignoresSafeArea()
                 
                 VStack(spacing: 0) {
-                    // Tab Selector
-                    tabSelector
+                    // Custom Clean Tab Selector
+                    glassTabSelector
+                        .padding(.top, 10)
+                        .padding(.bottom, 16)
                     
                     // Content
                     TabView(selection: $selectedTab) {
@@ -46,7 +49,7 @@ struct FavoritesView: View {
                     .tabViewStyle(.page(indexDisplayMode: .never))
                 }
             }
-            .navigationTitle("Beğenenler")
+            .navigationTitle("Beğenenler".localized)
             .navigationBarTitleDisplayMode(.large)
             .toolbarColorScheme(isDark ? .dark : .light, for: .navigationBar)
             .sheet(isPresented: $showPremiumSheet) {
@@ -57,144 +60,135 @@ struct FavoritesView: View {
             }
             .onAppear { loadData() }
             .onChange(of: selectedTab) { _, _ in
-                // Tab değiştiğinde trigger'ı sıfırla
                 hasTriggeredPremium = false
             }
         }
     }
     
-    // MARK: - Tab Selector
-    private var tabSelector: some View {
+    // MARK: - Glass Tab Selector
+    private var glassTabSelector: some View {
         HStack(spacing: 0) {
-            // Beğeni Tab
-            Button {
-                withAnimation(.easeInOut(duration: 0.2)) { selectedTab = .likes }
-            } label: {
-                VStack(spacing: 8) {
-                    Text("\(likedByUsers.count) Beğeni")
-                        .font(.system(size: 15, weight: selectedTab == .likes ? .bold : .medium))
-                        .foregroundStyle(selectedTab == .likes ? colors.primaryText : colors.secondaryText)
-                    
-                    Rectangle()
-                        .fill(selectedTab == .likes ? colors.accent : .clear)
-                        .frame(height: 2)
-                }
-            }
-            .frame(maxWidth: .infinity)
-            
-            // En Seçkin Profiller Tab
-            Button {
-                withAnimation(.easeInOut(duration: 0.2)) { selectedTab = .topPicks }
-            } label: {
-                VStack(spacing: 8) {
-                    Text("\(topPickUsers.count) En Seçkin Profil")
-                        .font(.system(size: 15, weight: selectedTab == .topPicks ? .bold : .medium))
-                        .foregroundStyle(selectedTab == .topPicks ? colors.primaryText : colors.secondaryText)
-                    
-                    Rectangle()
-                        .fill(selectedTab == .topPicks ? colors.accent : .clear)
-                        .frame(height: 2)
-                }
-            }
-            .frame(maxWidth: .infinity)
+            tabButton(title: "Beğeniler".localized, count: likedByUsers.count, tab: .likes)
+            tabButton(title: "Seçkinler".localized, count: topPickUsers.count, tab: .topPicks)
         }
+        .padding(4)
+        .background(
+            Capsule()
+                .fill(isDark ? Color.white.opacity(0.1) : Color.black.opacity(0.05))
+                .background(.ultraThinMaterial, in: Capsule())
+        )
         .padding(.horizontal, 16)
-        .padding(.top, 8)
     }
     
-    // MARK: - Likes Tab Content (Seni Beğenenler)
+    private func tabButton(title: String, count: Int, tab: LikesTab) -> some View {
+        let isSelected = selectedTab == tab
+        
+        return Button {
+            withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                selectedTab = tab
+            }
+        } label: {
+            HStack(spacing: 6) {
+                Text(title)
+                    .font(.system(size: 14, weight: .semibold))
+                
+                if count > 0 {
+                    Text("\(count)")
+                        .font(.system(size: 11, weight: .bold))
+                        .padding(.horizontal, 6)
+                        .padding(.vertical, 2)
+                        .background(
+                            Capsule()
+                                .fill(isSelected ? (isDark ? Color.black.opacity(0.2) : Color.white.opacity(0.3)) : Color.gray.opacity(0.2))
+                        )
+                }
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 10)
+            .background(
+                Capsule()
+                    .fill(isSelected ? (isDark ? Color.white : Color.black) : Color.clear)
+            )
+            .foregroundStyle(isSelected ? (isDark ? Color.black : Color.white) : colors.secondaryText)
+        }
+    }
+    
+    // MARK: - Likes Tab Content
     private var likesTabContent: some View {
         ScrollView(showsIndicators: false) {
-            VStack(spacing: 16) {
-                // Premium upsell message
+            VStack(spacing: 20) {
+                // Premium Banner if not Premium
                 if !appState.isPremium {
-                    Text("Seni beğenen kişileri\ngörmek için Gold'a yükselt")
-                        .font(.system(size: 15))
-                        .foregroundStyle(colors.secondaryText)
-                        .multilineTextAlignment(.center)
-                        .padding(.top, 8)
+                    premiumUpsellCard(
+                        title: "Seni Beğenenleri Gör".localized,
+                        subtitle: "Gold üyeler seni beğenen herkesi anında görür ve eşleşir.".localized,
+                        icon: "heart.fill",
+                        color: .pink
+                    )
+                    .padding(.horizontal, 16)
                 }
                 
-                // Grid - 2 columns with proper spacing
-                LazyVGrid(columns: [
-                    GridItem(.flexible(), spacing: 12),
-                    GridItem(.flexible(), spacing: 12)
-                ], spacing: 16) {
-                    ForEach(likedByUsers) { user in
-                        LikeCardView(
-                            user: user,
-                            isBlurred: !appState.isPremium,
-                            showStar: true,
-                            colors: colors
-                        ) {
-                            if appState.isPremium {
-                                openProfile(user)
-                            } else {
-                                showPremiumSheet = true
+                // Real Data Grid
+                if likedByUsers.isEmpty {
+                    emptyStateView(
+                        icon: "star.slash",
+                        title: "Henüz Superlike Yok".localized,
+                        subtitle: "Seni çok beğenen özel biri olduğunda burada görünecek.".localized
+                    )
+                    .padding(.top, 40)
+                } else {
+                    LazyVGrid(columns: [
+                        GridItem(.flexible(), spacing: 12),
+                        GridItem(.flexible(), spacing: 12)
+                    ], spacing: 16) {
+                        ForEach(likedByUsers) { user in
+                            LikeCardView(
+                                user: user,
+                                isBlurred: !appState.isPremium,
+                                showStar: user.isSuperLike, // Show star if superlike
+                                colors: colors
+                            ) {
+                                if appState.isPremium {
+                                    openProfile(user)
+                                } else {
+                                    showPremiumSheet = true
+                                }
                             }
                         }
                     }
+                    .padding(.horizontal, 16)
                 }
-                .padding(.horizontal, 16)
                 
-                // Bottom CTA for non-premium
-                if !appState.isPremium {
-                    Spacer().frame(height: 80)
-                }
+                Spacer().frame(height: 100)
             }
             .padding(.top, 16)
-            .padding(.bottom, 120)
         }
         .overlay(alignment: .bottom) {
             if !appState.isPremium {
-                // Premium CTA Button - Gold Liquid Glass Design
-                Button {
-                    showPremiumSheet = true
-                } label: {
-                    HStack(spacing: 10) {
-                        Image(systemName: "eye.fill")
-                            .font(.system(size: 18))
-                        
-                        Text("Seni kimlerin beğendiğini gör")
-                            .font(.system(size: 16, weight: .bold))
-                    }
-                    .foregroundStyle(.black)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 16)
-                    .background(
-                        LinearGradient(
-                            colors: [
-                                Color(red: 1, green: 0.85, blue: 0.4),
-                                Color(red: 1, green: 0.75, blue: 0.25)
-                            ],
-                            startPoint: .top,
-                            endPoint: .bottom
-                        ),
-                        in: Capsule()
-                    )
-                    .shadow(color: .orange.opacity(0.4), radius: 12, y: 4)
-                }
-                .padding(.horizontal, 24)
-                .padding(.bottom, 100)
+                premiumFloatButton(
+                    text: "Seni Kimlerin Beğendiğini Gör".localized,
+                    icon: "eye.fill"
+                )
             }
         }
     }
     
-    // MARK: - Top Picks Tab Content (En Seçkin Profiller)
+    // MARK: - Top Picks Tab Content
     private var topPicksTabContent: some View {
         ZStack {
             ScrollView(showsIndicators: false) {
-                VStack(spacing: 16) {
-                    // Premium upsell message
+                VStack(spacing: 20) {
+                    
                     if !appState.isPremium {
-                        Text("Daha fazla En Seçkin Profil için\nVibeU Gold'a yükselt!")
-                            .font(.system(size: 15))
-                            .foregroundStyle(.yellow)
-                            .multilineTextAlignment(.center)
-                            .padding(.top, 8)
+                        premiumUpsellCard(
+                            title: "En Seçkin Profiller".localized,
+                            subtitle: "Sana özel seçilmiş en popüler kullanıcılarla tanış.".localized,
+                            icon: "star.fill",
+                            color: .yellow
+                        )
+                        .padding(.horizontal, 16)
                     }
                     
-                    // Grid - First 6 free, rest blurred
                     LazyVGrid(columns: [
                         GridItem(.flexible(), spacing: 12),
                         GridItem(.flexible(), spacing: 12)
@@ -214,19 +208,14 @@ struct FavoritesView: View {
                                 }
                             }
                             .background(
-                                // Scroll detection for locked items
                                 GeometryReader { geo in
                                     Color.clear
                                         .onChange(of: geo.frame(in: .global).minY) { _, newY in
-                                            // Blurlu karta scroll edildiğinde premium ekranını aç
                                             if index >= 6 && !hasTriggeredPremium && !appState.isPremium {
-                                                let screenHeight = UIScreen.main.bounds.height
-                                                // Kart ekranın ortasına geldiğinde tetikle
+                                                let screenHeight = (UIApplication.shared.connectedScenes.first as? UIWindowScene)?.screen.bounds.height ?? 800
                                                 if newY < screenHeight * 0.6 && newY > 0 {
                                                     hasTriggeredPremium = true
-                                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                                                        showPremiumSheet = true
-                                                    }
+                                                    showPremiumSheet = true
                                                 }
                                             }
                                         }
@@ -239,75 +228,124 @@ struct FavoritesView: View {
                     Spacer().frame(height: 120)
                 }
                 .padding(.top, 16)
-                .padding(.bottom, 120)
             }
             
-            // Bottom gradient fade overlay
-            if !appState.isPremium {
+            // Bottom gradient fade
+             if !appState.isPremium {
                 VStack {
                     Spacer()
-                    
-                    // Gölgeli fade efekti
                     LinearGradient(
                         colors: [
                             .clear,
-                            colors.background.opacity(0.3),
-                            colors.background.opacity(0.6),
-                            colors.background.opacity(0.85),
+                            colors.background.opacity(0.8),
                             colors.background
                         ],
                         startPoint: .top,
                         endPoint: .bottom
                     )
-                    .frame(height: 200)
+                    .frame(height: 150)
                     .allowsHitTesting(false)
                 }
             }
             
-            // Premium CTA Button overlay - Gold Design
+            // Premium Button Overlay
             if !appState.isPremium {
                 VStack {
                     Spacer()
-                    
-                    Button {
-                        showPremiumSheet = true
-                    } label: {
-                        HStack(spacing: 10) {
-                            Image(systemName: "crown.fill")
-                                .font(.system(size: 18))
-                                .foregroundStyle(
-                                    LinearGradient(
-                                        colors: [.yellow, .orange],
-                                        startPoint: .topLeading,
-                                        endPoint: .bottomTrailing
-                                    )
-                                )
-                            
-                            Text("EN SEÇKİN PROFİLLERİ AÇ")
-                                .font(.system(size: 15, weight: .bold))
-                        }
-                        .foregroundStyle(.black)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 16)
-                        .background(
-                            LinearGradient(
-                                colors: [
-                                    Color(red: 1, green: 0.85, blue: 0.4),
-                                    Color(red: 1, green: 0.75, blue: 0.25)
-                                ],
-                                startPoint: .top,
-                                endPoint: .bottom
-                            ),
-                            in: Capsule()
-                        )
-                        .shadow(color: .orange.opacity(0.4), radius: 12, y: 4)
-                    }
-                    .padding(.horizontal, 24)
-                    .padding(.bottom, 100)
+                    premiumFloatButton(
+                        text: "EN SEÇKİN PROFİLLERİ AÇ".localized,
+                        icon: "crown.fill",
+                        isGold: true
+                    )
                 }
             }
         }
     }
+    
+    // MARK: - Helper Views
+    
+    private func premiumUpsellCard(title: String, subtitle: String, icon: String, color: Color) -> some View {
+        HStack(spacing: 16) {
+            ZStack {
+                Circle()
+                    .fill(color.opacity(0.2))
+                    .frame(width: 44, height: 44)
+                
+                Image(systemName: icon)
+                    .font(.system(size: 20, weight: .bold))
+                    .foregroundStyle(color)
+            }
+            
+            VStack(alignment: .leading, spacing: 4) {
+                Text(title)
+                    .font(.system(size: 16, weight: .bold))
+                    .foregroundStyle(colors.primaryText)
+                
+                Text(subtitle)
+                    .font(.system(size: 13))
+                    .foregroundStyle(colors.secondaryText)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            
+            Spacer()
+        }
+        .padding(12)
+        .background(
+            RoundedRectangle(cornerRadius: 16)
+                .fill(colors.cardBackground)
+                .shadow(color: .black.opacity(0.05), radius: 5, y: 2)
+        )
+    }
+    
+    private func emptyStateView(icon: String, title: String, subtitle: String) -> some View {
+        VStack(spacing: 16) {
+            Image(systemName: icon)
+                .font(.system(size: 48))
+                .foregroundStyle(Color.gray.opacity(0.5))
+            
+            Text(title)
+                .font(.title3.weight(.bold))
+                .foregroundStyle(colors.primaryText)
+            
+            Text(subtitle)
+                .font(.body)
+                .foregroundStyle(colors.secondaryText)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, 32)
+        }
+    }
+    
+    private func premiumFloatButton(text: String, icon: String, isGold: Bool = false) -> some View {
+        Button {
+            showPremiumSheet = true
+        } label: {
+            HStack(spacing: 10) {
+                Image(systemName: icon)
+                    .font(.system(size: 18))
+                
+                Text(text)
+                    .font(.system(size: 16, weight: .bold))
+            }
+            .foregroundStyle(.black)
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 16)
+            .background(
+                LinearGradient(
+                    colors: isGold ? 
+                        [Color(red: 1, green: 0.85, blue: 0.4), Color(red: 1, green: 0.75, blue: 0.25)] : // Gold
+                        [Color(red: 1, green: 0.85, blue: 0.4), Color(red: 1, green: 0.75, blue: 0.25)], 
+                    startPoint: .top,
+                    endPoint: .bottom
+                ),
+                in: Capsule()
+            )
+            .shadow(color: .orange.opacity(0.4), radius: 12, y: 4)
+        }
+        .padding(.horizontal, 24)
+        .padding(.bottom, 30)
+    }
+    
+    // MARK: - Logic
     
     private func openProfile(_ user: LikeUser) {
         let photos = [UserPhoto(id: UUID().uuidString, url: user.photo, thumbnailURL: user.photo, orderIndex: 0, isPrimary: true)]
@@ -319,7 +357,7 @@ struct FavoritesView: View {
             city: user.city,
             country: "TR",
             countryFlag: "🇹🇷",
-            distanceKm: 0,
+            distanceKm: 2,
             profilePhotoURL: user.photo,
             photos: photos,
             tags: [],
@@ -334,92 +372,57 @@ struct FavoritesView: View {
         
         selectedUser = discoverUser
     }
-
-    // MARK: - Load Data
+    
     private func loadData() {
         Task {
             guard let uid = Auth.auth().currentUser?.uid else { return }
-            
             let db = Firestore.firestore()
             
             do {
-                // Fetch received likes from Firestore
+                // Fetch ONLY Superlikes (As requested: "Only when superlike... only then fall into likes")
                 let likesSnapshot = try await db.collection("likes")
                     .whereField("toUserId", isEqualTo: uid)
-                    .limit(to: 20)
+                    .whereField("type", isEqualTo: "superlike")
+                    .order(by: "createdAt", descending: true)
+                    .limit(to: 30)
                     .getDocuments()
                 
-                var fetchedLikedByUsers: [LikeUser] = []
+                var fetchedLikes: [LikeUser] = []
                 
                 for doc in likesSnapshot.documents {
                     let data = doc.data()
                     let fromUserId = data["fromUserId"] as? String ?? ""
-                    let type = data["type"] as? String ?? "like"
                     let createdAt = (data["createdAt"] as? Timestamp)?.dateValue() ?? Date()
                     
-                    // Fetch user info
                     if let userDoc = try? await db.collection("users").document(fromUserId).getDocument(),
                        let userData = userDoc.data() {
-                        let user = LikeUser(
+                        fetchedLikes.append(LikeUser(
                             id: doc.documentID,
                             name: userData["displayName"] as? String ?? "Kullanıcı",
                             age: userData["age"] as? Int ?? 0,
                             city: userData["city"] as? String ?? "",
                             photo: userData["profilePhotoURL"] as? String ?? "",
                             timeLeft: formatTimeAgo(createdAt),
-                            bio: type == "superlike" ? "⭐ SuperLike" : ""
-                        )
-                        fetchedLikedByUsers.append(user)
+                            bio: "Seni Superlike'ladı! ⭐".localized,
+                            isSuperLike: true
+                        ))
                     }
                 }
                 
-                // If no real likes, add mock likes from mockUsers
-                if fetchedLikedByUsers.isEmpty {
-                    let mockLikes = DiscoverUser.mockUsers.prefix(8).map { mockUser in
-                        LikeUser(
-                            id: mockUser.id,
-                            name: mockUser.displayName,
-                            age: mockUser.age,
-                            city: mockUser.city,
-                            photo: mockUser.profilePhotoURL,
-                            timeLeft: ["5 dk önce", "12 dk önce", "1 saat önce", "3 saat önce"].randomElement()!,
-                            bio: mockUser.isBoosted ? "⭐ SuperLike" : ""
-                        )
-                    }
-                    fetchedLikedByUsers = mockLikes
+                // Top Picks (Still Mock for now as it's a premium algorithm usually)
+                let picks = DiscoverUser.mockUsers.sorted { $0.score > $1.score }.prefix(12).map { u in
+                    LikeUser(id: u.id, name: u.displayName, age: u.age, city: u.city, photo: u.profilePhotoURL, timeLeft: "Popüler".localized, bio: "", isSuperLike: false)
                 }
-                
-                // Fetch top profiles - use mock data directly for reliability
-                let topPicksFromMock = DiscoverUser.mockUsers
-                    .sorted { $0.score > $1.score }
-                    .prefix(10)
-                    .map { mockUser in
-                        LikeUser(
-                            id: mockUser.id,
-                            name: mockUser.displayName,
-                            age: mockUser.age,
-                            city: mockUser.city,
-                            photo: mockUser.profilePhotoURL,
-                            timeLeft: mockUser.isBoosted ? "🚀 Boost" : "",
-                            bio: ""
-                        )
-                    }
                 
                 await MainActor.run {
-                    likedByUsers = fetchedLikedByUsers
-                    topPickUsers = Array(topPicksFromMock)
+                    self.likedByUsers = fetchedLikes
+                    self.topPickUsers = Array(picks)
                 }
+                
             } catch {
-                print("❌ [FavoritesView] Error loading data: \(error)")
-                
-                // Fallback to mock data on error
+                print("Error loading likes: \(error)")
                 await MainActor.run {
-                    likedByUsers = DiscoverUser.mockUsers.prefix(8).map { u in
-                        LikeUser(id: u.id, name: u.displayName, age: u.age, city: u.city, photo: u.profilePhotoURL, timeLeft: "Yeni", bio: "")
-                    }
-                    topPickUsers = DiscoverUser.mockUsers.sorted { $0.score > $1.score }.prefix(10).map { u in
-                        LikeUser(id: u.id, name: u.displayName, age: u.age, city: u.city, photo: u.profilePhotoURL, timeLeft: u.isBoosted ? "🚀" : "", bio: "")
-                    }
+                    self.likedByUsers = []
                 }
             }
         }
@@ -427,23 +430,11 @@ struct FavoritesView: View {
     
     private func formatTimeAgo(_ date: Date) -> String {
         let interval = Date().timeIntervalSince(date)
-        
-        if interval < 60 {
-            return "Az önce"
-        } else if interval < 3600 {
-            return "\(Int(interval / 60)) dk önce"
-        } else if interval < 86400 {
-            return "\(Int(interval / 3600)) saat önce"
-        } else {
-            return "\(Int(interval / 86400)) gün önce"
-        }
+        if interval < 60 { return "Az önce" }
+        else if interval < 3600 { return "\(Int(interval / 60)) dk" }
+        else if interval < 86400 { return "\(Int(interval / 3600)) sa" }
+        else { return "\(Int(interval / 86400)) gn" }
     }
-}
-
-// MARK: - Tab Enum
-enum LikesTab {
-    case likes
-    case topPicks
 }
 
 // MARK: - Like User Model
@@ -455,125 +446,143 @@ struct LikeUser: Identifiable {
     let photo: String
     let timeLeft: String
     let bio: String
+    let isSuperLike: Bool
 }
 
-// MARK: - Like Card View Component (Liquid Glass Design)
+// MARK: - Enums
+enum LikesTab {
+    case likes
+    case topPicks
+}
+
+// MARK: - New Premium Like Card
 struct LikeCardView: View {
     let user: LikeUser
-    var isBlurred: Bool = false
-    var showStar: Bool = false
+    var isBlurred: Bool
+    var showStar: Bool
     var showTimeLeft: Bool = false
-    var colors: ThemeColors = .dark
+    var colors: ThemeColors
     let onTap: () -> Void
-    
-    private var isDark: Bool { colors.background == ThemeColors.dark.background }
     
     var body: some View {
         Button(action: onTap) {
             GeometryReader { geo in
                 ZStack(alignment: .bottom) {
-                    // Photo - fills entire card - NO BLUR for unlocked
+                    // Image Layer
                     AsyncImage(url: URL(string: user.photo)) { phase in
-                        switch phase {
-                        case .success(let image):
+                        if let image = phase.image {
                             image
                                 .resizable()
                                 .aspectRatio(contentMode: .fill)
                                 .frame(width: geo.size.width, height: geo.size.height)
                                 .clipped()
-                                .blur(radius: isBlurred ? 20 : 0)
-                        case .failure:
+                                .blur(radius: isBlurred ? 15 : 0)
+                        } else {
                             Rectangle()
-                                .fill(colors.secondaryBackground)
-                                .overlay(
-                                    Image(systemName: "person.fill")
-                                        .font(.system(size: 40))
-                                        .foregroundStyle(colors.tertiaryText)
-                                )
-                        case .empty:
-                            Rectangle()
-                                .fill(colors.secondaryBackground)
-                                .overlay(ProgressView().tint(colors.secondaryText))
-                        @unknown default:
-                            Rectangle().fill(colors.secondaryBackground)
+                                .fill(Color.gray.opacity(0.2))
                         }
                     }
                     
-                    // Bottom gradient overlay for text readability
+                    // Gradient Overlay
                     LinearGradient(
-                        colors: [.clear, .clear, .black.opacity(0.5), .black.opacity(0.8)],
-                        startPoint: .top,
+                        colors: [.clear, .black.opacity(0.6), .black.opacity(0.9)],
+                        startPoint: .center,
                         endPoint: .bottom
                     )
                     
-                    // Content overlay at bottom
+                    // Content
                     VStack(alignment: .leading, spacing: 4) {
-                        Spacer()
-                        
-                        // Name & Age with Star
-                        HStack(spacing: 4) {
+                        HStack {
                             if isBlurred {
-                                RoundedRectangle(cornerRadius: 4)
-                                    .fill(.white.opacity(0.5))
-                                    .frame(width: 60, height: 16)
+                                CapsuledText(text: "Gizli".localized, color: .white.opacity(0.7))
                             } else {
                                 Text("\(user.name), \(user.age)")
-                                    .font(.system(size: 15, weight: .bold))
+                                    .font(.system(size: 16, weight: .bold))
                                     .foregroundStyle(.white)
+                                    .lineLimit(1)
                             }
                             
                             Spacer()
                             
-                            if showStar {
+                            if showStar { // Superlike Indicator
                                 Image(systemName: "star.fill")
-                                    .font(.system(size: 16))
-                                    .foregroundStyle(.cyan)
+                                    .foregroundStyle(.yellow)
+                                    .font(.system(size: 14))
+                                    .padding(4)
+                                    .background(.ultraThinMaterial, in: Circle())
                             }
                         }
                         
-                        // City
                         if !isBlurred {
-                            HStack(spacing: 4) {
-                                Image(systemName: "location.fill")
-                                    .font(.system(size: 10))
-                                Text(user.city)
-                                    .font(.system(size: 12))
-                            }
-                            .foregroundStyle(.white.opacity(0.8))
+                            Text(user.city)
+                                .font(.system(size: 12))
+                                .foregroundStyle(.white.opacity(0.8))
                         }
                         
-                        // Time left
                         if showTimeLeft {
-                            Text(isBlurred ? "••••••" : user.timeLeft)
-                                .font(.system(size: 11, weight: .medium))
-                                .foregroundStyle(.yellow)
+                            HStack(spacing: 4) {
+                                Image(systemName: "clock")
+                                    .font(.system(size: 10))
+                                Text(user.timeLeft)
+                                    .font(.system(size: 11))
+                            }
+                            .foregroundStyle(.yellow.opacity(0.9))
                         }
                     }
                     .padding(12)
-                    .frame(maxWidth: .infinity, alignment: .leading)
                     
-                    // Lock icon for blurred cards
+                    // Lock Overlay
                     if isBlurred {
-                        VStack {
-                            ZStack {
-                                Circle()
-                                    .fill(.black.opacity(0.5))
-                                    .frame(width: 56, height: 56)
-                                
-                                Image(systemName: "lock.fill")
-                                    .font(.system(size: 24))
-                                    .foregroundStyle(.white)
-                            }
+                        ZStack {
+                            Circle()
+                                .fill(.ultraThinMaterial)
+                                .frame(width: 50, height: 50)
+                            
+                            Image(systemName: "lock.fill")
+                                .font(.system(size: 20))
+                                .foregroundStyle(.white)
                         }
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                     }
                 }
+                // Superlike Border
+                .overlay(
+                    RoundedRectangle(cornerRadius: 20)
+                        .stroke(user.isSuperLike ? Color.yellow : Color.clear, lineWidth: user.isSuperLike ? 3 : 0)
+                )
             }
             .aspectRatio(3/4, contentMode: .fit)
-            .clipShape(RoundedRectangle(cornerRadius: 16))
-            .shadow(color: .black.opacity(isDark ? 0.3 : 0.15), radius: 8, y: 4)
+            .clipShape(RoundedRectangle(cornerRadius: 20))
+            .shadow(color: .black.opacity(0.1), radius: 8, x: 0, y: 4)
+            .overlay(
+                RoundedRectangle(cornerRadius: 20)
+                    .stroke(LinearGradient(colors: [.white.opacity(0.3), .clear], startPoint: .topLeading, endPoint: .bottomTrailing), lineWidth: 1)
+            )
         }
-        .buttonStyle(.plain)
+        .buttonStyle(FavoritesScaleButtonStyle())
+    }
+}
+
+// MARK: - Helpers
+struct CapsuledText: View {
+    let text: String
+    let color: Color
+    
+    var body: some View {
+        Text(text)
+            .font(.system(size: 12, weight: .semibold))
+            .foregroundStyle(color)
+            .padding(.horizontal, 8)
+            .padding(.vertical, 4)
+            .background(.ultraThinMaterial, in: Capsule())
+    }
+}
+
+struct FavoritesScaleButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .scaleEffect(configuration.isPressed ? 0.96 : 1.0)
+            .animation(.spring(response: 0.3, dampingFraction: 0.6), value: configuration.isPressed)
     }
 }
 

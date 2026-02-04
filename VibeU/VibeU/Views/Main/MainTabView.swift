@@ -37,37 +37,42 @@ struct MainTabView: View {
                 DiscoverView()
                     .tabItem {
                         TabIcon(name: "sparkles", isSelected: selectedTab == .home, isDark: isDark)
-                        Text("Keşfet")
+                        Text("Keşfet".localized)
                     }
+
                     .tag(MainTab.home)
                 
                 ExploreViewNew()
                     .tabItem {
                         TabIcon(name: "safari", isSelected: selectedTab == .explore, isDark: isDark)
-                        Text("Göz At")
+                        Text("Göz At".localized)
                     }
+
                     .tag(MainTab.explore)
                 
                 FavoritesView()
                     .tabItem {
                         TabIcon(name: "heart", isSelected: selectedTab == .likes, isDark: isDark)
-                        Text("Beğenenler")
+                        Text("Beğenenler".localized)
                     }
+
                     .tag(MainTab.likes)
                     .badge(likesCount > 0 ? likesCount : 0)
                 
                 FriendsView()
                     .tabItem {
                         TabIcon(name: "person.2", isSelected: selectedTab == .friends, isDark: isDark)
-                        Text("Arkadaşlar")
+                        Text("Arkadaşlar".localized)
                     }
+
                     .tag(MainTab.friends)
                 
                 ProfileView()
                     .tabItem {
                         TabIcon(name: "person", isSelected: selectedTab == .profile, isDark: isDark)
-                        Text("Profil")
+                        Text("Profil".localized)
                     }
+
                     .tag(MainTab.profile)
             }
             .tint(isDark ? .white : .black)
@@ -144,9 +149,10 @@ struct MainTabView: View {
                                 .tint(.black)
                         } else {
                             Image(systemName: "play.rectangle.fill")
-                            Text("Reklam İzle & Kazan")
+                            Text("Reklam İzle & Kazan".localized)
                         }
                     }
+
                     .font(.system(size: 17, weight: .bold))
                     .foregroundStyle(.black)
                     .frame(maxWidth: .infinity)
@@ -266,12 +272,8 @@ struct MainTabView: View {
     }
     
     private func loadCounts() async {
-        do {
-            // Load likes count from service if available
-            // For now using static value
-        } catch {
-            print("Failed to load counts: \(error)")
-        }
+        // Load likes count from service if available
+        // For now using static value
     }
 }
 
@@ -320,15 +322,16 @@ struct MainLikesView: View {
                             .font(.system(size: 40))
                             .foregroundStyle(colors.secondaryText.opacity(0.5))
                         
-                        Text("Henüz Beğeni Yok")
+                        Text("Henüz Beğeni Yok".localized)
                             .font(.headline)
                             .foregroundStyle(colors.primaryText)
                         
-                        Text("Seni beğenen kişiler burada görünecek.")
+                        Text("Seni beğenen kişiler burada görünecek.".localized)
                             .font(.subheadline)
                             .foregroundStyle(colors.secondaryText)
                             .multilineTextAlignment(.center)
                     }
+
                     .padding(.top, 50)
                 }
                         
@@ -358,9 +361,10 @@ struct MainLikesView: View {
                         HStack(spacing: 8) {
                             Image(systemName: "crown.fill")
                                 .font(.system(size: 18))
-                            Text("Seni kimlerin beğendiğini gör")
+                            Text("Seni kimlerin beğendiğini gör".localized)
                                 .font(.system(size: 16, weight: .bold))
                         }
+
                         .foregroundStyle(isDark ? colors.background : .white)
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 16)
@@ -371,8 +375,9 @@ struct MainLikesView: View {
                     .padding(.bottom, 90)
                 }
             }
-            .navigationTitle("Beğenenler")
+            .navigationTitle("Beğenenler".localized)
             .navigationBarTitleDisplayMode(.large)
+
             .toolbarBackground(colors.background, for: .navigationBar)
             .toolbarBackground(.visible, for: .navigationBar)
             .toolbarColorScheme(isDark ? .dark : .light, for: .navigationBar)

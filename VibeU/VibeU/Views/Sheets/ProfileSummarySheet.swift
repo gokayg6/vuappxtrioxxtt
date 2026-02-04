@@ -179,7 +179,7 @@ struct ProfileSummarySheet: View {
         Task {
             do {
                 guard let currentUserId = Auth.auth().currentUser?.uid,
-                      let currentUserName = appState.currentUser?.displayName else {
+                      appState.currentUser?.displayName != nil else {
                     await MainActor.run {
                         isLoading = false
                         onSendRequest(false, "Kullanıcı bulunamadı")

@@ -14,6 +14,9 @@ class AppDelegate: NSObject, UIApplicationDelegate {
         settings.cacheSettings = PersistentCacheSettings(sizeBytes: FirestoreCacheSizeUnlimited as NSNumber)
         Firestore.firestore().settings = settings
         
+        // Initialize AdMob
+        AdMobManager.shared.initialize()
+        
         return true
     }
     
@@ -40,6 +43,7 @@ struct VibeUApp: App {
     @State private var deepLinkUser: DiscoverUser?
     @State private var showDeepLinkProfile: Bool = false
     @State private var isLoadingDeepLink: Bool = false
+    @StateObject private var languageManager = LanguageManager.shared
     @Environment(\.colorScheme) private var systemColorScheme
     
     private var activeTheme: ThemeColors {
@@ -54,6 +58,8 @@ struct VibeUApp: App {
         WindowGroup {
             RootView()
                 .environment(appState)
+                .environmentObject(languageManager)
+                .environment(\.locale, languageManager.locale)
                 .onOpenURL { url in
                     // Handle Google Sign In
                     if GIDSignIn.sharedInstance.handle(url) {

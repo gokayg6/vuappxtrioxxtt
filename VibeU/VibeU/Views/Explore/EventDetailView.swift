@@ -62,14 +62,14 @@ struct EventDetailView: View {
                             
                             // Info Cards
                             VStack(spacing: 12) {
-                                InfoRow(icon: "calendar", title: "Tarih", value: event.formattedDate, color: .orange)
-                                InfoRow(icon: "mappin.circle.fill", title: "Konum", value: event.location, color: .cyan)
-                                InfoRow(icon: "person.2.fill", title: "Katılımcılar", value: "\(event.attendees)/\(event.maxAttendees) kişi", color: .green)
+                                InfoRow(icon: "calendar", title: "Tarih".localized, value: event.formattedDate, color: .orange)
+                                InfoRow(icon: "mappin.circle.fill", title: "Konum".localized, value: event.location, color: .cyan)
+                                InfoRow(icon: "person.2.fill", title: "Katılımcılar".localized, value: "\(event.attendees)/\(event.maxAttendees) " + "kişi".localized, color: .green)
                             }
                             
                             // Description
                             VStack(alignment: .leading, spacing: 8) {
-                                Text("Açıklama")
+                                Text("Açıklama".localized)
                                     .font(.system(size: 18, weight: .bold))
                                     .foregroundStyle(colors.primaryText)
                                 
@@ -89,7 +89,7 @@ struct EventDetailView: View {
                                     HStack {
                                         Image(systemName: "ticket.fill")
                                             .font(.system(size: 18))
-                                        Text("Bilet Al")
+                                        Text("Bilet Al".localized)
                                             .font(.system(size: 16, weight: .semibold))
                                     }
                                     .foregroundStyle(.white)
@@ -109,7 +109,7 @@ struct EventDetailView: View {
                                 HStack {
                                     Image(systemName: "person.badge.plus.fill")
                                         .font(.system(size: 18))
-                                    Text("Etkinliğe Katıl")
+                                    Text("Etkinliğe Katıl".localized)
                                         .font(.system(size: 16, weight: .semibold))
                                 }
                                 .foregroundStyle(colors.primaryText)

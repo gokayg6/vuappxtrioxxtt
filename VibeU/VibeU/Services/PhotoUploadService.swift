@@ -164,7 +164,7 @@ final class PhotoUploadService: ObservableObject {
         uploadProgress = 0.2
         
         // Step 2: Compress to JPEG (40% progress)
-        guard let imageData = compressImage(resizedImage, quality: compressionQuality) else {
+        guard let _ = compressImage(resizedImage, quality: compressionQuality) else {
             let error = PhotoUploadError.compressionFailed
             lastError = error
             throw error
@@ -218,7 +218,7 @@ final class PhotoUploadService: ObservableObject {
         uploadProgress = 0.2
         
         // Step 2: Compress to JPEG
-        guard let imageData = compressImage(resizedImage, quality: compressionQuality) else {
+        guard let _ = compressImage(resizedImage, quality: compressionQuality) else {
             let error = PhotoUploadError.compressionFailed
             lastError = error
             throw error

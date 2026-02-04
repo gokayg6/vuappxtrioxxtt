@@ -21,6 +21,7 @@ struct DiscoverUser: Identifiable, Codable, Equatable, Hashable {
     let commonInterests: [String]
     let score: Double
     let isBoosted: Bool
+    let isVerified: Bool
     let tiktokUsername: String?
     let instagramUsername: String?
     let snapchatUsername: String?
@@ -35,6 +36,7 @@ struct DiscoverUser: Identifiable, Codable, Equatable, Hashable {
         case profilePhotoURL = "profile_photo_url"
         case commonInterests = "common_interests"
         case isBoosted = "is_boosted"
+        case isVerified = "is_verified"
         case tiktokUsername = "tiktok_username"
         case instagramUsername = "instagram_username"
         case snapchatUsername = "snapchat_username"
@@ -66,6 +68,7 @@ struct DiscoverUser: Identifiable, Codable, Equatable, Hashable {
         commonInterests: [String],
         score: Double,
         isBoosted: Bool,
+        isVerified: Bool = false,
         tiktokUsername: String? = nil,
         instagramUsername: String?,
         snapchatUsername: String?,
@@ -85,6 +88,7 @@ struct DiscoverUser: Identifiable, Codable, Equatable, Hashable {
         self.commonInterests = commonInterests
         self.score = score
         self.isBoosted = isBoosted
+        self.isVerified = isVerified
         self.tiktokUsername = tiktokUsername
         self.instagramUsername = instagramUsername
         self.snapchatUsername = snapchatUsername
@@ -128,6 +132,7 @@ extension DiscoverUser {
         self.commonInterests = [] // Can be computed contextually
         self.score = 0
         self.isBoosted = false
+        self.isVerified = user.isVerified
         self.tiktokUsername = user.socialLinks?.tiktok?.username
         self.instagramUsername = user.socialLinks?.instagram?.username
         self.snapchatUsername = user.socialLinks?.snapchat?.username
